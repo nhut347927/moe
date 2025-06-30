@@ -10,7 +10,7 @@ import com.moe.socialnetwork.api.dtos.DeleteDTO;
 import com.moe.socialnetwork.api.dtos.ListRolePerDTO;
 import com.moe.socialnetwork.api.dtos.RolePermissionDTO;
 import com.moe.socialnetwork.api.services.IRolePermissionService;
-import com.moe.socialnetwork.common.response.ResponseAPI;
+import com.moe.socialnetwork.response.ResponseAPI;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

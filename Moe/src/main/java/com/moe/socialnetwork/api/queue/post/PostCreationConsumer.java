@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moe.socialnetwork.api.services.impl.PostServiceImpl;
-import com.moe.socialnetwork.common.jpa.UserJpa;
-import com.moe.socialnetwork.common.models.User;
+import com.moe.socialnetwork.jpa.UserJpa;
+import com.moe.socialnetwork.models.User;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;

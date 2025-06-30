@@ -6,16 +6,16 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.moe.socialnetwork.common.models.Role;
+import com.moe.socialnetwork.models.Role;
 import com.moe.socialnetwork.api.dtos.DeleteDTO;
 import com.moe.socialnetwork.api.dtos.ListRolePerDTO;
 import com.moe.socialnetwork.api.dtos.RolePermissionDTO;
 import com.moe.socialnetwork.api.services.IRolePermissionService;
-import com.moe.socialnetwork.common.jpa.RoleJpa;
-import com.moe.socialnetwork.common.jpa.RolePermissionJpa;
-import com.moe.socialnetwork.common.jpa.UserJpa;
-import com.moe.socialnetwork.common.models.RolePermission;
-import com.moe.socialnetwork.common.models.User;
+import com.moe.socialnetwork.jpa.RoleJpa;
+import com.moe.socialnetwork.jpa.RolePermissionJpa;
+import com.moe.socialnetwork.jpa.UserJpa;
+import com.moe.socialnetwork.models.RolePermission;
+import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.exception.AppException;
 
 @Service

@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.moe.socialnetwork.api.dtos.ReportRequestDTO;
 import com.moe.socialnetwork.api.services.IReportService;
-import com.moe.socialnetwork.common.models.User;
-import com.moe.socialnetwork.common.response.ResponseAPI;
+import com.moe.socialnetwork.models.User;
+import com.moe.socialnetwork.response.ResponseAPI;
 
 import jakarta.validation.Valid;
 

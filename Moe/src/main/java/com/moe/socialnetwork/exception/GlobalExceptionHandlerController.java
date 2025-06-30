@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.moe.socialnetwork.api.services.impl.ActivityLogServiceImpl;
-import com.moe.socialnetwork.common.response.ResponseAPI;
+import com.moe.socialnetwork.response.ResponseAPI;
 
 @ControllerAdvice
 public class GlobalExceptionHandlerController {

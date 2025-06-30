@@ -15,11 +15,11 @@ import com.moe.socialnetwork.api.dtos.AccountDetailDTO;
 import com.moe.socialnetwork.api.dtos.AccountSearchResponseDTO;
 import com.moe.socialnetwork.api.services.IAccountService;
 import com.moe.socialnetwork.api.services.ICloudinaryService;
-import com.moe.socialnetwork.common.jpa.FollowerJpa;
-import com.moe.socialnetwork.common.jpa.PostJpa;
-import com.moe.socialnetwork.common.jpa.UserJpa;
-import com.moe.socialnetwork.common.models.Follower;
-import com.moe.socialnetwork.common.models.User;
+import com.moe.socialnetwork.jpa.FollowerJpa;
+import com.moe.socialnetwork.jpa.PostJpa;
+import com.moe.socialnetwork.jpa.UserJpa;
+import com.moe.socialnetwork.models.Follower;
+import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.exception.AppException;
 import com.moe.socialnetwork.util.Base64Util;
 

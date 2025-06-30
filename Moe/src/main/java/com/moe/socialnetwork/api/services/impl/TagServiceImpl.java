@@ -12,9 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.moe.socialnetwork.api.dtos.TagResponseDTO;
 import com.moe.socialnetwork.api.services.ITagService;
-import com.moe.socialnetwork.common.jpa.TagJpa;
-import com.moe.socialnetwork.common.models.Tag;
-import com.moe.socialnetwork.common.models.User;
+import com.moe.socialnetwork.jpa.TagJpa;
+import com.moe.socialnetwork.models.Tag;
+import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.exception.AppException;
 
 @Service

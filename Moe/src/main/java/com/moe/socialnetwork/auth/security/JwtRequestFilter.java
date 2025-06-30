@@ -14,7 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moe.socialnetwork.auth.services.impl.TokenServiceImpl;
-import com.moe.socialnetwork.common.response.ResponseAPI;
+import com.moe.socialnetwork.response.ResponseAPI;
 import com.moe.socialnetwork.exception.AppException;
 
 import io.jsonwebtoken.ExpiredJwtException;

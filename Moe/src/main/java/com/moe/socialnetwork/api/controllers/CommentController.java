@@ -7,8 +7,8 @@ import com.moe.socialnetwork.api.dtos.CreateReplyDto;
 import com.moe.socialnetwork.api.dtos.CodeDto;
 import com.moe.socialnetwork.api.dtos.ReplyDTO;
 import com.moe.socialnetwork.api.services.ICommentService;
-import com.moe.socialnetwork.common.models.User;
-import com.moe.socialnetwork.common.response.ResponseAPI;
+import com.moe.socialnetwork.models.User;
+import com.moe.socialnetwork.response.ResponseAPI;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

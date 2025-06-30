@@ -5,11 +5,11 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.moe.socialnetwork.api.services.IReportService;
-import com.moe.socialnetwork.common.jpa.PostJpa;
-import com.moe.socialnetwork.common.jpa.ReportJpa;
-import com.moe.socialnetwork.common.models.Post;
-import com.moe.socialnetwork.common.models.Report;
-import com.moe.socialnetwork.common.models.User;
+import com.moe.socialnetwork.jpa.PostJpa;
+import com.moe.socialnetwork.jpa.ReportJpa;
+import com.moe.socialnetwork.models.Post;
+import com.moe.socialnetwork.models.Report;
+import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.exception.AppException;
 
 @Service

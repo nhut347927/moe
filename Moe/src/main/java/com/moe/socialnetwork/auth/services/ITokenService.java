@@ -2,7 +2,7 @@ package com.moe.socialnetwork.auth.services;
 
 import java.time.LocalDateTime;
 
-import com.moe.socialnetwork.common.models.User;
+import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.exception.AppException;
 
 import io.jsonwebtoken.Claims;

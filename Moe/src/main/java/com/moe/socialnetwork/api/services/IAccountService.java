@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import com.moe.socialnetwork.api.dtos.AccountDetailDTO;
 import com.moe.socialnetwork.api.dtos.AccountSearchResponseDTO;
-import com.moe.socialnetwork.common.models.User;
+import com.moe.socialnetwork.models.User;
 
 public interface IAccountService {
     String updateImgAccUserFromBase64(String base64Data, User user);

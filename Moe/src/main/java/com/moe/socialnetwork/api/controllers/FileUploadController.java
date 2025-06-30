@@ -4,13 +4,12 @@ import com.moe.socialnetwork.api.dtos.CodeDto;
 import com.moe.socialnetwork.api.dtos.FileUploadRequestDTO;
 import com.moe.socialnetwork.api.services.ICloudinaryService;
 import com.moe.socialnetwork.api.services.impl.CloudinaryServiceImpl;
-import com.moe.socialnetwork.common.response.ResponseAPI;
+import com.moe.socialnetwork.response.ResponseAPI;
 
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 

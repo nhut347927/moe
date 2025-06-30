@@ -24,8 +24,8 @@ import com.moe.socialnetwork.auth.dtos.PasswordResetRequestDTO;
 import com.moe.socialnetwork.auth.dtos.UserRegisterResponseDTO;
 import com.moe.socialnetwork.auth.services.IAuthService;
 import com.moe.socialnetwork.auth.services.ITokenService;
-import com.moe.socialnetwork.common.models.User;
-import com.moe.socialnetwork.common.response.ResponseAPI;
+import com.moe.socialnetwork.models.User;
+import com.moe.socialnetwork.response.ResponseAPI;
 import jakarta.validation.Valid;
 
 @RestController

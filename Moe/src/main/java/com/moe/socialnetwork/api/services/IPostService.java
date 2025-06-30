@@ -6,7 +6,7 @@ import java.util.UUID;
 import com.moe.socialnetwork.api.dtos.PostCreateRepuestDTO;
 import com.moe.socialnetwork.api.dtos.PostResponseDTO;
 import com.moe.socialnetwork.api.dtos.PostSearchResponseDTO;
-import com.moe.socialnetwork.common.models.User;
+import com.moe.socialnetwork.models.User;
 
 public interface IPostService {
 	List<PostSearchResponseDTO> searchPosts(String keyword, int page, int size);

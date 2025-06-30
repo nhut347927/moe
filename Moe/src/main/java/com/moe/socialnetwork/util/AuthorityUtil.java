@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.moe.socialnetwork.common.models.RolePermission;
+import com.moe.socialnetwork.models.RolePermission;
 
 public class AuthorityUtil {
 

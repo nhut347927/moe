@@ -11,8 +11,8 @@ import com.moe.socialnetwork.api.dtos.KeyWordPageSize;
 import com.moe.socialnetwork.api.dtos.TagRequestDTO;
 import com.moe.socialnetwork.api.dtos.TagResponseDTO;
 import com.moe.socialnetwork.api.services.ITagService;
-import com.moe.socialnetwork.common.models.User;
-import com.moe.socialnetwork.common.response.ResponseAPI;
+import com.moe.socialnetwork.models.User;
+import com.moe.socialnetwork.response.ResponseAPI;
 
 import jakarta.validation.Valid;
 

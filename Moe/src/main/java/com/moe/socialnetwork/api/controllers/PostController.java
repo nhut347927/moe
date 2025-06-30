@@ -22,8 +22,8 @@ import com.moe.socialnetwork.api.dtos.PostSearchResponseDTO;
 import com.moe.socialnetwork.api.queue.post.PostCreationMessage;
 import com.moe.socialnetwork.api.services.IPostService;
 import com.moe.socialnetwork.api.queue.post.PostCreationProducer;
-import com.moe.socialnetwork.common.models.User;
-import com.moe.socialnetwork.common.response.ResponseAPI;
+import com.moe.socialnetwork.models.User;
+import com.moe.socialnetwork.response.ResponseAPI;
 
 import jakarta.validation.Valid;
 

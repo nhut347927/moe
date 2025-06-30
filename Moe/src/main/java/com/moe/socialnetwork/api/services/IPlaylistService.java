@@ -3,7 +3,7 @@ package com.moe.socialnetwork.api.services;
 import com.moe.socialnetwork.api.dtos.PlaylistDTO;
 import com.moe.socialnetwork.api.dtos.PlaylistPostDTO;
 import com.moe.socialnetwork.api.dtos.PlaylistSaveDTO;
-import com.moe.socialnetwork.common.models.User;
+import com.moe.socialnetwork.models.User;
 
 import java.util.List;
 import java.util.UUID;

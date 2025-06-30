@@ -2,7 +2,7 @@ package com.moe.socialnetwork.api.services;
 
 import com.moe.socialnetwork.api.dtos.CommentDTO;
 import com.moe.socialnetwork.api.dtos.ReplyDTO;
-import com.moe.socialnetwork.common.models.User;
+import com.moe.socialnetwork.models.User;
 
 import java.util.List;
 import java.util.UUID;

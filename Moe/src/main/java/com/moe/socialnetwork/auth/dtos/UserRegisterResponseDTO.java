@@ -2,7 +2,7 @@ package com.moe.socialnetwork.auth.dtos;
 
 import java.util.Set;
 
-import com.moe.socialnetwork.common.models.User.Gender;
+import com.moe.socialnetwork.models.User.Gender;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

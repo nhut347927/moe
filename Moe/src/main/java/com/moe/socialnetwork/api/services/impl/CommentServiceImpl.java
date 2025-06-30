@@ -3,13 +3,13 @@ package com.moe.socialnetwork.api.services.impl;
 import com.moe.socialnetwork.api.dtos.CommentDTO;
 import com.moe.socialnetwork.api.dtos.ReplyDTO;
 import com.moe.socialnetwork.api.services.ICommentService;
-import com.moe.socialnetwork.common.jpa.CommentJpa;
-import com.moe.socialnetwork.common.jpa.CommentLikeJpa;
-import com.moe.socialnetwork.common.jpa.PostJpa;
-import com.moe.socialnetwork.common.models.Comment;
-import com.moe.socialnetwork.common.models.CommentLike;
-import com.moe.socialnetwork.common.models.Post;
-import com.moe.socialnetwork.common.models.User;
+import com.moe.socialnetwork.jpa.CommentJpa;
+import com.moe.socialnetwork.jpa.CommentLikeJpa;
+import com.moe.socialnetwork.jpa.PostJpa;
+import com.moe.socialnetwork.models.Comment;
+import com.moe.socialnetwork.models.CommentLike;
+import com.moe.socialnetwork.models.Post;
+import com.moe.socialnetwork.models.User;
 
 import jakarta.transaction.Transactional;
 

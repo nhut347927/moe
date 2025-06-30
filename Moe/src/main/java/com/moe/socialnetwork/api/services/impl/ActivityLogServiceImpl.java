@@ -7,9 +7,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
-import com.moe.socialnetwork.common.jpa.ActivityLogJpa;
-import com.moe.socialnetwork.common.models.ActivityLog;
-import com.moe.socialnetwork.common.models.User;
+import com.moe.socialnetwork.jpa.ActivityLogJpa;
+import com.moe.socialnetwork.models.ActivityLog;
+import com.moe.socialnetwork.models.User;
 
 import jakarta.servlet.http.HttpServletRequest;
 

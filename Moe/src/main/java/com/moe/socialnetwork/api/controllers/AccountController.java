@@ -9,9 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.moe.socialnetwork.api.dtos.AccountDetailDTO;
 import com.moe.socialnetwork.api.dtos.AccountSearchResponseDTO;
@@ -19,8 +17,8 @@ import com.moe.socialnetwork.api.dtos.CodeDto;
 import com.moe.socialnetwork.api.dtos.KeyWordPageSize;
 import com.moe.socialnetwork.api.dtos.ProfileUpdateDTO;
 import com.moe.socialnetwork.api.services.IAccountService;
-import com.moe.socialnetwork.common.models.User;
-import com.moe.socialnetwork.common.response.ResponseAPI;
+import com.moe.socialnetwork.models.User;
+import com.moe.socialnetwork.response.ResponseAPI;
 
 import jakarta.validation.Valid;
 

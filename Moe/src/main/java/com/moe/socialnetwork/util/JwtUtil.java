@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.moe.socialnetwork.auth.services.impl.TokenServiceImpl;
-import com.moe.socialnetwork.common.jpa.UserJpa;
+import com.moe.socialnetwork.jpa.UserJpa;
 
 import io.jsonwebtoken.Claims;
 

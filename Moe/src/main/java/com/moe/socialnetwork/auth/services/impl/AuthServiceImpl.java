@@ -22,8 +22,8 @@ import com.moe.socialnetwork.auth.dtos.RegisterRequestDTO;
 import com.moe.socialnetwork.auth.dtos.UserRegisterResponseDTO;
 import com.moe.socialnetwork.auth.services.IAuthService;
 import com.moe.socialnetwork.auth.services.ITokenService;
-import com.moe.socialnetwork.common.jpa.UserJpa;
-import com.moe.socialnetwork.common.models.User;
+import com.moe.socialnetwork.jpa.UserJpa;
+import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.exception.AppException;
 import com.moe.socialnetwork.util.AuthorityUtil;
 

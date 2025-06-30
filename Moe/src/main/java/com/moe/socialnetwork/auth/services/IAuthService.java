@@ -4,7 +4,7 @@ import com.moe.socialnetwork.auth.dtos.LoginRequestDTO;
 import com.moe.socialnetwork.auth.dtos.LoginResponseDTO;
 import com.moe.socialnetwork.auth.dtos.RegisterRequestDTO;
 import com.moe.socialnetwork.auth.dtos.UserRegisterResponseDTO;
-import com.moe.socialnetwork.common.models.User;
+import com.moe.socialnetwork.models.User;
 
 public interface IAuthService {
 
