@@ -1,0 +1,30 @@
+.error-boundary {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #000; /* Nền đen */
+    color: #fff; /* Chữ trắng */
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+  
+  .error-icon {
+    width: 100px;
+    height: 100px;
+    color: #fff; /* Icon trắng */
+  }
+  
+  .error-message {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+  
+  .error-subtext {
+    font-size: 14px;
+    color: #bbb;
+    margin-top: 5px;
+  }
+  
