@@ -33,9 +33,12 @@ public class CloudinaryServiceImpl implements ICloudinaryService {
         return (String) response.get("public_id");
     }
 
- public String uploadVideo(MultipartFile file) throws IOException {
-        final long MAX_SIZE = 100 * 1024 * 1024; // 100MB
+    private static final long MAX_SIZE = 100 * 1024 * 1024; // 100MB
+    private static final long FIVE_MB = 5 * 1024 * 1024; // 5MB
+    private static final int POLL_TIMEOUT_SECONDS = 60; // Max wait time
+    private static final int POLL_INTERVAL_MS = 3000; // Poll every 3 seconds
 
+    public String uploadVideo(MultipartFile file) throws IOException {
         // Validate file
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("Video file cannot be null or empty.");
@@ -50,36 +53,102 @@ public class CloudinaryServiceImpl implements ICloudinaryService {
             throw new IllegalArgumentException("File must be a video (e.g., MP4, AVI).");
         }
 
-        try (InputStream inputStream = file.getInputStream()) {
-            Map<String, Object> options = ObjectUtils.asMap(
-                "resource_type", "video",
-                "format", "mp4",
-                "folder", "videos",
-                "eager", List.of(
-                    new Transformation()
-                        .width(640)
-                        .crop("scale")
-                        .fetchFormat("mp4")
-                        .quality("auto")
-                        .videoCodec("auto")
-                ),
-                "eager_async", true,
-                "async", true, // Force asynchronous upload
-                "chunk_size", 5 * 1024 * 1024 // 5MB chunks
-            );
+        // Choose upload method based on file size
+        if (file.getSize() <= FIVE_MB) {
+            return uploadSmallVideo(file);
+        } else {
+            return uploadLargeVideo(file);
+        }
+    }
 
-            // Log upload details for debugging
-            System.out.println("Uploading video: size=" + file.getSize() + ", contentType=" + contentType);
-            Map<String, Object> response = cloudinary.uploader().uploadLarge(inputStream, options);
+    private String uploadSmallVideo(MultipartFile file) throws IOException {
+        try {
+            Map<?, ?> response = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap(
+                            "resource_type", "video",
+                            "format", "mp4",
+                            "folder", "videos"));
+
+            return (String) response.get("public_id");
+        } catch (Exception e) {
+            throw new IOException("Failed to upload small video to Cloudinary: " + e.getMessage(), e);
+        }
+    }
+
+    private String uploadLargeVideo(MultipartFile file) throws IOException {
+        try (InputStream inputStream = file.getInputStream()) {
+            Map<String, Object> largeFileOptions = ObjectUtils.asMap(
+                    "resource_type", "video",
+                    "format", "mp4",
+                    "folder", "videos",
+                    "eager", List.of(
+                            new Transformation()
+                                    .width(640)
+                                    .crop("scale")
+                                    .fetchFormat("mp4")
+                                    .quality("auto")
+                                    .videoCodec("auto")),
+                    "eager_async", true,
+                    "async", true,
+                    "chunk_size", 5 * 1024 * 1024, // 5MB chunks
+                    "timeout", 180_000, // Higher timeout for large files
+                    "filename", file.getOriginalFilename());
+
+            // Log upload details
+            System.out.println("Uploading large video: size=" + file.getSize() + ", contentType="
+                    + file.getContentType() + ", filename=" + file.getOriginalFilename());
+            Map<String, Object> response = cloudinary.uploader().uploadLarge(inputStream, largeFileOptions);
             System.out.println("Cloudinary response: " + response);
 
+            String batchId = (String) response.get("batch_id");
             String publicId = (String) response.get("public_id");
-            if (publicId == null) {
-                throw new IOException("Failed to retrieve public_id from Cloudinary response.");
+
+            // If public_id is available, return it
+            if (publicId != null) {
+                return publicId;
             }
-            return publicId;
+
+            // If async, poll for public_id
+            if (batchId == null) {
+                throw new IOException("Neither public_id nor batch_id found in Cloudinary response.");
+            }
+
+            // Poll for upload completion
+            long startTime = System.currentTimeMillis();
+            while (System.currentTimeMillis() - startTime < POLL_TIMEOUT_SECONDS * 1000) {
+                try {
+                    // Use Cloudinary API to check upload status
+                    Map<String, Object> statusResponse = cloudinary.api().resources(
+                            ObjectUtils.asMap("resource_type", "video", "prefix", "videos/"));
+                    System.out.println("Status response: " + statusResponse);
+
+                    List<Map<String, Object>> resources = (List<Map<String, Object>>) statusResponse.get("resources");
+                    if (resources != null) {
+                        for (Map<String, Object> resource : resources) {
+                            String status = (String) resource.get("status");
+                            publicId = (String) resource.get("public_id");
+                            if ("failed".equals(status)) {
+                                throw new IOException("Cloudinary upload failed for public_id: " + publicId);
+                            }
+                            if (publicId != null && status != null && status.equals("active")) {
+                                return publicId;
+                            }
+                        }
+                    }
+                    // Wait before next poll
+                    Thread.sleep(POLL_INTERVAL_MS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new IOException("Polling interrupted for batch_id: " + batchId, e);
+                } catch (Exception e) {
+                    throw new IOException("Failed to check upload status for batch_id: " + batchId, e);
+                }
+            }
+
+            throw new IOException("Timeout waiting for Cloudinary upload to complete for batch_id: " + batchId);
         } catch (Exception e) {
-            throw new IOException("Failed to upload video to Cloudinary: " + e.getMessage(), e);
+            throw new IOException("Failed to upload large video to Cloudinary: " + e.getMessage(), e);
         }
     }
 

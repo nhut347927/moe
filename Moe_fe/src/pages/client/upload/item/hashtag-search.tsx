@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -10,9 +11,8 @@ import { PostCreateForm } from "../type";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ActionMenuDialog from "@/components/dialog/action-menu-dialog";
 import { toast } from "@/common/hooks/use-toast";
-import { Dialog, DialogClose } from "@/components/ui/dialog";
+import { DialogClose } from "@/components/ui/dialog";
 
-// Interface for tags
 interface Tag {
   code: string;
   name: string;
@@ -21,7 +21,6 @@ interface Tag {
   avatar: string;
 }
 
-// Interface for component props
 interface HashtagSearchProp {
   postCreateForm: PostCreateForm | null;
   setPostCreateForm: (form: PostCreateForm) => void;
@@ -34,15 +33,14 @@ interface HashtagSearchProp {
 export default function HashtagSearch({
   postCreateForm,
   setPostCreateForm,
+  errorMessages,
 }: HashtagSearchProp) {
-  // State definitions
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [searchResults, setSearchResults] = useState<Tag[]>([]);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [newTagName, setNewTagName] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  // API functions
   const searchTag = useCallback(async () => {
     if (!searchTerm) return [];
     try {
@@ -94,7 +92,6 @@ export default function HashtagSearch({
     }
   }, [postCreateForm?.tagCodeList]);
 
-  // Debounced search effect
   useEffect(() => {
     if (!searchTerm) {
       setSearchResults([]);
@@ -107,7 +104,6 @@ export default function HashtagSearch({
     return () => clearTimeout(handler);
   }, [searchTerm, searchTag]);
 
-  // Fetch tags by code on mount or when tagCodeList changes
   useEffect(() => {
     const fetchTags = async () => {
       if (postCreateForm?.tagCodeList?.length && selectedTags.length === 0) {
@@ -161,17 +157,16 @@ export default function HashtagSearch({
       setSelectedTags((prev) => [...prev, newTag]);
       setNewTagName("");
       setErrorMessage("");
-      // Note: Dialog.Close needs to be triggered programmatically if not handled by ActionMenuDialog
     }
   };
 
   return (
-    <div className="w-full">
-      <h2 className="text-sm mb-2 font-medium text-gray-700 dark:text-gray-200">
+    <div className="w-full space-y-3">
+      <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100">
         Hashtag Search
       </h2>
 
-      <div className="relative mb-3">
+      <div className="relative">
         <div className="flex gap-2">
           <div className="relative w-full">
             <Input
@@ -179,7 +174,7 @@ export default function HashtagSearch({
               placeholder="Search hashtags..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pr-8"
+              className="w-full pr-10 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-zinc-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
               aria-label="Search hashtags"
             />
             {searchTerm && (
@@ -188,7 +183,7 @@ export default function HashtagSearch({
                   setSearchTerm("");
                   setSearchResults([]);
                 }}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 transition-colors"
                 aria-label="Clear search"
               >
                 <X className="h-4 w-4" />
@@ -198,13 +193,17 @@ export default function HashtagSearch({
           <ActionMenuDialog
             title="Create New Tag"
             trigger={
-              <Button variant="outline" aria-label="Create new tag">
+              <Button
+                variant="outline"
+                className="bg-white dark:bg-zinc-800 border-gray-300 dark:border-zinc-600 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-zinc-700"
+                aria-label="Create new tag"
+              >
                 <Plus className="w-4 h-4" />
               </Button>
             }
-            className="rounded-3xl"
+            className="rounded-xl bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700"
           >
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-gray-500 dark:text-zinc-400 mb-4">
               Enter the name for the new hashtag.
             </p>
             <Input
@@ -212,37 +211,47 @@ export default function HashtagSearch({
               placeholder="New tag name"
               value={newTagName}
               onChange={(e) => setNewTagName(e.target.value)}
-              className="mb-2"
+              className="mb-4 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-zinc-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
               aria-label="New tag name"
             />
             {errorMessage && (
-              <p className="text-red-500 text-xs mb-2">{errorMessage}</p>
+              <p className="text-red-500 dark:text-red-400 text-xs mb-4">{errorMessage}</p>
             )}
             <div className="flex justify-end gap-2">
               <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
+                <Button
+                  variant="outline"
+                  className="bg-white dark:bg-zinc-800 border-gray-300 dark:border-zinc-600 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-zinc-700"
+                >
+                  Cancel
+                </Button>
               </DialogClose>
               <DialogClose asChild>
-                <Button onClick={handleCreateTag}>Create</Button>
+                <Button
+                  onClick={handleCreateTag}
+                  className="bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
+                >
+                  Create
+                </Button>
               </DialogClose>
             </div>
           </ActionMenuDialog>
         </div>
 
         {searchTerm && searchResults.length > 0 && (
-          <div className="absolute z-10 w-full mt-1 bg-white rounded-md shadow-lg border border-gray-200 max-h-40 overflow-auto">
+          <div className="absolute z-10 w-full mt-1 bg-white dark:bg-zinc-900 rounded-md shadow-lg border border-gray-200 dark:border-zinc-700 max-h-40 overflow-auto">
             {searchResults.map((hashtag) => {
               const isSelected = postCreateForm?.tagCodeList?.includes(hashtag.code) || false;
               return (
                 <div
                   key={hashtag.code}
-                  className={`flex items-center justify-between p-3 hover:bg-gray-100 border-b last:border-b-0 ${
-                    isSelected ? "bg-gray-50" : ""
+                  className={`flex items-center justify-between p-3 hover:bg-gray-100 dark:hover:bg-zinc-800 border-b border-gray-200 dark:border-zinc-700 last:border-b-0 ${
+                    isSelected ? "bg-gray-50 dark:bg-zinc-800" : ""
                   }`}
                 >
                   <div className="flex flex-col text-sm">
-                    <span>#{hashtag.name}</span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-gray-900 dark:text-gray-100">#{hashtag.name}</span>
+                    <span className="text-xs text-gray-500 dark:text-zinc-400">
                       {hashtag.usageCount} uses • @{hashtag.username}
                     </span>
                   </div>
@@ -251,15 +260,17 @@ export default function HashtagSearch({
                       <AvatarImage
                         src={
                           hashtag.avatar
-                            ? `https://res.cloudinary.com/dwv76nhoy/image/upload/w_80,h_80/${hashtag.avatar}`
+                            ? `https://res.cloudinary.com/dwv76nhoy/image/upload/w_80,h_80,c_thumb,f_auto,q_auto/${hashtag.avatar}`
                             : undefined
                         }
                         alt={`${hashtag.username}'s avatar`}
                       />
-                      <AvatarFallback>NA</AvatarFallback>
+                      <AvatarFallback className="bg-gray-200 dark:bg-zinc-700 text-gray-900 dark:text-gray-100">
+                        NA
+                      </AvatarFallback>
                     </Avatar>
                     {isSelected ? (
-                      <div className="flex items-center text-green-500">
+                      <div className="flex items-center text-green-500 dark:text-green-400">
                         <Check className="h-4 w-4" />
                       </div>
                     ) : (
@@ -267,6 +278,7 @@ export default function HashtagSearch({
                         size="sm"
                         onClick={() => selectHashtag(hashtag)}
                         disabled={isSelected}
+                        className="bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
                       >
                         Add
                       </Button>
@@ -279,8 +291,8 @@ export default function HashtagSearch({
         )}
 
         {searchTerm && searchResults.length === 0 && (
-          <div className="absolute z-10 w-full mt-1 bg-white rounded-md shadow-lg border border-gray-200 max-h-40 overflow-auto">
-            <div className="p-4 text-sm text-gray-500 text-center">
+          <div className="absolute z-10 w-full mt-1 bg-white dark:bg-zinc-900 rounded-md shadow-lg border border-gray-200 dark:border-zinc-700 max-h-40 overflow-auto">
+            <div className="p-4 text-sm text-gray-500 dark:text-zinc-400 text-center">
               No hashtags found.
             </div>
           </div>
@@ -292,12 +304,12 @@ export default function HashtagSearch({
           <Badge
             key={hashtag.code}
             variant="secondary"
-            className="px-3 py-1 text-sm rounded-xl"
+            className="px-3 py-1 text-sm rounded-xl bg-gray-200 dark:bg-zinc-700 text-gray-900 dark:text-gray-100"
           >
             #{hashtag.name}
             <button
               onClick={() => removeHashtag(hashtag)}
-              className="ml-2 hover:text-gray-700"
+              className="ml-2 hover:text-gray-700 dark:hover:text-zinc-200 transition-colors"
               aria-label={`Remove ${hashtag.name} hashtag`}
             >
               <X className="h-3 w-3" />
@@ -305,6 +317,12 @@ export default function HashtagSearch({
           </Badge>
         ))}
       </div>
+      {errorMessages?.title && (
+        <p className="text-red-500 dark:text-red-400 text-xs mt-2">{errorMessages.title}</p>
+      )}
+      {errorMessages?.description && (
+        <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errorMessages.description}</p>
+      )}
     </div>
   );
 }

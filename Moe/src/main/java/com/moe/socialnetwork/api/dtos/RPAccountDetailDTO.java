@@ -6,7 +6,7 @@ import java.util.UUID;
 import java.util.List;
 
 @Data
-public class AccountDetailDTO {
+public class RPAccountDetailDTO {
     private UUID userCode;
     private String userName;
     private String displayName;

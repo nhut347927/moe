@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -210,106 +210,112 @@ export default function VideoThumbnailSelector({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button
-          className="w-full bg-zinc-900 hover:bg-zinc-700"
-          disabled={!videoUrl || !postCreateForm}
-          aria-label="Chọn ảnh thumbnail cho video"
-        >
-          Chọn ảnh thumbnail
-        </Button>
-      </DialogTrigger>
+  <Dialog open={isOpen} onOpenChange={setIsOpen}>
+  <DialogTrigger asChild>
+    <Button
+      className="w-full bg-gray-800 dark:bg-gray-700 text-white dark:text-gray-100 hover:bg-gray-900 dark:hover:bg-gray-600 disabled:bg-gray-300 dark:disabled:bg-zinc-600 disabled:text-gray-500 dark:disabled:text-zinc-400"
+      disabled={!videoUrl || !postCreateForm}
+      aria-label="Chọn ảnh thumbnail cho video"
+    >
+      Chọn ảnh thumbnail
+    </Button>
+  </DialogTrigger>
 
-      <DialogContent className="max-w-4xl w-full">
-        <DialogHeader>
-          <DialogTitle>Chọn ảnh bìa từ video</DialogTitle>
-        </DialogHeader>
+  <DialogContent className="max-w-4xl w-full bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700">
+    <DialogHeader>
+      <DialogTitle className="text-gray-900 dark:text-gray-100">Chọn ảnh bìa từ video</DialogTitle>
+    </DialogHeader>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Video Preview */}
-          <div className="space-y-4">
-            <div className="relative bg-black rounded-lg overflow-hidden">
-              {isLoading && (
-                <div
-                  className="absolute inset-0 flex items-center justify-center bg-black/50 z-10"
-                  aria-label="Đang tải video"
-                >
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
-                </div>
-              )}
-              <video
-                key={videoUrl}
-                ref={videoRef}
-                src={videoUrl}
-                className="w-full h-64 object-contain"
-                preload="metadata"
-                controls
-                crossOrigin="anonymous"
-                aria-label="Video preview for thumbnail selection"
-              />
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Video Preview */}
+      <div className="space-y-4">
+        <div className="relative bg-black dark:bg-zinc-800 rounded-lg overflow-hidden border border-gray-300 dark:border-zinc-600">
+          {isLoading && (
+            <div
+              className="absolute inset-0 flex items-center justify-center bg-black/50 dark:bg-zinc-900/50 z-10"
+              aria-label="Đang tải video"
+            >
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white dark:border-gray-100"></div>
             </div>
-            <div className="text-center text-sm text-muted-foreground">
-              Video - {formatTime(currentTime)} / {formatTime(duration)}
-            </div>
-          </div>
-
-          {/* Thumbnail Preview */}
-          <div className="space-y-4">
-            <div className="relative bg-gray-100 rounded-lg overflow-hidden">
-              <img
-                src={getThumbnailUrl(selectedSeconds)}
-                alt={`Ảnh bìa tại ${formatTime(selectedSeconds)}`}
-                className="w-full h-64 object-contain"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src =
-                    "https://via.placeholder.com/640x360?text=Thumbnail+Error";
-                  toast({
-                    variant: "destructive",
-                    description: "Không thể tải ảnh bìa. Vui lòng thử lại.",
-                  });
-                }}
-              />
-            </div>
-            <div className="text-center text-sm text-muted-foreground">
-              Tại giây thứ {Math.floor(selectedSeconds)} ({formatTime(selectedSeconds)})
-            </div>
-          </div>
-        </div>
-
-        {/* Slider */}
-        <div className="mt-6 space-y-2 px-2">
-          <Slider
-            value={[selectedSeconds]}
-            onValueChange={handleSliderChange}
-            max={duration > 0 ? duration : 0}
-            min={0}
-            step={duration < 1 ? 0.01 : 0.1}
-            className="w-full"
-            disabled={isLoading || duration <= 0}
-            aria-label={`Chọn thời gian cho ảnh bìa, hiện tại: ${formatTime(selectedSeconds)}`}
+          )}
+          <video
+            key={videoUrl}
+            ref={videoRef}
+            src={videoUrl}
+            className="w-full h-64 object-contain"
+            preload="metadata"
+            controls
+            crossOrigin="anonymous"
+            aria-label="Video preview for thumbnail selection"
           />
-          <div className="flex justify-between text-sm text-muted-foreground">
-            <span>0:00</span>
-            <span className="font-medium">
-              {isLoading ? "Đang tải..." : `Đã chọn: ${formatTime(selectedSeconds)}`}
-            </span>
-            <span>{duration > 0 ? formatTime(duration) : "..."}</span>
-          </div>
         </div>
+        <div className="text-center text-sm text-gray-500 dark:text-zinc-400">
+          Video - {formatTime(currentTime)} / {formatTime(duration)}
+        </div>
+      </div>
 
-        <DialogFooter className="mt-4">
-          <DialogClose asChild>
-            <Button variant="outline">Hủy</Button>
-          </DialogClose>
-          <Button
-            onClick={handleConfirm}
-            disabled={isLoading || duration <= 0 || !postCreateForm}
-          >
-            Chọn ảnh bìa
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      {/* Thumbnail Preview */}
+      <div className="space-y-4">
+        <div className="relative bg-gray-100 dark:bg-zinc-800 rounded-lg overflow-hidden border border-gray-300 dark:border-zinc-600">
+          <img
+            src={getThumbnailUrl(selectedSeconds)}
+            alt={`Ảnh bìa tại ${formatTime(selectedSeconds)}`}
+            className="w-full h-64 object-contain"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src =
+                "https://via.placeholder.com/640x360?text=Thumbnail+Error";
+              toast({
+                variant: "destructive",
+                description: "Không thể tải ảnh bìa. Vui lòng thử lại.",
+              });
+            }}
+          />
+        </div>
+        <div className="text-center text-sm text-gray-500 dark:text-zinc-400">
+          Tại giây thứ {Math.floor(selectedSeconds)} ({formatTime(selectedSeconds)})
+        </div>
+      </div>
+    </div>
+
+    {/* Slider */}
+    <div className="mt-6 space-y-2 px-2">
+      <Slider
+        value={[selectedSeconds]}
+        onValueChange={handleSliderChange}
+        max={duration > 0 ? duration : 0}
+        min={0}
+        step={duration < 1 ? 0.01 : 0.1}
+        className="w-full [&>span]:bg-gray-300 dark:[&>span]:bg-zinc-600 [&>span>span]:bg-gray-800 dark:[&>span>span]:bg-gray-600"
+        disabled={isLoading || duration <= 0}
+        aria-label={`Chọn thời gian cho ảnh bìa, hiện tại: ${formatTime(selectedSeconds)}`}
+      />
+      <div className="flex justify-between text-sm text-gray-500 dark:text-zinc-400">
+        <span>0:00</span>
+        <span className="font-medium">
+          {isLoading ? "Đang tải..." : `Đã chọn: ${formatTime(selectedSeconds)}`}
+        </span>
+        <span>{duration > 0 ? formatTime(duration) : "..."}</span>
+      </div>
+    </div>
+
+    <DialogFooter className="mt-4">
+      <DialogClose asChild>
+        <Button
+          variant="outline"
+          className="bg-white dark:bg-zinc-800 border-gray-300 dark:border-zinc-600 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-zinc-700"
+        >
+          Hủy
+        </Button>
+      </DialogClose>
+      <Button
+        onClick={handleConfirm}
+        disabled={isLoading || duration <= 0 || !postCreateForm}
+        className="bg-gray-800 dark:bg-gray-700 text-white dark:text-gray-100 hover:bg-gray-900 dark:hover:bg-gray-600 disabled:bg-gray-300 dark:disabled:bg-zinc-600 disabled:text-gray-500 dark:disabled:text-zinc-400"
+      >
+        Chọn ảnh bìa
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
   );
 }

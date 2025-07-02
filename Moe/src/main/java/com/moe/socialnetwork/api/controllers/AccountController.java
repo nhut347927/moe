@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.moe.socialnetwork.api.dtos.AccountDetailDTO;
-import com.moe.socialnetwork.api.dtos.AccountSearchResponseDTO;
-import com.moe.socialnetwork.api.dtos.CodeDto;
+import com.moe.socialnetwork.api.dtos.RPAccountDetailDTO;
+import com.moe.socialnetwork.api.dtos.RPAccountSearchDTO;
+import com.moe.socialnetwork.api.dtos.ZCodeDto;
 import com.moe.socialnetwork.api.dtos.KeyWordPageSize;
 import com.moe.socialnetwork.api.dtos.ProfileUpdateDTO;
 import com.moe.socialnetwork.api.services.IAccountService;
@@ -46,7 +46,7 @@ public class AccountController {
 
     @PostMapping("/update-avatar")
     public ResponseEntity<ResponseAPI<String>> updateAvatar(
-            @RequestBody @Valid CodeDto request,
+            @RequestBody @Valid ZCodeDto request,
             @AuthenticationPrincipal User userLogin) {
 
         String img =  accountService.updateImgAccUserFromBase64(request.getCode(), userLogin);
@@ -59,12 +59,12 @@ public class AccountController {
     }
 
     @PostMapping("/search")
-    public ResponseEntity<ResponseAPI<List<AccountSearchResponseDTO>>> searchUsers(
+    public ResponseEntity<ResponseAPI<List<RPAccountSearchDTO>>> searchUsers(
             @RequestBody KeyWordPageSize keyWordPageSize,
             @AuthenticationPrincipal User userLogin) {
-        ResponseAPI<List<AccountSearchResponseDTO>> response = new ResponseAPI<>();
+        ResponseAPI<List<RPAccountSearchDTO>> response = new ResponseAPI<>();
 
-        List<AccountSearchResponseDTO> searchResults = accountService.searchUsers(
+        List<RPAccountSearchDTO> searchResults = accountService.searchUsers(
                 keyWordPageSize.getKeyWord(), keyWordPageSize.getPage(), keyWordPageSize.getSize(), userLogin);
         response.setCode(HttpStatus.OK.value());
         response.setMessage("Search completed successfully");
@@ -74,7 +74,7 @@ public class AccountController {
 
     @PostMapping("/follow")
     public ResponseEntity<ResponseAPI<Void>> followUser(
-            @RequestBody @Valid CodeDto code,
+            @RequestBody @Valid ZCodeDto code,
             @AuthenticationPrincipal User userLogin) {
 
         accountService.followUser(UUID.fromString(code.getCode()), userLogin);
@@ -85,11 +85,11 @@ public class AccountController {
     }
 
     @PostMapping("/get-my-account-detail")
-    public ResponseEntity<ResponseAPI<AccountDetailDTO>> getMyAccountDetail(
+    public ResponseEntity<ResponseAPI<RPAccountDetailDTO>> getMyAccountDetail(
             @AuthenticationPrincipal User userLogin) {
 
-        AccountDetailDTO accountDetail = accountService.getAccountDetail(userLogin.getCode(), userLogin);
-        ResponseAPI<AccountDetailDTO> response = new ResponseAPI<>();
+        RPAccountDetailDTO accountDetail = accountService.getAccountDetail(userLogin.getCode(), userLogin);
+        ResponseAPI<RPAccountDetailDTO> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
         response.setMessage("Account detail retrieved successfully");
         response.setData(accountDetail);
@@ -98,12 +98,12 @@ public class AccountController {
     }
 
     @PostMapping("/get-account-detail")
-    public ResponseEntity<ResponseAPI<AccountDetailDTO>> getAccountDetail(
-            @RequestBody CodeDto code,
+    public ResponseEntity<ResponseAPI<RPAccountDetailDTO>> getAccountDetail(
+            @RequestBody ZCodeDto code,
             @AuthenticationPrincipal User userLogin) {
 
-        AccountDetailDTO accountDetail = accountService.getAccountDetail(UUID.fromString(code.getCode()), userLogin);
-        ResponseAPI<AccountDetailDTO> response = new ResponseAPI<>();
+        RPAccountDetailDTO accountDetail = accountService.getAccountDetail(UUID.fromString(code.getCode()), userLogin);
+        ResponseAPI<RPAccountDetailDTO> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
         response.setMessage("Account detail retrieved successfully");
         response.setData(accountDetail);

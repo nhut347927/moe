@@ -57,6 +57,7 @@ export default function Login() {
       Cookies.set("refreshToken_fe", response.data.data.refreshToken, {
         expires: 180,
       });
+      Cookies.set("avatar", response.data.data.user.profilePictureUrl);
       toast({
         variant: "default",
         description: <p className="text-lime-500">{response.data.message}</p>,

@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 
 const ClientLayout = () => {
   return (
-    <div className="w-full h-screen bg-white dark:bg-zinc-950 overflow-hidden">
+    <div className="w-full h-screen bg-white dark:bg-black overflow-hidden">
       <Toaster />
       <Header/>
       <Outlet />

@@ -1,48 +1,18 @@
-import { useState } from "react";
 import {
-  Bell,
-
-  Maximize,
-  Minimize,
-  CircleAlert,
-  Settings,
   Home,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ModeToggle } from "@/components/common/mode-toggle";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Header() {
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  // const location = useLocation();
-
-  const enterFullscreen = () => {
-    document.documentElement.requestFullscreen();
-    setIsFullscreen(true);
-  };
-
-  const exitFullscreen = () => {
-    document.exitFullscreen();
-    setIsFullscreen(false);
-  };
-
-  const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      enterFullscreen();
-    } else {
-      exitFullscreen();
-    }
-  };
-
+  function getCookie(name: string): string | undefined {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(";").shift();
+    return undefined;
+  }
+  const avatar = getCookie("avatar");
   return (
     <header className="relative z-50">
      <div className="absolute w-full p-2 z-10 flex justify-between">
@@ -52,7 +22,7 @@ export default function Header() {
           </Button>
         </Link>
         <div className="flex gap-2">
-          <DropdownMenu>
+          {/* <DropdownMenu>
             <DropdownMenuTrigger asChild className="outline-none">
               <Button
                 variant="outline"
@@ -78,11 +48,11 @@ export default function Header() {
                 </div>
               </div>
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu> */}
            <Link to={"/client/my-profile"}>
             <Avatar className="w-9 h-9">
               <AvatarImage
-                src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_80,h_80/${"abc"}`}
+                src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_80,h_80/${avatar}`}
               />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>

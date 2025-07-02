@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import com.moe.socialnetwork.api.services.ITagService;
 import com.moe.socialnetwork.jpa.TagJpa;
 import com.moe.socialnetwork.models.Tag;
 import com.moe.socialnetwork.models.User;
+import com.moe.socialnetwork.util.TextNormalizer;
 import com.moe.socialnetwork.exception.AppException;
 
 @Service
@@ -74,13 +76,14 @@ public class TagServiceImpl implements ITagService {
     @Override
     @Transactional
     public TagResponseDTO addTag(String name, User user) {
-
-        boolean exists = tagJpa.existsByNameIgnoreCase(name.trim());
+        String tagName = TextNormalizer.removeVietnameseAccents(name)
+                    .trim();
+        boolean exists = tagJpa.existsByNameIgnoreCase(TextNormalizer.removeWhitespace(tagName));
         if (exists) {
             throw new AppException("Tag already in use", 400);
         }
         Tag tag = new Tag();
-        tag.setName(name.trim());
+        tag.setName(TextNormalizer.removeWhitespace(tagName));
         tag.setUserCreate(user);
         tag.setUsageCount(0);
         tag = tagJpa.save(tag);

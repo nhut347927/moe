@@ -135,24 +135,47 @@ public class FFmpegServiceImpl implements IFFmpegService {
     }
 
     public File downloadFileFromCloudinary(String publicId, String filename, String fileType) {
-        String fileUrl = getFileUrl(publicId, fileType);
-        File file = new File(System.getProperty("java.io.tmpdir"), filename);
-        if (file.exists())
+        final String fileUrl = getFileUrl(publicId, fileType);
+        final File file = new File(System.getProperty("java.io.tmpdir"), filename);
+
+        if (file.exists()) {
             file.delete();
-
-        try (InputStream in = new BufferedInputStream(new URL(fileUrl).openStream());
-                FileOutputStream out = new FileOutputStream(file)) {
-
-            byte[] buffer = new byte[8192];
-            int bytesRead;
-            while ((bytesRead = in.read(buffer)) != -1) {
-                out.write(buffer, 0, bytesRead);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to download file from Cloudinary", e);
         }
 
-        return file;
+        final long timeoutMillis = 60_000; // 1 phút
+        final long retryDelayMillis = 3_000; // 3 giây giữa mỗi lần thử
+        final long startTime = System.currentTimeMillis();
+
+        IOException lastException = null;
+
+        while (System.currentTimeMillis() - startTime < timeoutMillis) {
+            try (InputStream in = new BufferedInputStream(new URL(fileUrl).openStream());
+                    FileOutputStream out = new FileOutputStream(file)) {
+
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+                while ((bytesRead = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, bytesRead);
+                }
+
+                // ✅ Thành công
+                return file;
+
+            } catch (IOException e) {
+                lastException = e;
+                System.err.println("Lỗi khi tải file, sẽ thử lại sau...: " + e.getMessage());
+
+                try {
+                    Thread.sleep(retryDelayMillis);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Thread bị gián đoạn trong khi retry tải file.", ie);
+                }
+            }
+        }
+
+        // ❌ Sau 1 phút vẫn không thành công
+        throw new RuntimeException("Tải file thất bại sau nhiều lần thử.", lastException);
     }
 
     public File extractAudioFromVideo(File videoFile) throws IOException {

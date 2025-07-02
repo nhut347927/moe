@@ -142,8 +142,16 @@ public class AuthController {
                 .maxAge(0)
                 .build();
 
+                  ResponseCookie deleteRefreshCookie = ResponseCookie.from("refresh_token", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .sameSite("Strict")
+                .maxAge(0)
+                .build();
+
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, deleteAccessCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, deleteAccessCookie.toString(), deleteRefreshCookie.toString())
                 .body(ResponseAPI.of(HttpStatus.OK.value(), "Logged out successfully", "Success"));
     }
 

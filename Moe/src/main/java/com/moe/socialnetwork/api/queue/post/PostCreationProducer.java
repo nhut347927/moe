@@ -12,16 +12,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PostCreationProducer {
 
-    private final RedisTemplate<String, String> redisTemplate;
-    private final ObjectMapper objectMapper;
-    private static final String QUEUE_NAME = "post_creation_queue";
+    // private final RedisTemplate<String, String> redisTemplate;
+    // private final ObjectMapper objectMapper;
+    // private static final String QUEUE_NAME = "post_creation_queue";
 
-    public void enqueue(PostCreationMessage message) {
-        try {
-            String json = objectMapper.writeValueAsString(message);
-            redisTemplate.opsForList().rightPush(QUEUE_NAME, json);
-        } catch (Exception e) {
-            throw new AppException(QUEUE_NAME, 500);
-        }
-    }
+    // public void enqueue(PostCreationMessage message) {
+    //     try {
+    //         String json = objectMapper.writeValueAsString(message);
+    //         redisTemplate.opsForList().rightPush(QUEUE_NAME, json);
+    //     } catch (Exception e) {
+    //         throw new AppException(QUEUE_NAME, 500);
+    //     }
+    // }
 }

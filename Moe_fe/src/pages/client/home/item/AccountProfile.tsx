@@ -15,7 +15,6 @@ interface AccountProfileProps {
 export function AccountProfile({
   accountDetail,
   handleFollowOrUnfollow,
-  handleDeletePost,
 }: AccountProfileProps) {
   const [selectedPost, setSelectedPost] = useState<string | null>(null);
 

@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.checkerframework.checker.units.qual.s;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
@@ -159,6 +158,7 @@ public class PostServiceImpl implements IPostService {
 		// Create post
 		Post post = new Post();
 		post.setUser(user);
+		post.setUserCreate(user);
 		post.setTitle(dto.getTitle());
 		post.setDescription(dto.getDescription());
 		post.setType("VID".equals(dto.getPostType()) ? Post.PostType.VID : Post.PostType.IMG);

@@ -2,11 +2,6 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import React, { Suspense } from "react";
 
 import LoadingSpinner from "../components/common/loading-spinner-with-icon";
-import Like from "../pages/client/like/like-page";
-import Chat from "../pages/client/chat/chat-page";
-import Playlist from "../pages/client/playlist/playlist-page";
-import Explore from "@/pages/client/explore/explore-page";
-import AboutPage from "@/pages/client/about/about-page";
 import NotFound from "@/components/common/not-found";
 import ManageSongs from "@/pages/admin/manage-songs";
 import ManageUsers from "@/pages/admin/manage-users";
@@ -18,7 +13,6 @@ import ForgotPassword from "@/pages/auth/forgot-password";
 import ResetPassword from "@/pages/auth/reset-password";
 import Home from "@/pages/client/home/home-page";
 import { SearchPage } from "@/pages/client/search/search-page";
-import PostPage from "@/pages/client/post/post-page";
 
 import { ProfilePage } from "@/pages/client/profile/profile-page";
 import KeepAlive from "react-activation";
@@ -52,23 +46,9 @@ const AppRoutes = () => {
               </KeepAlive>
             }
           />
-
-          <Route path="playlist" element={<Playlist />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="my-profile" element={<MyProfilePage />} />
-
-          <Route path="likes" element={<Like />} />
-          <Route path="likes/post" element={<Like />} />
-          <Route path="likes/video" element={<Like />} />
-
           <Route path="upload" element={<UploadPage />} />
-
-          <Route path="explore" element={<Explore />} />
-          <Route path="chat" element={<Chat />} />
-          <Route path="about" element={<AboutPage />} />
-
-          <Route path="post" element={<PostPage />} />
-
           <Route path="*" element={<NotFound />} />
         </Route>
 

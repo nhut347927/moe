@@ -201,7 +201,10 @@ public class User implements UserDetails {
 		this.updatedAt = now;
 		this.code = UUID.randomUUID();
 		this.gender = Gender.NOT_UPDATED_YET;
-		this.provider = "NORMAL";
+		if (this.provider == null || this.provider.isEmpty()) {
+			this.provider = "NORMAL";
+		}
+		
 	}
 
 	@PreUpdate

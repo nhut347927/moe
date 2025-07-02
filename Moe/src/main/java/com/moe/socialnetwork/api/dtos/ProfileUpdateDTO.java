@@ -10,6 +10,7 @@ public class ProfileUpdateDTO {
 
     @NotBlank(message = "Username không được để trống")
     private String userName;
-
+    
+    @NotBlank(message = "bio không được để trống")
     private String bio;
 }

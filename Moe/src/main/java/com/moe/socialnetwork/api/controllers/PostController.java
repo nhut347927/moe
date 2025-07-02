@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.moe.socialnetwork.api.dtos.CodeDto;
+import com.moe.socialnetwork.api.dtos.ZCodeDto;
 import com.moe.socialnetwork.api.dtos.CodePageSize;
 import com.moe.socialnetwork.api.dtos.KeyWordPageSize;
 import com.moe.socialnetwork.api.dtos.PostCreateRepuestDTO;
@@ -37,9 +37,10 @@ public class PostController {
         this.postService = postService;
         this.postCreationProducer = postCreationProducer;
     };
-   @PostMapping("/delete")
+
+    @PostMapping("/delete")
     public ResponseEntity<ResponseAPI<Void>> deletePost(
-            @RequestBody CodeDto postCode,
+            @RequestBody ZCodeDto postCode,
             @AuthenticationPrincipal User user) {
 
         postService.deletePost(UUID.fromString(postCode.getCode()), user);
@@ -49,7 +50,6 @@ public class PostController {
         response.setMessage("Post delete successfully!");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-
 
     @PostMapping("/search")
     public ResponseEntity<ResponseAPI<List<PostSearchResponseDTO>>> searchPosts(
@@ -66,7 +66,7 @@ public class PostController {
 
     @PostMapping("/get-post-by-code")
     public ResponseEntity<ResponseAPI<PostResponseDTO>> getPostByCode(
-            @RequestBody CodeDto postCode,
+            @RequestBody ZCodeDto postCode,
             @AuthenticationPrincipal User user) {
         ResponseAPI<PostResponseDTO> response = new ResponseAPI<>();
         PostResponseDTO post = postService.getPostByCode(postCode.getCode(), user);
@@ -78,7 +78,7 @@ public class PostController {
 
     @PostMapping("/view")
     public ResponseEntity<ResponseAPI<Void>> viewPost(
-            @RequestBody CodeDto postCode,
+            @RequestBody ZCodeDto postCode,
             @AuthenticationPrincipal User user) {
 
         postService.viewPost(postCode.getCode(), user);
@@ -91,7 +91,7 @@ public class PostController {
 
     @PostMapping("/like")
     public ResponseEntity<ResponseAPI<Void>> likePost(
-            @RequestBody CodeDto postCode,
+            @RequestBody ZCodeDto postCode,
             @AuthenticationPrincipal User user) {
 
         postService.likePost(postCode.getCode(), user);
@@ -119,14 +119,13 @@ public class PostController {
     @PostMapping("/create-new-post")
     public ResponseEntity<ResponseAPI<String>> createNewPost(
             @AuthenticationPrincipal User user,
-            @RequestBody @Valid PostCreateRepuestDTO dto) {
+            @Valid @RequestBody PostCreateRepuestDTO dto) {
 
-        PostCreationMessage job = new PostCreationMessage(user, dto);
-        postCreationProducer.enqueue(job); // Đẩy vào hàng đợi
+        postService.createNewPost(dto, user);
 
         ResponseAPI<String> response = new ResponseAPI<>();
         response.setCode(HttpStatus.ACCEPTED.value());
-        response.setMessage("Post has been queued for creation.");
+        response.setMessage("Post is being processed");
         response.setData("Please wait...");
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);

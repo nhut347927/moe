@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import com.moe.socialnetwork.api.dtos.CodeDto;
+import com.moe.socialnetwork.api.dtos.ZCodeDto;
 import com.moe.socialnetwork.api.dtos.KeyWordPageSize;
 import com.moe.socialnetwork.api.dtos.TagRequestDTO;
 import com.moe.socialnetwork.api.dtos.TagResponseDTO;
@@ -27,7 +27,7 @@ public class TagController {
     }
 
     @PostMapping("/search-by-code")
-    public ResponseEntity<ResponseAPI<List<TagResponseDTO>>> searchTagByCode(@RequestBody CodeDto request) {
+    public ResponseEntity<ResponseAPI<List<TagResponseDTO>>> searchTagByCode(@RequestBody ZCodeDto request) {
         List<TagResponseDTO> tagList = tagService.searchTags(request.getCode());
 
         ResponseAPI<List<TagResponseDTO>> response = new ResponseAPI<>();

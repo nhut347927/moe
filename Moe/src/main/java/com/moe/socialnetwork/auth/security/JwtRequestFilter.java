@@ -112,7 +112,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 path.startsWith("/api/auth//password-reset-request") ||
                 path.startsWith("/api/auth/password-reset") ||
                 path.startsWith("/api/auth/refresh-token") ||
-                path.startsWith("/api/auth/logout")||
+                // path.startsWith("/api/auth/logout")||
                 path.startsWith("/api/file/upload-image") ||
                 path.startsWith("/api/file/upload-video") ||
                 path.startsWith("/api/file/upload-audio") ||

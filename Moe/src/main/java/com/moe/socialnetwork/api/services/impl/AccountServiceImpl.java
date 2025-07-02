@@ -11,8 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.moe.socialnetwork.api.dtos.AccountDetailDTO;
-import com.moe.socialnetwork.api.dtos.AccountSearchResponseDTO;
+import com.moe.socialnetwork.api.dtos.RPAccountDetailDTO;
+import com.moe.socialnetwork.api.dtos.RPAccountSearchDTO;
 import com.moe.socialnetwork.api.services.IAccountService;
 import com.moe.socialnetwork.api.services.ICloudinaryService;
 import com.moe.socialnetwork.jpa.FollowerJpa;
@@ -90,12 +90,12 @@ public class AccountServiceImpl implements IAccountService {
         userJpa.save(user);
     }
 
-    public List<AccountSearchResponseDTO> searchUsers(String searchTerm, int page, int size, User userLogin) {
+    public List<RPAccountSearchDTO> searchUsers(String searchTerm, int page, int size, User userLogin) {
         Pageable pageable = PageRequest.of(page, size);
         var userPage = userJpa.findUsersByUsernameOrDisplayName(searchTerm, pageable);
         List<User> users = userPage.getContent();
         return users.stream().map(user -> {
-            AccountSearchResponseDTO response = new AccountSearchResponseDTO();
+            RPAccountSearchDTO response = new RPAccountSearchDTO();
             response.setUserCode(user.getCode().toString());
             response.setUserName(user.getUsername());
             response.setDisplayName(user.getDisplayName());
@@ -137,7 +137,7 @@ public class AccountServiceImpl implements IAccountService {
         }
     }
 
-    public AccountDetailDTO getAccountDetail(UUID userCode, User userLogin) {
+    public RPAccountDetailDTO getAccountDetail(UUID userCode, User userLogin) {
         if (userLogin == null) {
             throw new AppException("User not authenticated", 401);
         }
@@ -145,7 +145,7 @@ public class AccountServiceImpl implements IAccountService {
         User user = userJpa.findByCode(userCode)
                 .orElseThrow(() -> new AppException("User not found with code: " + userCode, 404));
 
-        AccountDetailDTO accountDetail = new AccountDetailDTO();
+        RPAccountDetailDTO accountDetail = new RPAccountDetailDTO();
         accountDetail.setUserCode(user.getCode());
         accountDetail.setBio(user.getBio());
         accountDetail.setUserName(user.getUsername());
@@ -166,9 +166,9 @@ public class AccountServiceImpl implements IAccountService {
                 .sum();
         accountDetail.setLikeCount(String.valueOf(totalLikeCount));
 
-        List<AccountDetailDTO.AccountPostDTO> posts = postJpa.findListPostByUserId(userLogin.getId()).stream()
+        List<RPAccountDetailDTO.AccountPostDTO> posts = postJpa.findListPostByUserId(userLogin.getId()).stream()
                 .map(post -> {
-                    AccountDetailDTO.AccountPostDTO postDTO = new AccountDetailDTO.AccountPostDTO();
+                    RPAccountDetailDTO.AccountPostDTO postDTO = new RPAccountDetailDTO.AccountPostDTO();
                     postDTO.setPostCode(post.getCode());
                     postDTO.setPostType(post.getType() != null ? post.getType().toString() : null);
                     postDTO.setViewCount(String.valueOf(post.getViews().size()));
