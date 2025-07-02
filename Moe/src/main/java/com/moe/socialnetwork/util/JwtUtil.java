@@ -6,16 +6,18 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.moe.socialnetwork.auth.services.impl.TokenServiceImpl;
-import com.moe.socialnetwork.jpa.UserJpa;
+import com.moe.socialnetwork.jpa.UserJPA;
 
 import io.jsonwebtoken.Claims;
-
+/**
+ * Author: nhutnm379
+ */
 @Component
 public class JwtUtil {
 
 	private final TokenServiceImpl tokenService;
 
-	public JwtUtil(TokenServiceImpl tokenService, UserJpa userJPA) {
+	public JwtUtil(TokenServiceImpl tokenService, UserJPA userJPA) {
 		this.tokenService = tokenService;
 	}
 

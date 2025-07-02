@@ -11,8 +11,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.moe.socialnetwork.models.Post;
-
-public interface PostJpa extends JpaRepository<Post, Long> {
+/**
+ * Author: nhutnm379
+ */
+public interface PostJPA extends JpaRepository<Post, Long> {
 
   @Query("SELECT p FROM Post p JOIN p.user u LEFT JOIN p.audio a WHERE p.isDeleted = false AND p.visibility = 'PUBLIC' AND p.type = 'VID' AND a IS NULL AND (p.title LIKE %:keyword% OR u.displayName LIKE %:keyword%)")
   List<Post> findByKeyword(@Param("keyword") String keyword, Pageable pageable);

@@ -11,7 +11,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-
+/**
+ * Author: nhutnm379
+ */
 @Configuration
 public class CorsConfig {
 	@Value("${cors.allowed.origin}")

@@ -20,7 +20,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Author: nhut379
+ * Author: nhutnm379
  */
 @Entity
 @Table(name = "ActivityLogs")

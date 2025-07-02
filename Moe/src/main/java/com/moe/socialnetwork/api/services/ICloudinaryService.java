@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 
 import org.springframework.web.multipart.MultipartFile;
-
+/**
+ * Author: nhutnm379
+ */
 public interface ICloudinaryService {
     String uploadImage(MultipartFile file) throws IOException;
 

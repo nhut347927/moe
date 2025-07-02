@@ -1,7 +1,7 @@
 package com.moe.socialnetwork.api.controllers;
 
 import com.moe.socialnetwork.api.dtos.ZCodeDto;
-import com.moe.socialnetwork.api.dtos.FileUploadRequestDTO;
+import com.moe.socialnetwork.api.dtos.RQFileUploadDTO;
 import com.moe.socialnetwork.api.services.ICloudinaryService;
 import com.moe.socialnetwork.api.services.impl.CloudinaryServiceImpl;
 import com.moe.socialnetwork.response.ResponseAPI;
@@ -12,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-
+/**
+ * Author: nhutnm379
+ */
 @RestController
 @RequestMapping("/api/file")
 public class FileUploadController {
@@ -25,7 +27,7 @@ public class FileUploadController {
 
     @PostMapping("/upload/image")
     public ResponseEntity<ResponseAPI<String>> uploadImage(
-        @Valid @ModelAttribute FileUploadRequestDTO request
+        @Valid @ModelAttribute RQFileUploadDTO request
     ) throws IOException {
         String publicId = cloudinaryService.uploadImage(request.getFile());
         ResponseAPI<String> response = new ResponseAPI<>();
@@ -37,7 +39,7 @@ public class FileUploadController {
 
     @PostMapping("/upload/video")
     public ResponseEntity<ResponseAPI<String>> uploadVideo(
-        @Valid @ModelAttribute FileUploadRequestDTO request
+        @Valid @ModelAttribute RQFileUploadDTO request
     ) throws IOException {
         String publicId = cloudinaryService.uploadVideo(request.getFile());
         ResponseAPI<String> response = new ResponseAPI<>();
@@ -49,7 +51,7 @@ public class FileUploadController {
 
     @PostMapping("/upload/audio")
     public ResponseEntity<ResponseAPI<String>> uploadAudio(
-        @Valid @ModelAttribute FileUploadRequestDTO request
+        @Valid @ModelAttribute RQFileUploadDTO request
     ) throws IOException {
         String publicId = cloudinaryService.uploadAudio(request.getFile());
         ResponseAPI<String> response = new ResponseAPI<>();

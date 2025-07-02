@@ -13,7 +13,9 @@ import com.moe.socialnetwork.exception.AppException;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-
+/**
+ * Author: nhutnm379
+ */
 @Service
 public class EmailServiceImpl implements IEmailService {
 

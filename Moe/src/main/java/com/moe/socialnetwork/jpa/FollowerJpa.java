@@ -8,8 +8,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.moe.socialnetwork.models.Follower;
-
-public interface FollowerJpa extends JpaRepository<Follower, Long> {
+/**
+ * Author: nhutnm379
+ */
+public interface FollowerJPA extends JpaRepository<Follower, Long> {
     @Query("SELECT COUNT(f) > 0 FROM Follower f WHERE f.follower.code = :followerCode AND f.followed.code = :followedCode")
     boolean checkExistsByUserFollowerCodeAndUserFollowedCode(
             @Param("followerCode") UUID followerCode,

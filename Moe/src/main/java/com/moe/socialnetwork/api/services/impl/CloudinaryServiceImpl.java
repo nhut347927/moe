@@ -14,7 +14,9 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 import com.moe.socialnetwork.api.services.ICloudinaryService;
-
+/**
+ * Author: nhutnm379
+ */
 @Service
 public class CloudinaryServiceImpl implements ICloudinaryService {
     private final Cloudinary cloudinary;

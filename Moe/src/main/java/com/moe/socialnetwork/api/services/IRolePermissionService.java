@@ -2,14 +2,16 @@ package com.moe.socialnetwork.api.services;
 
 import java.util.List;
 
-import com.moe.socialnetwork.api.dtos.DeleteDTO;
-import com.moe.socialnetwork.api.dtos.ListRolePerDTO;
-import com.moe.socialnetwork.api.dtos.RolePermissionDTO;
-
+import com.moe.socialnetwork.api.dtos.ZDeleteDTO;
+import com.moe.socialnetwork.api.dtos.RPListRolePerDTO;
+import com.moe.socialnetwork.api.dtos.RPRolePermissionDTO;
+/**
+ * Author: nhutnm379
+ */
 public interface IRolePermissionService {
-    List<RolePermissionDTO> getPermissionsByUser(String userCode);
+    List<RPRolePermissionDTO> getPermissionsByUser(String userCode);
 
-    void createOrUpdatePermission(ListRolePerDTO dto);
+    void createOrUpdatePermission(RPListRolePerDTO dto);
 
-    void deletePermission(DeleteDTO code);
+    void deletePermission(ZDeleteDTO code);
 }

@@ -10,8 +10,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.moe.socialnetwork.models.Comment;
-
-public interface CommentJpa extends JpaRepository<Comment, Long> {
+/**
+ * Author: nhutnm379
+ */
+public interface CommentJPA extends JpaRepository<Comment, Long> {
     @Query("""
                 SELECT c FROM Comment c
                 WHERE c.post.code = :postCode

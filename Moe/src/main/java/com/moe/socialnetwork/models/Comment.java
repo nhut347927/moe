@@ -25,7 +25,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Author: nhut379
+ * Author: nhutnm379
  */
 @Data
 @Entity

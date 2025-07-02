@@ -11,24 +11,26 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.moe.socialnetwork.api.dtos.TagResponseDTO;
+import com.moe.socialnetwork.api.dtos.RPTagDTO;
 import com.moe.socialnetwork.api.services.ITagService;
-import com.moe.socialnetwork.jpa.TagJpa;
+import com.moe.socialnetwork.jpa.TagJPA;
 import com.moe.socialnetwork.models.Tag;
 import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.util.TextNormalizer;
 import com.moe.socialnetwork.exception.AppException;
-
+/**
+ * Author: nhutnm379
+ */
 @Service
 public class TagServiceImpl implements ITagService {
 
-    private final TagJpa tagJpa;
+    private final TagJPA tagJpa;
 
-    public TagServiceImpl(TagJpa tagJpa) {
+    public TagServiceImpl(TagJPA tagJpa) {
         this.tagJpa = tagJpa;
     }
 
-    public List<TagResponseDTO> searchByCode(String code) {
+    public List<RPTagDTO> searchByCode(String code) {
         List<String> codes = Arrays.stream(code.split(","))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
@@ -43,7 +45,7 @@ public class TagServiceImpl implements ITagService {
                     Tag tag = optionalTag.get();
                     User user = tag.getUserCreate();
 
-                    return new TagResponseDTO(
+                    return new RPTagDTO(
                             tag.getCode().toString(),
                             tag.getName(),
                             String.valueOf(tag.getUsageCount()),
@@ -55,7 +57,7 @@ public class TagServiceImpl implements ITagService {
     }
 
     @Override
-    public List<TagResponseDTO> searchTags(String keyword) {
+    public List<RPTagDTO> searchTags(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
             keyword = "";
         }
@@ -64,7 +66,7 @@ public class TagServiceImpl implements ITagService {
 
             User user = tag.getUserCreate();
 
-            return new TagResponseDTO(
+            return new RPTagDTO(
                     tag.getCode().toString(),
                     tag.getName(),
                     String.valueOf(tag.getUsageCount()),
@@ -75,7 +77,7 @@ public class TagServiceImpl implements ITagService {
 
     @Override
     @Transactional
-    public TagResponseDTO addTag(String name, User user) {
+    public RPTagDTO addTag(String name, User user) {
         String tagName = TextNormalizer.removeVietnameseAccents(name)
                     .trim();
         boolean exists = tagJpa.existsByNameIgnoreCase(TextNormalizer.removeWhitespace(tagName));
@@ -88,7 +90,7 @@ public class TagServiceImpl implements ITagService {
         tag.setUsageCount(0);
         tag = tagJpa.save(tag);
 
-        return new TagResponseDTO(
+        return new RPTagDTO(
                 tag.getCode().toString(),
                 tag.getName(),
                 String.valueOf(tag.getUsageCount()),

@@ -1,5 +1,7 @@
 package com.moe.socialnetwork.api.services;
-
+/**
+ * Author: nhutnm379
+ */
 public interface IEmailService {
 
     /**

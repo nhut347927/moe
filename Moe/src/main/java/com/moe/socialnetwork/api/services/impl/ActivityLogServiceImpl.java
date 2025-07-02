@@ -7,17 +7,19 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
-import com.moe.socialnetwork.jpa.ActivityLogJpa;
+import com.moe.socialnetwork.jpa.ActivityLogJPA;
 import com.moe.socialnetwork.models.ActivityLog;
 import com.moe.socialnetwork.models.User;
 
 import jakarta.servlet.http.HttpServletRequest;
-
+/**
+ * Author: nhutnm379
+ */
 @Service
 public class ActivityLogServiceImpl {
-    private final ActivityLogJpa activityLogJPA;
+    private final ActivityLogJPA activityLogJPA;
 
-    public ActivityLogServiceImpl(ActivityLogJpa activityLogJPA) {
+    public ActivityLogServiceImpl(ActivityLogJPA activityLogJPA) {
         this.activityLogJPA = activityLogJPA;
     }
 

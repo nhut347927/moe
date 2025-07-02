@@ -11,8 +11,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.moe.socialnetwork.models.Tag;
-
-public interface TagJpa extends JpaRepository<Tag, Long> {
+/**
+ * Author: nhutnm379
+ */
+public interface TagJPA extends JpaRepository<Tag, Long> {
 
     @Query("SELECT t FROM Tag t WHERE t.name = :name")
     Optional<Tag> findByName(@Param("name") String name);

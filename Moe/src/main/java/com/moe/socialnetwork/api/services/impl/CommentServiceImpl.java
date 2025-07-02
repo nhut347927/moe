@@ -1,11 +1,11 @@
 package com.moe.socialnetwork.api.services.impl;
 
-import com.moe.socialnetwork.api.dtos.CommentDTO;
-import com.moe.socialnetwork.api.dtos.ReplyDTO;
+import com.moe.socialnetwork.api.dtos.RPCommentDTO;
+import com.moe.socialnetwork.api.dtos.RPReplyDTO;
 import com.moe.socialnetwork.api.services.ICommentService;
-import com.moe.socialnetwork.jpa.CommentJpa;
-import com.moe.socialnetwork.jpa.CommentLikeJpa;
-import com.moe.socialnetwork.jpa.PostJpa;
+import com.moe.socialnetwork.jpa.CommentJPA;
+import com.moe.socialnetwork.jpa.CommentLikeJPA;
+import com.moe.socialnetwork.jpa.PostJPA;
 import com.moe.socialnetwork.models.Comment;
 import com.moe.socialnetwork.models.CommentLike;
 import com.moe.socialnetwork.models.Post;
@@ -20,22 +20,23 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
+/**
+ * Author: nhutnm379
+ */
 @Service
-
 public class CommentServiceImpl implements ICommentService {
 
-    private final CommentJpa commentJpa;
-    private final PostJpa postJpa;
-    private final CommentLikeJpa commentLikeJpa;
+    private final CommentJPA commentJpa;
+    private final PostJPA postJpa;
+    private final CommentLikeJPA commentLikeJpa;
 
-    public CommentServiceImpl(CommentJpa commentJpa, PostJpa postJpa, CommentLikeJpa commentLikeJpa) {
+    public CommentServiceImpl(CommentJPA commentJpa, PostJPA postJpa, CommentLikeJPA commentLikeJpa) {
         this.commentJpa = commentJpa;
         this.postJpa = postJpa;
         this.commentLikeJpa = commentLikeJpa;
     }
 
-    public CommentDTO addComment(UUID postCode, String content, User user) {
+    public RPCommentDTO addComment(UUID postCode, String content, User user) {
         Post post = postJpa.findPostByPostCode(postCode)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with code: " + postCode));
         Comment comment = new Comment();
@@ -44,7 +45,7 @@ public class CommentServiceImpl implements ICommentService {
         comment.setUser(user);
         commentJpa.save(comment);
 
-        CommentDTO dto = new CommentDTO();
+        RPCommentDTO dto = new RPCommentDTO();
         dto.setCommentCode(comment.getCode() != null ? comment.getCode().toString() : null);
         dto.setContent(comment.getContent());
         dto.setCreatedAt(comment.getCreatedAt() != null ? comment.getCreatedAt().toString() : null);
@@ -59,7 +60,7 @@ public class CommentServiceImpl implements ICommentService {
         return dto;
     }
 
-    public ReplyDTO addReply(UUID commentCode, String content, User user) {
+    public RPReplyDTO addReply(UUID commentCode, String content, User user) {
         Comment parentComment = commentJpa.findCommentByCommentCode(commentCode)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found with code: " + commentCode));
         Comment reply = new Comment();
@@ -69,7 +70,7 @@ public class CommentServiceImpl implements ICommentService {
         reply.setPost(parentComment.getPost());
         commentJpa.save(reply);
 
-        ReplyDTO dto = new ReplyDTO();
+        RPReplyDTO dto = new RPReplyDTO();
         dto.setCommentCode(reply.getCode() != null ? reply.getCode().toString() : null);
         dto.setContent(reply.getContent());
         dto.setCreatedAt(reply.getCreatedAt() != null ? reply.getCreatedAt().toString() : null);
@@ -123,13 +124,13 @@ public class CommentServiceImpl implements ICommentService {
     }
 
     @Override
-    public List<CommentDTO> getCommentsByPost(UUID postCode, User user, int page, int size) {
+    public List<RPCommentDTO> getCommentsByPost(UUID postCode, User user, int page, int size) {
         PageRequest pageable = PageRequest.of(page, size);
 
         return commentJpa.findTopLevelCommentsByPostCode(postCode, pageable)
                 .stream()
                 .map(comment -> {
-                    CommentDTO dto = new CommentDTO();
+                    RPCommentDTO dto = new RPCommentDTO();
                     dto.setCommentCode(comment.getCode().toString());
                     dto.setContent(comment.getContent());
                     dto.setCreatedAt(comment.getCreatedAt().toString());
@@ -162,13 +163,13 @@ public class CommentServiceImpl implements ICommentService {
     }
 
     @Override
-    public List<ReplyDTO> getRepliesByComment(UUID commentCode, User user, int page, int size) {
+    public List<RPReplyDTO> getRepliesByComment(UUID commentCode, User user, int page, int size) {
         PageRequest pageable = PageRequest.of(page, size);
 
         return commentJpa.findRepliesByParentCode(commentCode, pageable)
                 .stream()
                 .map(reply -> {
-                    ReplyDTO dto = new ReplyDTO();
+                    RPReplyDTO dto = new RPReplyDTO();
                     dto.setCommentCode(reply.getCode().toString());
                     dto.setContent(reply.getContent());
                     dto.setCreatedAt(reply.getCreatedAt().toString());

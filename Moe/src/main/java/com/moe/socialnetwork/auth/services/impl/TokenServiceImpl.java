@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.moe.socialnetwork.auth.services.ITokenService;
-import com.moe.socialnetwork.jpa.UserJpa;
+import com.moe.socialnetwork.jpa.UserJPA;
 import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.exception.AppException;
 
@@ -27,12 +27,14 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Key;
-
+/**
+ * Author: nhutnm379
+ */
 @Service
 public class TokenServiceImpl implements ITokenService {
 
     private final Key key;
-    private final UserJpa userJPA;
+    private final UserJPA userJPA;
 
     @Value("${app.expiration24h}")
     private Long jwtExpirationMs24h;
@@ -43,7 +45,7 @@ public class TokenServiceImpl implements ITokenService {
     @Value("${app.jwtSecret}")
     private String jwtSecret;
 
-    public TokenServiceImpl(UserJpa userJPA, @Value("${app.jwtSecret}") String jwtSecret) {
+    public TokenServiceImpl(UserJPA userJPA, @Value("${app.jwtSecret}") String jwtSecret) {
         this.userJPA = userJPA;
         if (jwtSecret == null || jwtSecret.isBlank()) {
             throw new IllegalArgumentException("JWT secret key must not be null or empty.");

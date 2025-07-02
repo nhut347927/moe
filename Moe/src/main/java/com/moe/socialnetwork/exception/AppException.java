@@ -1,5 +1,7 @@
 package com.moe.socialnetwork.exception;
-
+/**
+ * Author: nhutnm379
+ */
 public class AppException extends RuntimeException {
 	private final String message;
 	private final int statusCode;

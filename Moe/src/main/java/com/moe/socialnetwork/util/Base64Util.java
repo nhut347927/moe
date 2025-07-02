@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.util.Base64;
 
 /**
- * Utility class for converting between Base64 and file types.
+ * Author: nhutnm379
  */
 public class Base64Util {
 

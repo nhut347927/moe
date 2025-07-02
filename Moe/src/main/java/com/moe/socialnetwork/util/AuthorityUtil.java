@@ -10,7 +10,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.moe.socialnetwork.models.RolePermission;
-
+/**
+ * Author: nhutnm379
+ */
 public class AuthorityUtil {
 
 	/**

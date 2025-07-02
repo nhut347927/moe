@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 
 import com.cloudinary.Cloudinary;
-import com.moe.socialnetwork.api.dtos.PostCreateRepuestDTO.FFmpegMergeParams;
+import com.moe.socialnetwork.api.dtos.RQPostCreateDTO.FFmpegMergeParams;
 import com.moe.socialnetwork.api.services.ICloudinaryService;
 import com.moe.socialnetwork.api.services.IFFmpegService;
 
@@ -18,7 +18,9 @@ import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
-
+/**
+ * Author: nhutnm379
+ */
 @Service
 public class FFmpegServiceImpl implements IFFmpegService {
 

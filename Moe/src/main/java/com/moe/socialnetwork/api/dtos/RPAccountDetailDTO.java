@@ -4,7 +4,9 @@ import lombok.Data;
 import java.util.UUID;
 
 import java.util.List;
-
+/**
+ * Author: nhutnm379
+ */
 @Data
 public class RPAccountDetailDTO {
     private UUID userCode;

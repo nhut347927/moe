@@ -3,8 +3,10 @@ package com.moe.socialnetwork.api.services;
 import java.io.File;
 import java.io.IOException;
 
-import com.moe.socialnetwork.api.dtos.PostCreateRepuestDTO.FFmpegMergeParams;
-
+import com.moe.socialnetwork.api.dtos.RQPostCreateDTO.FFmpegMergeParams;
+/**
+ * Author: nhutnm379
+ */
 public interface IFFmpegService {
     File extractAudioFromVideo(File videoFile) throws IOException;
     File mergeVideoWithAudio(File video, File audio) throws IOException;

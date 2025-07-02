@@ -7,15 +7,17 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import com.moe.socialnetwork.api.dtos.ZCodeDto;
-import com.moe.socialnetwork.api.dtos.KeyWordPageSize;
-import com.moe.socialnetwork.api.dtos.TagRequestDTO;
-import com.moe.socialnetwork.api.dtos.TagResponseDTO;
+import com.moe.socialnetwork.api.dtos.RQKeyWordPageSizeDTO;
+import com.moe.socialnetwork.api.dtos.RQTagDTO;
+import com.moe.socialnetwork.api.dtos.RPTagDTO;
 import com.moe.socialnetwork.api.services.ITagService;
 import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.response.ResponseAPI;
 
 import jakarta.validation.Valid;
-
+/**
+ * Author: nhutnm379
+ */
 @RestController
 @RequestMapping("/api/tag")
 public class TagController {
@@ -27,10 +29,10 @@ public class TagController {
     }
 
     @PostMapping("/search-by-code")
-    public ResponseEntity<ResponseAPI<List<TagResponseDTO>>> searchTagByCode(@RequestBody ZCodeDto request) {
-        List<TagResponseDTO> tagList = tagService.searchTags(request.getCode());
+    public ResponseEntity<ResponseAPI<List<RPTagDTO>>> searchTagByCode(@RequestBody ZCodeDto request) {
+        List<RPTagDTO> tagList = tagService.searchTags(request.getCode());
 
-        ResponseAPI<List<TagResponseDTO>> response = new ResponseAPI<>();
+        ResponseAPI<List<RPTagDTO>> response = new ResponseAPI<>();
         response.setCode(200);
         response.setMessage("Lấy list tag thành công");
         response.setData(tagList);
@@ -40,10 +42,10 @@ public class TagController {
 
     // Phương thức tìm kiếm tag theo keyword ()
     @PostMapping("/search")
-    public ResponseEntity<ResponseAPI<List<TagResponseDTO>>> searchTags(@RequestBody KeyWordPageSize request) {
-        List<TagResponseDTO> tagList = tagService.searchTags(request.getKeyWord());
+    public ResponseEntity<ResponseAPI<List<RPTagDTO>>> searchTags(@RequestBody RQKeyWordPageSizeDTO request) {
+        List<RPTagDTO> tagList = tagService.searchTags(request.getKeyWord());
 
-        ResponseAPI<List<TagResponseDTO>> response = new ResponseAPI<>();
+        ResponseAPI<List<RPTagDTO>> response = new ResponseAPI<>();
         response.setCode(200);
         response.setMessage("Tìm kiếm thành công");
         response.setData(tagList);
@@ -53,13 +55,13 @@ public class TagController {
 
     // Phương thức tạo tag mới (POST)
     @PostMapping("/create")
-    public ResponseEntity<ResponseAPI<TagResponseDTO>> addTag(
-            @RequestBody @Valid TagRequestDTO request,
+    public ResponseEntity<ResponseAPI<RPTagDTO>> addTag(
+            @RequestBody @Valid RQTagDTO request,
             @AuthenticationPrincipal User user) {
 
-        TagResponseDTO tag = tagService.addTag(request.getTag(), user);
+        RPTagDTO tag = tagService.addTag(request.getTag(), user);
 
-        ResponseAPI<TagResponseDTO> response = new ResponseAPI<>();
+        ResponseAPI<RPTagDTO> response = new ResponseAPI<>();
         response.setCode(200);
         response.setMessage("Tag được tạo thành công");
         response.setData(tag);

@@ -9,7 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.cloudinary.Cloudinary;
-
+/**
+ * Author: nhutnm379
+ */
 @Configuration
 public class CloudinaryConfig {
 

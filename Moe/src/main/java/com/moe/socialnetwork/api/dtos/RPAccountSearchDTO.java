@@ -1,7 +1,9 @@
 package com.moe.socialnetwork.api.dtos;
 
 import lombok.Data;
-
+/**
+ * Author: nhutnm379
+ */
 @Data
 public class RPAccountSearchDTO {
     private String userCode;

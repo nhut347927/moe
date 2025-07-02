@@ -13,21 +13,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.moe.socialnetwork.api.services.IEmailService;
-import com.moe.socialnetwork.auth.dtos.ChangePasswordRequestDTO;
-import com.moe.socialnetwork.auth.dtos.LoginRequestDTO;
-import com.moe.socialnetwork.auth.dtos.LoginResponseDTO;
-import com.moe.socialnetwork.auth.dtos.LoginWithGoogleRequestDTO;
-import com.moe.socialnetwork.auth.dtos.RegisterRequestDTO;
-import com.moe.socialnetwork.auth.dtos.PasswordResetRequestRequestDTO;
-import com.moe.socialnetwork.auth.dtos.RefreshAccessTokenRequestDTO;
-import com.moe.socialnetwork.auth.dtos.PasswordResetRequestDTO;
-import com.moe.socialnetwork.auth.dtos.UserRegisterResponseDTO;
+import com.moe.socialnetwork.auth.dtos.RQChangePasswordDTO;
+import com.moe.socialnetwork.auth.dtos.RQLoginDTO;
+import com.moe.socialnetwork.auth.dtos.RPLoginDTO;
+import com.moe.socialnetwork.auth.dtos.RQLoginWithGoogleDTO;
+import com.moe.socialnetwork.auth.dtos.RQRegisterDTO;
+import com.moe.socialnetwork.auth.dtos.RQPasswordResetRequestDTO;
+import com.moe.socialnetwork.auth.dtos.RQRefreshAccessTokenDTO;
+import com.moe.socialnetwork.auth.dtos.RQPasswordResetDTO;
+import com.moe.socialnetwork.auth.dtos.RPUserRegisterDTO;
 import com.moe.socialnetwork.auth.services.IAuthService;
 import com.moe.socialnetwork.auth.services.ITokenService;
 import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.response.ResponseAPI;
 import jakarta.validation.Valid;
-
+/**
+ * Author: nhutnm379
+ */
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -49,28 +51,28 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ResponseAPI<UserRegisterResponseDTO>> register(
-            @RequestBody @Valid RegisterRequestDTO request) {
-        UserRegisterResponseDTO registeredUser = authService.register(request);
+    public ResponseEntity<ResponseAPI<RPUserRegisterDTO>> register(
+            @RequestBody @Valid RQRegisterDTO request) {
+        RPUserRegisterDTO registeredUser = authService.register(request);
         return ResponseEntity.ok(ResponseAPI.of(HttpStatus.OK.value(), "Registration successful", registeredUser));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ResponseAPI<LoginResponseDTO>> login(@RequestBody @Valid LoginRequestDTO request) {
-        LoginResponseDTO login = authService.login(request);
+    public ResponseEntity<ResponseAPI<RPLoginDTO>> login(@RequestBody @Valid RQLoginDTO request) {
+        RPLoginDTO login = authService.login(request);
         return buildLoginResponse(login);
     }
 
     @PostMapping("/google-login")
-    public ResponseEntity<ResponseAPI<LoginResponseDTO>> loginWithGoogle(
-            @RequestBody @Valid LoginWithGoogleRequestDTO request) {
-        LoginResponseDTO login = authService.loginWithGoogle(request.getToken());
+    public ResponseEntity<ResponseAPI<RPLoginDTO>> loginWithGoogle(
+            @RequestBody @Valid RQLoginWithGoogleDTO request) {
+        RPLoginDTO login = authService.loginWithGoogle(request.getToken());
         return buildLoginResponse(login);
     }
 
     @PutMapping("/change-password")
     public ResponseEntity<ResponseAPI<String>> changePassword(@AuthenticationPrincipal User user,
-            @RequestBody @Valid ChangePasswordRequestDTO request) {
+            @RequestBody @Valid RQChangePasswordDTO request) {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(ResponseAPI.error(HttpStatus.UNAUTHORIZED.value(), "User is not authenticated", null));
@@ -85,7 +87,7 @@ public class AuthController {
 
     @PostMapping("/password-reset-request")
     public ResponseEntity<ResponseAPI<String>> passwordResetRequest(
-            @RequestBody @Valid PasswordResetRequestRequestDTO request) {
+            @RequestBody @Valid RQPasswordResetRequestDTO request) {
         User user = authService.findByEmail(request.getEmail());
         String resetToken = tokenService.generatePasswordResetToken(user);
         emailService.sendPasswordResetEmail(user.getEmail(), resetToken);
@@ -95,7 +97,7 @@ public class AuthController {
     }
 
     @PostMapping("/password-reset")
-    public ResponseEntity<ResponseAPI<String>> passwordReset(@RequestBody @Valid PasswordResetRequestDTO request) {
+    public ResponseEntity<ResponseAPI<String>> passwordReset(@RequestBody @Valid RQPasswordResetDTO request) {
         User user = authService.findByResetToken(request.getToken());
 
         if (!tokenService.validatePasswordResetToken(user, request.getToken())) {
@@ -110,7 +112,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<ResponseAPI<String>> refreshAccessToken(@RequestBody RefreshAccessTokenRequestDTO request) {
+    public ResponseEntity<ResponseAPI<String>> refreshAccessToken(@RequestBody RQRefreshAccessTokenDTO request) {
 
         if (request.getRefreshToken() == null || !tokenService.validateJwtToken(request.getRefreshToken())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -155,7 +157,7 @@ public class AuthController {
                 .body(ResponseAPI.of(HttpStatus.OK.value(), "Logged out successfully", "Success"));
     }
 
-    private ResponseEntity<ResponseAPI<LoginResponseDTO>> buildLoginResponse(LoginResponseDTO login) {
+    private ResponseEntity<ResponseAPI<RPLoginDTO>> buildLoginResponse(RPLoginDTO login) {
         int maxAgeAccessToken = (int) (jwtExpirationMs / 1000);
         //int maxAgeRefreshToken = (int) (jwtExpirationMs2 / 1000);
 

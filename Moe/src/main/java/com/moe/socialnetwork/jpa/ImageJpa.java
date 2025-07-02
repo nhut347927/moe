@@ -3,7 +3,9 @@ package com.moe.socialnetwork.jpa;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.moe.socialnetwork.models.Image;
-
-public interface ImageJpa extends JpaRepository<Image, Long>{
+/**
+ * Author: nhutnm379
+ */
+public interface ImageJPA extends JpaRepository<Image, Long>{
     
 }

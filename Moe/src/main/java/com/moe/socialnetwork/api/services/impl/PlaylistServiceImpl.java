@@ -1,13 +1,13 @@
 package com.moe.socialnetwork.api.services.impl;
 
-import com.moe.socialnetwork.api.dtos.PlaylistDTO;
-import com.moe.socialnetwork.api.dtos.PlaylistPostDTO;
-import com.moe.socialnetwork.api.dtos.PlaylistSaveDTO;
+import com.moe.socialnetwork.api.dtos.RPPlaylistDTO;
+import com.moe.socialnetwork.api.dtos.RPPlaylistPostDTO;
+import com.moe.socialnetwork.api.dtos.RQPlaylistSaveDTO;
 import com.moe.socialnetwork.api.services.IPlaylistService;
-import com.moe.socialnetwork.jpa.AudioJpa;
-import com.moe.socialnetwork.jpa.PlaylistJpa;
-import com.moe.socialnetwork.jpa.PostJpa;
-import com.moe.socialnetwork.jpa.PostPlaylistJpa;
+import com.moe.socialnetwork.jpa.AudioJPA;
+import com.moe.socialnetwork.jpa.PlaylistJPA;
+import com.moe.socialnetwork.jpa.PostJPA;
+import com.moe.socialnetwork.jpa.PostPlaylistJPA;
 import com.moe.socialnetwork.models.Audio;
 import com.moe.socialnetwork.models.Image;
 import com.moe.socialnetwork.models.Playlist;
@@ -22,30 +22,32 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
+/**
+ * Author: nhutnm379
+ */
 @Service
 public class PlaylistServiceImpl implements IPlaylistService {
 
-    private final PlaylistJpa playlistJpa;
-    private final PostJpa postJpa;
-    private final PostPlaylistJpa postPlaylistJpa;
-    private final AudioJpa audioJpa;
+    private final PlaylistJPA playlistJpa;
+    private final PostJPA postJpa;
+    private final PostPlaylistJPA postPlaylistJpa;
+    private final AudioJPA audioJpa;
 
-    public PlaylistServiceImpl(PlaylistJpa playlistJpa, PostJpa postJpa, PostPlaylistJpa postPlaylistJpa, AudioJpa audioJpa) {
+    public PlaylistServiceImpl(PlaylistJPA playlistJpa, PostJPA postJpa, PostPlaylistJPA postPlaylistJpa, AudioJPA audioJpa) {
         this.playlistJpa = playlistJpa;
         this.postJpa = postJpa;
         this.postPlaylistJpa = postPlaylistJpa;
         this.audioJpa = audioJpa;
     }
 
-    public List<PlaylistDTO> getPlaylistsByUser(UUID userCode) {
+    public List<RPPlaylistDTO> getPlaylistsByUser(UUID userCode) {
         return playlistJpa.findPlaylistByUserCode(userCode)
                 .stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public List<PlaylistPostDTO> getPostsByPlaylist(UUID playlistCode, User user) {
+    public List<RPPlaylistPostDTO> getPostsByPlaylist(UUID playlistCode, User user) {
         List<Post> playlist = playlistJpa.findPostsByPlaylistCodeAndUserId(playlistCode, user.getId());
 
         return playlist.stream()
@@ -53,7 +55,7 @@ public class PlaylistServiceImpl implements IPlaylistService {
                 .collect(Collectors.toList());
     }
 
-    public void createPlaylist(PlaylistSaveDTO dto, User user) {
+    public void createPlaylist(RQPlaylistSaveDTO dto, User user) {
         Playlist playlist = new Playlist();
         playlist.setName(dto.getName());
         playlist.setDescription(dto.getDescription());
@@ -69,7 +71,7 @@ public class PlaylistServiceImpl implements IPlaylistService {
 
     }
 
-    public void updatePlaylist(PlaylistDTO dto, User user) {
+    public void updatePlaylist(RPPlaylistDTO dto, User user) {
         Playlist playlist = playlistJpa
                 .findPlaylistByPlaylistCodeAndUserId(UUID.fromString(dto.getCode()), user.getId())
                 .orElseThrow(() -> new AppException("Playlist not found or not public", 404));
@@ -130,8 +132,8 @@ public class PlaylistServiceImpl implements IPlaylistService {
 
     }
 
-    private PlaylistDTO toDTO(Playlist playlist) {
-        PlaylistDTO dto = new PlaylistDTO();
+    private RPPlaylistDTO toDTO(Playlist playlist) {
+        RPPlaylistDTO dto = new RPPlaylistDTO();
         dto.setCode(playlist.getCode() != null ? playlist.getCode().toString() : null);
         dto.setName(playlist.getName());
         dto.setDescription(playlist.getDescription());
@@ -140,8 +142,8 @@ public class PlaylistServiceImpl implements IPlaylistService {
         return dto;
     }
 
-    private PlaylistPostDTO toPlaylistPostResponse(Post post, User user) {
-        PlaylistPostDTO dto = new PlaylistPostDTO();
+    private RPPlaylistPostDTO toPlaylistPostResponse(Post post, User user) {
+        RPPlaylistPostDTO dto = new RPPlaylistPostDTO();
         dto.setPostCode(String.valueOf(post.getCode()));
         dto.setCreated(post.getCreatedAt().toString());
 

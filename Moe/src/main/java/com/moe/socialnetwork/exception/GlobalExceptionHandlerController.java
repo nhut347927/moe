@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.moe.socialnetwork.api.services.impl.ActivityLogServiceImpl;
 import com.moe.socialnetwork.response.ResponseAPI;
-
+/**
+ * Author: nhutnm379
+ */
 @ControllerAdvice
 public class GlobalExceptionHandlerController {
 

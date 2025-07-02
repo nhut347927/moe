@@ -14,14 +14,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.moe.socialnetwork.api.dtos.RPAccountDetailDTO;
 import com.moe.socialnetwork.api.dtos.RPAccountSearchDTO;
 import com.moe.socialnetwork.api.dtos.ZCodeDto;
-import com.moe.socialnetwork.api.dtos.KeyWordPageSize;
-import com.moe.socialnetwork.api.dtos.ProfileUpdateDTO;
+import com.moe.socialnetwork.api.dtos.RQKeyWordPageSizeDTO;
+import com.moe.socialnetwork.api.dtos.RQProfileUpdateDTO;
 import com.moe.socialnetwork.api.services.IAccountService;
 import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.response.ResponseAPI;
 
 import jakarta.validation.Valid;
-
+/**
+ * Author: nhutnm379
+ */
 @RestController
 @RequestMapping("/api/account")
 public class AccountController {
@@ -34,7 +36,7 @@ public class AccountController {
 
     @PostMapping("/update-profile")
     public ResponseEntity<ResponseAPI<Void>> updateProfile(
-            @RequestBody @Valid ProfileUpdateDTO dto,
+            @RequestBody @Valid RQProfileUpdateDTO dto,
             @AuthenticationPrincipal User userLogin) {
 
         accountService.updateProfileAccUser(dto.getDisplayName(), dto.getUserName(), dto.getBio(), userLogin);
@@ -60,7 +62,7 @@ public class AccountController {
 
     @PostMapping("/search")
     public ResponseEntity<ResponseAPI<List<RPAccountSearchDTO>>> searchUsers(
-            @RequestBody KeyWordPageSize keyWordPageSize,
+            @RequestBody RQKeyWordPageSizeDTO keyWordPageSize,
             @AuthenticationPrincipal User userLogin) {
         ResponseAPI<List<RPAccountSearchDTO>> response = new ResponseAPI<>();
 

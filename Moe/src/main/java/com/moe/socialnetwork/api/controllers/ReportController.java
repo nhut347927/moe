@@ -10,13 +10,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.moe.socialnetwork.api.dtos.ReportRequestDTO;
+import com.moe.socialnetwork.api.dtos.RQReportDTO;
 import com.moe.socialnetwork.api.services.IReportService;
 import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.response.ResponseAPI;
 
 import jakarta.validation.Valid;
-
+/**
+ * Author: nhutnm379
+ */
 @RestController
 @RequestMapping("/api/report")
 public class ReportController {
@@ -28,7 +30,7 @@ public class ReportController {
 
     @PostMapping("/create")
     public ResponseEntity<ResponseAPI<Void>> likeComment(
-            @RequestBody @Valid ReportRequestDTO request,
+            @RequestBody @Valid RQReportDTO request,
             @AuthenticationPrincipal User user) {
 
         iReportService.addReport(UUID.fromString(request.getPostCode()), request.getReason(),

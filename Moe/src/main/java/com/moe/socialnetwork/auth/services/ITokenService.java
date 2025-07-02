@@ -7,7 +7,9 @@ import com.moe.socialnetwork.exception.AppException;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
-
+/**
+ * Author: nhutnm379
+ */
 public interface ITokenService {
 
     /**

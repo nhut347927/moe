@@ -14,19 +14,19 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
-import com.moe.socialnetwork.api.dtos.PostCreateRepuestDTO;
-import com.moe.socialnetwork.api.dtos.PostResponseDTO;
-import com.moe.socialnetwork.api.dtos.PostSearchResponseDTO;
-import com.moe.socialnetwork.api.dtos.PostCreateRepuestDTO.FFmpegMergeParams;
+import com.moe.socialnetwork.api.dtos.RQPostCreateDTO;
+import com.moe.socialnetwork.api.dtos.RPPostResponseDTO;
+import com.moe.socialnetwork.api.dtos.RPPostSearchDTO;
+import com.moe.socialnetwork.api.dtos.RQPostCreateDTO.FFmpegMergeParams;
 import com.moe.socialnetwork.api.services.IFFmpegService;
 import com.moe.socialnetwork.api.services.IPostService;
-import com.moe.socialnetwork.jpa.AudioJpa;
-import com.moe.socialnetwork.jpa.ImageJpa;
-import com.moe.socialnetwork.jpa.LikeJpa;
-import com.moe.socialnetwork.jpa.PostJpa;
-import com.moe.socialnetwork.jpa.PostTagJpa;
-import com.moe.socialnetwork.jpa.TagJpa;
-import com.moe.socialnetwork.jpa.ViewJpa;
+import com.moe.socialnetwork.jpa.AudioJPA;
+import com.moe.socialnetwork.jpa.ImageJPA;
+import com.moe.socialnetwork.jpa.LikeJPA;
+import com.moe.socialnetwork.jpa.PostJPA;
+import com.moe.socialnetwork.jpa.PostTagJPA;
+import com.moe.socialnetwork.jpa.TagJPA;
+import com.moe.socialnetwork.jpa.ViewJPA;
 import com.moe.socialnetwork.models.Audio;
 import com.moe.socialnetwork.models.Image;
 import com.moe.socialnetwork.models.Like;
@@ -38,22 +38,24 @@ import com.moe.socialnetwork.models.View;
 import com.moe.socialnetwork.exception.AppException;
 
 import jakarta.transaction.Transactional;
-
+/**
+ * Author: nhutnm379
+ */
 @Service
 public class PostServiceImpl implements IPostService {
 
-	private final PostTagJpa postTagJPA;
-	private final PostJpa postJPA;
+	private final PostTagJPA postTagJPA;
+	private final PostJPA postJPA;
 	private final IFFmpegService ffmpegService;
-	private final TagJpa tagJPA;
-	private final AudioJpa audioJPA;
-	private final ImageJpa imageJPA;
-	private final LikeJpa likeJpa;
+	private final TagJPA tagJPA;
+	private final AudioJPA audioJPA;
+	private final ImageJPA imageJPA;
+	private final LikeJPA likeJpa;
 	private final CloudinaryServiceImpl cloudinaryService;
-	private final ViewJpa viewJPA;
+	private final ViewJPA viewJPA;
 
-	public PostServiceImpl(PostTagJpa postTagJPA, PostJpa postJPA, TagJpa tagJPA, AudioJpa audioJPA, ImageJpa imageJPA,
-			CloudinaryServiceImpl cloudinaryService, IFFmpegService ffmpegService, LikeJpa likeJpa, ViewJpa viewJPA) {
+	public PostServiceImpl(PostTagJPA postTagJPA, PostJPA postJPA, TagJPA tagJPA, AudioJPA audioJPA, ImageJPA imageJPA,
+			CloudinaryServiceImpl cloudinaryService, IFFmpegService ffmpegService, LikeJPA likeJpa, ViewJPA viewJPA) {
 		this.postTagJPA = postTagJPA;
 		this.postJPA = postJPA;
 		this.tagJPA = tagJPA;
@@ -65,16 +67,16 @@ public class PostServiceImpl implements IPostService {
 		this.viewJPA = viewJPA;
 	}
 
-	public List<PostSearchResponseDTO> searchPosts(String keyword, int page, int size) {
+	public List<RPPostSearchDTO> searchPosts(String keyword, int page, int size) {
 		Pageable pageable = PageRequest.of(page, size);
 		List<Post> posts = postJPA.findPostsByTitleOrDescription(keyword, pageable).getContent();
 		if (posts.isEmpty()) {
 			throw new AppException("No posts found containing the keyword!", 404);
 		}
 
-		List<PostSearchResponseDTO> response = new ArrayList<>();
+		List<RPPostSearchDTO> response = new ArrayList<>();
 		for (Post post : posts) {
-			PostSearchResponseDTO dto = new PostSearchResponseDTO();
+			RPPostSearchDTO dto = new RPPostSearchDTO();
 			dto.setUserCode(String.valueOf(post.getUser().getCode()));
 			dto.setTitle(post.getTitle());
 			dto.setUserName(post.getUser().getUsername());
@@ -107,7 +109,7 @@ public class PostServiceImpl implements IPostService {
 		return response;
 	}
 
-	public PostResponseDTO getPostByCode(String postCode, User user) {
+	public RPPostResponseDTO getPostByCode(String postCode, User user) {
 		UUID code = UUID.fromString(postCode);
 		Post post = postJPA.findPostByPostCode(code)
 				.orElseThrow(() -> new AppException("Post not found with provided postCode", 404));
@@ -153,7 +155,7 @@ public class PostServiceImpl implements IPostService {
 	}
 
 	@Transactional
-	public Boolean createNewPost(PostCreateRepuestDTO dto, User user) {
+	public Boolean createNewPost(RQPostCreateDTO dto, User user) {
 		Post save = null;
 		// Create post
 		Post post = new Post();
@@ -301,7 +303,7 @@ public class PostServiceImpl implements IPostService {
 	}
 
 	@Override
-	public List<PostResponseDTO> getPostList(User user) {
+	public List<RPPostResponseDTO> getPostList(User user) {
 		// 1. Lấy top 25 tagId mà user đã like
 		List<Long> tagIds = postJPA.findTopTagIdsUserLiked(user.getId(), PageRequest.of(0, 25));
 
@@ -361,8 +363,8 @@ public class PostServiceImpl implements IPostService {
 		return result.stream().limit(18).map(post -> this.toPostResponse(post, user)).collect(Collectors.toList());
 	}
 
-	private PostResponseDTO toPostResponse(Post post, User user) {
-		PostResponseDTO dto = new PostResponseDTO();
+	private RPPostResponseDTO toPostResponse(Post post, User user) {
+		RPPostResponseDTO dto = new RPPostResponseDTO();
 		dto.setPostId(post.getId().toString());
 		dto.setUserCode(String.valueOf(post.getUser().getCode()));
 		dto.setPostCode(String.valueOf(post.getCode()));

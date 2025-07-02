@@ -15,24 +15,26 @@ import com.moe.socialnetwork.api.dtos.RPAccountDetailDTO;
 import com.moe.socialnetwork.api.dtos.RPAccountSearchDTO;
 import com.moe.socialnetwork.api.services.IAccountService;
 import com.moe.socialnetwork.api.services.ICloudinaryService;
-import com.moe.socialnetwork.jpa.FollowerJpa;
-import com.moe.socialnetwork.jpa.PostJpa;
-import com.moe.socialnetwork.jpa.UserJpa;
+import com.moe.socialnetwork.jpa.FollowerJPA;
+import com.moe.socialnetwork.jpa.PostJPA;
+import com.moe.socialnetwork.jpa.UserJPA;
 import com.moe.socialnetwork.models.Follower;
 import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.exception.AppException;
 import com.moe.socialnetwork.util.Base64Util;
 
 import jakarta.transaction.Transactional;
-
+/**
+ * Author: nhutnm379
+ */
 @Service
 public class AccountServiceImpl implements IAccountService {
-    private final UserJpa userJpa;
-    private final FollowerJpa followerJpa;
+    private final UserJPA userJpa;
+    private final FollowerJPA followerJpa;
     private final ICloudinaryService cloudinaryService;
-    private final PostJpa postJpa;
+    private final PostJPA postJpa;
 
-    public AccountServiceImpl(UserJpa userJpa, FollowerJpa followerJpa, ICloudinaryService cloudinaryService,PostJpa postJpa) {
+    public AccountServiceImpl(UserJPA userJpa, FollowerJPA followerJpa, ICloudinaryService cloudinaryService,PostJPA postJpa) {
         this.userJpa = userJpa;
         this.followerJpa = followerJpa;
         this.cloudinaryService = cloudinaryService;

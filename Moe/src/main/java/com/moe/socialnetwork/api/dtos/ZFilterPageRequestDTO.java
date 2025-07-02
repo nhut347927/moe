@@ -1,18 +1,26 @@
 package com.moe.socialnetwork.api.dtos;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+/**
+ * Author: nhutnm379
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ZFilterPageRequestDTO {
-      private String keyword;       // tìm kiếm toàn cục (title, name, content, ...)
-    private String filterType;    // loại lọc, tùy context (VD: PostType, Role, Category,...)
-    private String visibility;    // cũng có thể là trạng thái chung
+    private String code;
+    private String keyword;
+
+    @Min(value = 0, message = "Page must be greater than or equal to 0.")
     private Integer page = 0;
+
+    @Min(value = 1, message = "Size must be greater than or equal to 1.")
     private Integer size = 10;
-    private String sortBy = "createdAt";
-    private String sortDirection = "desc";
+
+    @Pattern(regexp = "^(desc|asc)$", message = "Sort type must be either 'desc' or 'asc'")
+    private String sort = "desc";
 }

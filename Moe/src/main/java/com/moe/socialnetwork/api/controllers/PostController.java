@@ -10,32 +10,29 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.moe.socialnetwork.api.dtos.ZCodeDto;
-import com.moe.socialnetwork.api.dtos.CodePageSize;
-import com.moe.socialnetwork.api.dtos.KeyWordPageSize;
-import com.moe.socialnetwork.api.dtos.PostCreateRepuestDTO;
-import com.moe.socialnetwork.api.dtos.PostResponseDTO;
-import com.moe.socialnetwork.api.dtos.PostSearchResponseDTO;
-import com.moe.socialnetwork.api.queue.post.PostCreationMessage;
+import com.moe.socialnetwork.api.dtos.RQKeyWordPageSizeDTO;
+import com.moe.socialnetwork.api.dtos.RQPostCreateDTO;
+import com.moe.socialnetwork.api.dtos.RPPostResponseDTO;
+import com.moe.socialnetwork.api.dtos.RPPostSearchDTO;
 import com.moe.socialnetwork.api.services.IPostService;
-import com.moe.socialnetwork.api.queue.post.PostCreationProducer;
 import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.response.ResponseAPI;
 
 import jakarta.validation.Valid;
-
+/**
+ * Author: nhutnm379
+ */
 @RestController
 @RequestMapping("/api/post")
 public class PostController {
     private final IPostService postService;
-    private final PostCreationProducer postCreationProducer;
+   // private final PostCreationProducer postCreationProducer;
 
-    public PostController(IPostService postService, PostCreationProducer postCreationProducer) {
+    public PostController(IPostService postService) {
         this.postService = postService;
-        this.postCreationProducer = postCreationProducer;
     };
 
     @PostMapping("/delete")
@@ -52,11 +49,11 @@ public class PostController {
     }
 
     @PostMapping("/search")
-    public ResponseEntity<ResponseAPI<List<PostSearchResponseDTO>>> searchPosts(
-            @RequestBody KeyWordPageSize keyPageSize) {
+    public ResponseEntity<ResponseAPI<List<RPPostSearchDTO>>> searchPosts(
+            @RequestBody RQKeyWordPageSizeDTO keyPageSize) {
 
-        ResponseAPI<List<PostSearchResponseDTO>> response = new ResponseAPI<>();
-        List<PostSearchResponseDTO> posts = postService.searchPosts(keyPageSize.getKeyWord(), keyPageSize.getPage(),
+        ResponseAPI<List<RPPostSearchDTO>> response = new ResponseAPI<>();
+        List<RPPostSearchDTO> posts = postService.searchPosts(keyPageSize.getKeyWord(), keyPageSize.getPage(),
                 keyPageSize.getSize());
         response.setCode(HttpStatus.OK.value());
         response.setMessage("Search completed successfully!");
@@ -65,11 +62,11 @@ public class PostController {
     }
 
     @PostMapping("/get-post-by-code")
-    public ResponseEntity<ResponseAPI<PostResponseDTO>> getPostByCode(
+    public ResponseEntity<ResponseAPI<RPPostResponseDTO>> getPostByCode(
             @RequestBody ZCodeDto postCode,
             @AuthenticationPrincipal User user) {
-        ResponseAPI<PostResponseDTO> response = new ResponseAPI<>();
-        PostResponseDTO post = postService.getPostByCode(postCode.getCode(), user);
+        ResponseAPI<RPPostResponseDTO> response = new ResponseAPI<>();
+        RPPostResponseDTO post = postService.getPostByCode(postCode.getCode(), user);
         response.setCode(HttpStatus.OK.value());
         response.setMessage("Post retrieved successfully!");
         response.setData(post);
@@ -103,12 +100,12 @@ public class PostController {
     }
 
     @GetMapping("/get-post")
-    public ResponseEntity<ResponseAPI<List<PostResponseDTO>>> getPost(
+    public ResponseEntity<ResponseAPI<List<RPPostResponseDTO>>> getPost(
             @AuthenticationPrincipal User user) {
 
-        ResponseAPI<List<PostResponseDTO>> response = new ResponseAPI<>();
+        ResponseAPI<List<RPPostResponseDTO>> response = new ResponseAPI<>();
 
-        List<PostResponseDTO> posts = postService.getPostList(user);
+        List<RPPostResponseDTO> posts = postService.getPostList(user);
         response.setCode(HttpStatus.OK.value());
         response.setMessage("Successful!");
         response.setData(posts);
@@ -119,7 +116,7 @@ public class PostController {
     @PostMapping("/create-new-post")
     public ResponseEntity<ResponseAPI<String>> createNewPost(
             @AuthenticationPrincipal User user,
-            @Valid @RequestBody PostCreateRepuestDTO dto) {
+            @Valid @RequestBody RQPostCreateDTO dto) {
 
         postService.createNewPost(dto, user);
 

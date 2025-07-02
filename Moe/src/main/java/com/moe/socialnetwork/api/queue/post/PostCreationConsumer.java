@@ -1,21 +1,23 @@
 package com.moe.socialnetwork.api.queue.post;
 
-import java.util.concurrent.TimeUnit;
+// import java.util.concurrent.TimeUnit;
 
-import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.RedisConnectionFailureException;
-import org.springframework.data.redis.core.RedisTemplate;
+// import org.springframework.dao.DataAccessException;
+// import org.springframework.data.redis.RedisConnectionFailureException;
+// import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moe.socialnetwork.api.services.impl.PostServiceImpl;
-import com.moe.socialnetwork.jpa.UserJpa;
-import com.moe.socialnetwork.models.User;
+// import com.fasterxml.jackson.databind.ObjectMapper;
+// import com.moe.socialnetwork.api.services.impl.PostServiceImpl;
+// import com.moe.socialnetwork.jpa.UserJPA;
+// import com.moe.socialnetwork.models.User;
 
-import jakarta.annotation.PostConstruct;
+// import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
+/**
+ * Author: nhutnm379
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j

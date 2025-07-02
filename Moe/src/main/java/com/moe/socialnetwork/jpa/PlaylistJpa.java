@@ -10,8 +10,10 @@ import org.springframework.data.repository.query.Param;
 
 import com.moe.socialnetwork.models.Playlist;
 import com.moe.socialnetwork.models.Post;
-
-public interface PlaylistJpa extends JpaRepository<Playlist, Long> {
+/**
+ * Author: nhutnm379
+ */
+public interface PlaylistJPA extends JpaRepository<Playlist, Long> {
     @Query("SELECT p FROM UserPlaylist up JOIN up.user u JOIN up.playlist p WHERE u.code = :userCode AND p.isDeleted = false AND (p.isPublic = true OR p.user.code = :userCode)")
     List<Playlist> findPlaylistByUserCode(@Param("userCode") UUID userCode);
 

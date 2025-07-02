@@ -10,8 +10,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.moe.socialnetwork.models.User;
-
-public interface UserJpa extends JpaRepository<User, Long> {
+/**
+ * Author: nhutnm379
+ */
+public interface UserJPA extends JpaRepository<User, Long> {
 	@Query("SELECT u FROM User u WHERE u.email = :email")
 	Optional<User> findByEmail(@Param("email") String email);
 

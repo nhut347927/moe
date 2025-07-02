@@ -1,13 +1,15 @@
 package com.moe.socialnetwork.api.queue.post;
 
-import org.springframework.data.redis.core.RedisTemplate;
+// import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moe.socialnetwork.exception.AppException;
+// import com.fasterxml.jackson.databind.ObjectMapper;
+// import com.moe.socialnetwork.exception.AppException;
 
 import lombok.RequiredArgsConstructor;
-
+/**
+ * Author: nhutnm379
+ */
 @Component
 @RequiredArgsConstructor
 public class PostCreationProducer {

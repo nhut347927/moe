@@ -2,11 +2,13 @@ package com.moe.socialnetwork.api.services;
 
 import java.util.List;
 
-import com.moe.socialnetwork.api.dtos.TagResponseDTO;
+import com.moe.socialnetwork.api.dtos.RPTagDTO;
 import com.moe.socialnetwork.models.User;
-
+/**
+ * Author: nhutnm379
+ */
 public interface ITagService {
-   List<TagResponseDTO> searchByCode(String code);
-    List<TagResponseDTO> searchTags(String keyword);
-    TagResponseDTO addTag(String name, User user);
+   List<RPTagDTO> searchByCode(String code);
+    List<RPTagDTO> searchTags(String keyword);
+    RPTagDTO addTag(String name, User user);
 }

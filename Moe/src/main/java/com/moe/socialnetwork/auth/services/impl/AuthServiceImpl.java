@@ -16,37 +16,39 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
-import com.moe.socialnetwork.auth.dtos.LoginRequestDTO;
-import com.moe.socialnetwork.auth.dtos.LoginResponseDTO;
-import com.moe.socialnetwork.auth.dtos.RegisterRequestDTO;
-import com.moe.socialnetwork.auth.dtos.UserRegisterResponseDTO;
+import com.moe.socialnetwork.auth.dtos.RQLoginDTO;
+import com.moe.socialnetwork.auth.dtos.RPLoginDTO;
+import com.moe.socialnetwork.auth.dtos.RQRegisterDTO;
+import com.moe.socialnetwork.auth.dtos.RPUserRegisterDTO;
 import com.moe.socialnetwork.auth.services.IAuthService;
 import com.moe.socialnetwork.auth.services.ITokenService;
-import com.moe.socialnetwork.jpa.UserJpa;
+import com.moe.socialnetwork.jpa.UserJPA;
 import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.exception.AppException;
 import com.moe.socialnetwork.util.AuthorityUtil;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-
+/**
+ * Author: nhutnm379
+ */
 @Service
 public class AuthServiceImpl implements IAuthService {
 
-    private final UserJpa userJpa;
+    private final UserJPA userJpa;
     private final PasswordEncoder passwordEncoder;
     private final ITokenService tokenService;
     @Value("${google.client.id}")
     private String googleClientId;
 
-    public AuthServiceImpl(UserJpa userJPA, PasswordEncoder passwordEncoder, TokenServiceImpl tokenService) {
+    public AuthServiceImpl(UserJPA userJPA, PasswordEncoder passwordEncoder, TokenServiceImpl tokenService) {
         this.userJpa = userJPA;
         this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
     }
 
     @Transactional
-    public UserRegisterResponseDTO register(RegisterRequestDTO request) {
+    public RPUserRegisterDTO register(RQRegisterDTO request) {
         String email = request.getEmail().trim().toLowerCase();
 
         if (!request.getPassword().equals(request.getConfirmPassword())) {
@@ -75,7 +77,7 @@ public class AuthServiceImpl implements IAuthService {
         }
     }
 
-    public LoginResponseDTO login(LoginRequestDTO request) {
+    public RPLoginDTO login(RQLoginDTO request) {
         String email = request.getEmail();
         String password = request.getPassword();
         User user = userJpa.findByEmail(email)
@@ -88,7 +90,7 @@ public class AuthServiceImpl implements IAuthService {
         return buildLoginResponse(user);
     }
 
-    public LoginResponseDTO loginWithGoogle(String token) {
+    public RPLoginDTO loginWithGoogle(String token) {
         HttpTransport transport = new NetHttpTransport();
         JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
@@ -189,12 +191,12 @@ public class AuthServiceImpl implements IAuthService {
         userJpa.save(user);
     }
 
-    private LoginResponseDTO buildLoginResponse(User user) {
+    private RPLoginDTO buildLoginResponse(User user) {
         try {
             String refreshToken = tokenService.generateRefreshToken(user);
             String accessToken = tokenService.generateJwtToken(user);
 
-            LoginResponseDTO responseDTO = new LoginResponseDTO();
+            RPLoginDTO responseDTO = new RPLoginDTO();
             responseDTO.setAccessToken(accessToken);
             responseDTO.setRefreshToken(refreshToken);
 
@@ -207,7 +209,7 @@ public class AuthServiceImpl implements IAuthService {
             long expiresInSecondsRe = ChronoUnit.SECONDS.between(LocalDateTime.now(), expirationDateRe);
             responseDTO.setRefreshTokenExpiresIn(expiresInSecondsRe / 3600 + " Giờ");
 
-            UserRegisterResponseDTO userInfo = buildUserRegisterResponse(user);
+            RPUserRegisterDTO userInfo = buildUserRegisterResponse(user);
             responseDTO.setUser(userInfo);
             return responseDTO;
         } catch (Exception e) {
@@ -215,8 +217,8 @@ public class AuthServiceImpl implements IAuthService {
         }
     }
 
-    private UserRegisterResponseDTO buildUserRegisterResponse(User user) {
-        UserRegisterResponseDTO userInfo = new UserRegisterResponseDTO();
+    private RPUserRegisterDTO buildUserRegisterResponse(User user) {
+        RPUserRegisterDTO userInfo = new RPUserRegisterDTO();
         userInfo.setUserId(user.getId());
         userInfo.setEmail(user.getEmail());
         userInfo.setUserName(user.getUsername());

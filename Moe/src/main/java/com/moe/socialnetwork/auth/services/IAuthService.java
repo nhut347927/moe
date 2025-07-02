@@ -1,18 +1,20 @@
 package com.moe.socialnetwork.auth.services;
 
-import com.moe.socialnetwork.auth.dtos.LoginRequestDTO;
-import com.moe.socialnetwork.auth.dtos.LoginResponseDTO;
-import com.moe.socialnetwork.auth.dtos.RegisterRequestDTO;
-import com.moe.socialnetwork.auth.dtos.UserRegisterResponseDTO;
+import com.moe.socialnetwork.auth.dtos.RQLoginDTO;
+import com.moe.socialnetwork.auth.dtos.RPLoginDTO;
+import com.moe.socialnetwork.auth.dtos.RQRegisterDTO;
+import com.moe.socialnetwork.auth.dtos.RPUserRegisterDTO;
 import com.moe.socialnetwork.models.User;
-
+/**
+ * Author: nhutnm379
+ */
 public interface IAuthService {
 
-	UserRegisterResponseDTO register(RegisterRequestDTO request);
+	RPUserRegisterDTO register(RQRegisterDTO request);
 
-	LoginResponseDTO login(LoginRequestDTO request);
+	RPLoginDTO login(RQLoginDTO request);
 
-	LoginResponseDTO loginWithGoogle(String token);
+	RPLoginDTO loginWithGoogle(String token);
 
 	void changePassword(User user, String newPassword);
 
