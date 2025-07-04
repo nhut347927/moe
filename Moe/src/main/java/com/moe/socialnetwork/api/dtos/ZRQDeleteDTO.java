@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ZDeleteDTO {
+public class ZRQDeleteDTO {
     @NotBlank(message = "Code cannot be blank")
     private String code;
 }

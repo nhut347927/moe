@@ -44,8 +44,8 @@ export default function HashtagSearch({
   const searchTag = useCallback(async () => {
     if (!searchTerm) return [];
     try {
-      const response = await axiosInstance.post("tag/search", {
-        keyWord: searchTerm,
+      const response = await axiosInstance.get("tag/search", {
+        params: { keyWord: searchTerm },
       });
       return response.data.data ?? [];
     } catch (error: any) {
@@ -79,8 +79,8 @@ export default function HashtagSearch({
   const searchTagByCode = useCallback(async () => {
     if (!postCreateForm?.tagCodeList?.length) return [];
     try {
-      const response = await axiosInstance.post("tag/search-by-code", {
-        code: postCreateForm.tagCodeList.join(","),
+      const response = await axiosInstance.get("tag/search-by-code", {
+        params: { code: postCreateForm.tagCodeList.join(",") },
       });
       return response.data.data ?? [];
     } catch (error: any) {

@@ -57,8 +57,8 @@ export function MyProfilePage() {
   const fetchAccountProfile = async () => {
     try {
       console.log("Fetching my profile");
-      const response = await axiosInstance.post(
-        "account/get-my-account-detail"
+      const response = await axiosInstance.get(
+        "account/get-my-account"
       );
       return response.data.data;
     } catch (error: any) {
@@ -204,8 +204,14 @@ export function MyProfilePage() {
     const loadData = async () => {
       setIsLoading(true);
       try {
-        const data = await fetchAccountProfile();
-        setAccountDetail(data);
+        const profileData = await fetchAccountProfile();
+        const postsData = await fetchAccountPost(profileData.userCode, "0");
+        setAccountDetail({
+          ...profileData,
+          posts: postsData.contents, // assuming postsData has a 'contents' array
+          page: 1,
+          hasNext: postsData.hasNext,
+        });
       } catch (error: any) {
         toast({
           variant: "destructive",
@@ -217,7 +223,40 @@ export function MyProfilePage() {
     };
     loadData();
   }, []);
+  const loadMorePost = (userCode: string, page: string) => {
+    fetchAccountPost(userCode, page)
+      .then((newPosts) => {
+        setAccountDetail((prev) =>
+          prev
+            ? {
+                ...prev,
+                posts: [...(prev.posts || []), ...(newPosts.contents || [])],
+                page: Number(prev.page) + 1,
+                hasNext: newPosts.hasNext,
+              }
+            : prev
+        );
+      })
+      .catch((error) => {
+        toast({
+          variant: "destructive",
+          description:
+            error.response?.data?.message || "Failed to fetch more posts!",
+        });
+      });
+  };
 
+  const fetchAccountPost = async (code: string, page: string) => {
+    const response = await axiosInstance.get(`account/posts`, {
+      params: {
+        code: code,
+        page: page,
+        size: "12",
+        sort: "desc",
+      },
+    });
+    return response.data.data;
+  };
   if (isLoading && !accountDetail) {
     return (
       <div className="flex-1 flex justify-center items-center">
@@ -460,6 +499,21 @@ export function MyProfilePage() {
               ))
             )}
           </div>
+           {accountDetail?.hasNext && (
+            <div className="flex justify-center">
+              <button
+                onClick={() => {
+                  loadMorePost(
+                    accountDetail.userCode,
+                    String(accountDetail?.page)
+                  );
+                }}
+                className="px-4 py-1.5 mt-4 text-sm rounded-full border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+              >
+                Tải thêm bài viết
+              </button>
+            </div>
+          )}
         </div>
       </ScrollArea>
       {selectedPost && (

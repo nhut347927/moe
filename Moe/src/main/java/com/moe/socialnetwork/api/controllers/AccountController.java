@@ -6,21 +6,28 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.moe.socialnetwork.api.dtos.RPAccountDetailDTO;
 import com.moe.socialnetwork.api.dtos.RPAccountSearchDTO;
-import com.moe.socialnetwork.api.dtos.ZCodeDto;
+import com.moe.socialnetwork.api.dtos.ZRQCodeDto;
+import com.moe.socialnetwork.api.dtos.ZRQFilterPageDTO;
 import com.moe.socialnetwork.api.dtos.RQKeyWordPageSizeDTO;
 import com.moe.socialnetwork.api.dtos.RQProfileUpdateDTO;
+import com.moe.socialnetwork.api.dtos.ZRPPageDTO;
 import com.moe.socialnetwork.api.services.IAccountService;
 import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.response.ResponseAPI;
 
 import jakarta.validation.Valid;
+
 /**
  * Author: nhutnm379
  */
@@ -48,10 +55,10 @@ public class AccountController {
 
     @PostMapping("/update-avatar")
     public ResponseEntity<ResponseAPI<String>> updateAvatar(
-            @RequestBody @Valid ZCodeDto request,
+            @RequestBody @Valid ZRQCodeDto request,
             @AuthenticationPrincipal User userLogin) {
 
-        String img =  accountService.updateImgAccUserFromBase64(request.getCode(), userLogin);
+        String img = accountService.updateImgAccUserFromBase64(request.getCode(), userLogin);
 
         ResponseAPI<String> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
@@ -60,23 +67,29 @@ public class AccountController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/search")
-    public ResponseEntity<ResponseAPI<List<RPAccountSearchDTO>>> searchUsers(
-            @RequestBody RQKeyWordPageSizeDTO keyWordPageSize,
+    @GetMapping("/search")
+    public ResponseEntity<ResponseAPI<ZRPPageDTO<RPAccountSearchDTO>>> searchUsers(
+            @ModelAttribute ZRQFilterPageDTO request,
             @AuthenticationPrincipal User userLogin) {
-        ResponseAPI<List<RPAccountSearchDTO>> response = new ResponseAPI<>();
 
-        List<RPAccountSearchDTO> searchResults = accountService.searchUsers(
-                keyWordPageSize.getKeyWord(), keyWordPageSize.getPage(), keyWordPageSize.getSize(), userLogin);
+        ZRPPageDTO<RPAccountSearchDTO> result = accountService.searchUsers(
+                request.getKeyWord(),
+                request.getPage(),
+                request.getSize(),
+                request.getSort(),
+                userLogin);
+
+        ResponseAPI<ZRPPageDTO<RPAccountSearchDTO>> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
         response.setMessage("Search completed successfully");
-        response.setData(searchResults);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        response.setData(result);
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/follow")
     public ResponseEntity<ResponseAPI<Void>> followUser(
-            @RequestBody @Valid ZCodeDto code,
+            @RequestBody @Valid ZRQCodeDto code,
             @AuthenticationPrincipal User userLogin) {
 
         accountService.followUser(UUID.fromString(code.getCode()), userLogin);
@@ -86,11 +99,11 @@ public class AccountController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/get-my-account-detail")
+    @GetMapping("/get-my-account")
     public ResponseEntity<ResponseAPI<RPAccountDetailDTO>> getMyAccountDetail(
             @AuthenticationPrincipal User userLogin) {
 
-        RPAccountDetailDTO accountDetail = accountService.getAccountDetail(userLogin.getCode(), userLogin);
+        RPAccountDetailDTO accountDetail = accountService.getAccountSummary(userLogin.getCode(), userLogin);
         ResponseAPI<RPAccountDetailDTO> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
         response.setMessage("Account detail retrieved successfully");
@@ -99,17 +112,31 @@ public class AccountController {
 
     }
 
-    @PostMapping("/get-account-detail")
+    @GetMapping("/get-account")
     public ResponseEntity<ResponseAPI<RPAccountDetailDTO>> getAccountDetail(
-            @RequestBody ZCodeDto code,
+            @ModelAttribute ZRQCodeDto code,
             @AuthenticationPrincipal User userLogin) {
 
-        RPAccountDetailDTO accountDetail = accountService.getAccountDetail(UUID.fromString(code.getCode()), userLogin);
+        RPAccountDetailDTO accountDetail = accountService.getAccountSummary(UUID.fromString(code.getCode()), userLogin);
         ResponseAPI<RPAccountDetailDTO> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
         response.setMessage("Account detail retrieved successfully");
         response.setData(accountDetail);
         return ResponseEntity.status(HttpStatus.OK).body(response);
 
+    }
+
+    @GetMapping("/posts")
+    public ResponseEntity<ResponseAPI<ZRPPageDTO<RPAccountDetailDTO.RPAccountPostDTO>>> getAccountPosts(
+            @ModelAttribute ZRQFilterPageDTO request) {
+        UUID userCode = UUID.fromString(request.getCode());
+        ZRPPageDTO<RPAccountDetailDTO.RPAccountPostDTO> postPage = accountService.getAccountPosts(userCode,
+                request.getPage(), request.getSize(), request.getSort());
+
+        ResponseAPI<ZRPPageDTO<RPAccountDetailDTO.RPAccountPostDTO>> response = new ResponseAPI<>();
+        response.setCode(HttpStatus.OK.value());
+        response.setMessage("Account detail retrieved successfully");
+        response.setData(postPage);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

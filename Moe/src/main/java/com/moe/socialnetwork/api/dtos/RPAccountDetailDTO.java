@@ -18,13 +18,13 @@ public class RPAccountDetailDTO {
     private String likeCount; // tổng số lượt like
     private Boolean isFollowing = false; // người đang đăng nhập có theo dõi không
     private String bio;
-    private List<AccountPostDTO> posts; // danh sách bài viết
+    private List<RPAccountPostDTO> posts; // danh sách bài viết
 
     private String userAccountCode;
     private String userCurrentCode;
 
     @Data
-    public static class AccountPostDTO {
+    public static class RPAccountPostDTO {
         private UUID postCode;
         private String postType;
         private String videoThumbnail;

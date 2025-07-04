@@ -528,15 +528,26 @@ const HomePage = () => {
             });
           });
       } else if (tabType === "acc") {
-        fetchAccountProfile(post.userCode)
-          .then((profile) => {
+        Promise.all([
+          fetchAccountProfile(post.userCode),
+          fetchAccountPost(post.userCode, "0"),
+        ])
+          .then(([profile, posts]) => {
             setPostData((prev) => {
               const newPosts = [...prev];
+              const current = newPosts[currentPostIndex];
+
               newPosts[currentPostIndex] = {
-                ...newPosts[currentPostIndex],
-                accountDetail: profile,
-                currentTab: tabType,
+                ...current,
+                accountDetail: {
+                  ...profile,
+                  posts: posts.contents,
+                  page: 1, // 👈 set thêm page tại đây
+                  hasNext: posts.hasNext,
+                },
+                currentTab: tabType as TabType,
               };
+
               return newPosts;
             });
           })
@@ -544,7 +555,8 @@ const HomePage = () => {
             toast({
               variant: "destructive",
               description:
-                error.response?.data?.message || "Failed to fetch profile!",
+                error.response?.data?.message ||
+                "Failed to fetch profile or posts!",
             });
           });
       } else {
@@ -587,6 +599,37 @@ const HomePage = () => {
           error.response?.data?.message || "Failed to follow/unfollow!",
       });
     }
+  };
+
+  const loadMorePost = (userCode: string, page: string) => {
+    fetchAccountPost(userCode, page)
+      .then((newPosts) => {
+        setPostData((prev) => {
+          const newPostData = [...prev];
+          const current = newPostData[currentPostIndex];
+
+          if (!current.accountDetail) return prev; // Phòng hờ nhưng chắc chắn đã có
+
+          newPostData[currentPostIndex] = {
+            ...current,
+            accountDetail: {
+              ...current.accountDetail,
+              posts: [...current.accountDetail.posts, ...newPosts.contents], // nối post cũ + mới
+              page: Number(page) + 1, // cập nhật page
+              hasNext: newPosts.hasNext,
+            },
+          };
+
+          return newPostData;
+        });
+      })
+      .catch((error) => {
+        toast({
+          variant: "destructive",
+          description:
+            error.response?.data?.message || "Failed to fetch more posts!",
+        });
+      });
   };
 
   const handleDeletePost = async (postCode: string) => {
@@ -671,8 +714,20 @@ const HomePage = () => {
   };
 
   const fetchAccountProfile = async (userCode: string) => {
-    const response = await axiosInstance.post(`account/get-account-detail`, {
-      code: userCode,
+    const response = await axiosInstance.get(`account/get-account`, {
+      params: { code: userCode },
+    });
+    return response.data.data;
+  };
+
+  const fetchAccountPost = async (code: string, page: string) => {
+    const response = await axiosInstance.get(`account/posts`, {
+      params: {
+        code: code,
+        page: page,
+        size: "12",
+        sort: "desc",
+      },
     });
     return response.data.data;
   };
@@ -818,6 +873,7 @@ const HomePage = () => {
                         accountDetail={post.accountDetail}
                         handleFollowOrUnfollow={handleFollowOrUnfollow}
                         handleDeletePost={handleDeletePost}
+                        loadMorePost={loadMorePost}
                       />
                     );
                   default:
@@ -905,9 +961,7 @@ const HomePage = () => {
                     >
                       <User className="h-5 w-5 mr-1" />
                       {post.currentTab === "acc" ? (
-                        <span className="w-full flex justify-center text-xs">
-                          Account
-                        </span>
+                        <span className=" text-xs">Account</span>
                       ) : (
                         ""
                       )}

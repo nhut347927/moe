@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.moe.socialnetwork.api.dtos.RQPostCreateDTO;
+import com.moe.socialnetwork.api.dtos.ZRPPageDTO;
 import com.moe.socialnetwork.api.dtos.RPPostResponseDTO;
 import com.moe.socialnetwork.api.dtos.RPPostSearchDTO;
 import com.moe.socialnetwork.models.User;
@@ -11,7 +12,7 @@ import com.moe.socialnetwork.models.User;
  * Author: nhutnm379
  */
 public interface IPostService {
-	List<RPPostSearchDTO> searchPosts(String keyword, int page, int size);
+	ZRPPageDTO<RPPostSearchDTO> searchPosts(String keyword, int page, int size, String sort);
 	RPPostResponseDTO getPostByCode(String postCode, User user);
 	void viewPost(String postCode, User user);
 	void likePost(String postCode, User user);

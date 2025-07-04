@@ -11,13 +11,16 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
 import com.moe.socialnetwork.api.dtos.RQPostCreateDTO;
 import com.moe.socialnetwork.api.dtos.RPPostResponseDTO;
 import com.moe.socialnetwork.api.dtos.RPPostSearchDTO;
 import com.moe.socialnetwork.api.dtos.RQPostCreateDTO.FFmpegMergeParams;
+import com.moe.socialnetwork.api.dtos.ZRPPageDTO;
 import com.moe.socialnetwork.api.services.IFFmpegService;
 import com.moe.socialnetwork.api.services.IPostService;
 import com.moe.socialnetwork.jpa.AudioJPA;
@@ -38,6 +41,7 @@ import com.moe.socialnetwork.models.View;
 import com.moe.socialnetwork.exception.AppException;
 
 import jakarta.transaction.Transactional;
+
 /**
  * Author: nhutnm379
  */
@@ -67,15 +71,12 @@ public class PostServiceImpl implements IPostService {
 		this.viewJPA = viewJPA;
 	}
 
-	public List<RPPostSearchDTO> searchPosts(String keyword, int page, int size) {
-		Pageable pageable = PageRequest.of(page, size);
-		List<Post> posts = postJPA.findPostsByTitleOrDescription(keyword, pageable).getContent();
-		if (posts.isEmpty()) {
-			throw new AppException("No posts found containing the keyword!", 404);
-		}
+	public ZRPPageDTO<RPPostSearchDTO> searchPosts(String keyword, int page, int size, String sort) { //sort trả về desc hoặc asc
+		Sort.Direction direction = "asc".equalsIgnoreCase(sort) ? Sort.Direction.ASC : Sort.Direction.DESC;
+		Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "id"));
+		Page<Post> postPage = postJPA.searchPostsByKeyword(keyword, pageable);
 
-		List<RPPostSearchDTO> response = new ArrayList<>();
-		for (Post post : posts) {
+		List<RPPostSearchDTO> responseList = postPage.getContent().stream().map(post -> {
 			RPPostSearchDTO dto = new RPPostSearchDTO();
 			dto.setUserCode(String.valueOf(post.getUser().getCode()));
 			dto.setTitle(post.getTitle());
@@ -85,28 +86,40 @@ public class PostServiceImpl implements IPostService {
 			dto.setPostCode(String.valueOf(post.getCode()));
 			dto.setPostType(post.getType().toString());
 			dto.setVideoThumbnail(post.getVideoThumbnail());
-			if (post.getType() != null && post.getType().toString().equals("VID")) {
+
+			if (post.getType() == Post.PostType.VID) {
 				dto.setMediaUrl(post.getVideoUrl());
+
+				// Tìm audio nếu có
+				Audio aud = audioJPA.findAudioByOwnerPostId(post.getId());
+				if (aud != null) {
+					dto.setAudioCode(aud.getCode().toString());
+					dto.setAudioPublicId(aud.getAudioName());
+				}
 			} else {
 				if (post.getImages() != null && !post.getImages().isEmpty()) {
 					dto.setMediaUrl(post.getImages().get(0).getImageName());
 				}
+				if (post.getAudio() != null) {
+					dto.setAudioCode(post.getAudio().getCode().toString());
+					dto.setAudioPublicId(post.getAudio().getAudioName());
+				}
 			}
+
 			dto.setViewCount(String.valueOf(post.getViews().size()));
 			dto.setCreateAt(post.getCreatedAt().toString());
 
-			if (post.getType().equals("VID")) {
-				Audio aud = audioJPA.findAudioByOwnerPostId(post.getId());
-				dto.setAudioCode(aud.getCode().toString());
-				dto.setAudioPublicId(aud.getAudioName());
-			} else {
-				dto.setAudioCode(post.getAudio() != null ? post.getAudio().getCode().toString() : null);
-				dto.setAudioPublicId(post.getAudio() != null ? post.getAudio().getAudioName() : null);
-			}
+			return dto;
+		}).toList();
 
-			response.add(dto);
-		}
-		return response;
+		return new ZRPPageDTO<>(
+				responseList,
+				postPage.getTotalElements(),
+				postPage.getTotalPages(),
+				page,
+				size,
+				postPage.hasNext(),
+				postPage.hasPrevious());
 	}
 
 	public RPPostResponseDTO getPostByCode(String postCode, User user) {
@@ -305,7 +318,7 @@ public class PostServiceImpl implements IPostService {
 	@Override
 	public List<RPPostResponseDTO> getPostList(User user) {
 		// 1. Lấy top 25 tagId mà user đã like
-		List<Long> tagIds = postJPA.findTopTagIdsUserLiked(user.getId(), PageRequest.of(0, 25));
+		List<Long> tagIds = postJPA.findTopTagIdsUserLiked(user.getId(), PageRequest.of(0, 24));
 
 		// 2. Lấy các post chứa tag này, chưa xem
 		List<Post> candidatePosts = tagIds.isEmpty() ? new ArrayList<>()
@@ -324,8 +337,8 @@ public class PostServiceImpl implements IPostService {
 				.sorted(Comparator.comparingDouble(PostWithScore::getScore).reversed())
 				.collect(Collectors.toList());
 
-		// 4. Lấy 9-18 post đầu tiên
-		int limit = Math.max(9, Math.min(18, scoredPosts.size()));
+		// 4. Lấy 9-18 => 3-9 post đầu tiên
+		int limit = Math.max(3, Math.min(9, scoredPosts.size()));
 		List<Post> result = scoredPosts.stream()
 				.limit(limit)
 				.map(PostWithScore::getPost)
@@ -333,34 +346,34 @@ public class PostServiceImpl implements IPostService {
 
 		// 5. Nếu chưa đủ, lấy thêm post chưa xem bất kỳ (lọc trùng)
 		Set<Long> seenPostIds = result.stream().map(Post::getId).collect(Collectors.toSet());
-		if (result.size() < 18) {
+		if (result.size() < 9) {
 			List<Post> moreUnviewed = postJPA.findRandomUnviewedPosts(user.getId(),
-					PageRequest.of(0, 18 - result.size()));
+					PageRequest.of(0, 9 - result.size()));
 			for (Post p : moreUnviewed) {
 				if (!seenPostIds.contains(p.getId())) {
 					result.add(p);
 					seenPostIds.add(p.getId());
 				}
-				if (result.size() >= 18)
+				if (result.size() >= 9)
 					break;
 			}
 		}
 
 		// 6. Nếu vẫn chưa đủ, lấy post ngẫu nhiên (lọc trùng)
-		if (result.size() < 18) {
-			List<Post> randomPosts = postJPA.findRandomPosts(PageRequest.of(0, 18 - result.size()));
+		if (result.size() < 9) {
+			List<Post> randomPosts = postJPA.findRandomPosts(PageRequest.of(0, 9 - result.size()));
 			for (Post p : randomPosts) {
 				if (!seenPostIds.contains(p.getId())) {
 					result.add(p);
 					seenPostIds.add(p.getId());
 				}
-				if (result.size() >= 18)
+				if (result.size() >= 9)
 					break;
 			}
 		}
 
 		// 7. Chuyển sang DTO
-		return result.stream().limit(18).map(post -> this.toPostResponse(post, user)).collect(Collectors.toList());
+		return result.stream().limit(9).map(post -> this.toPostResponse(post, user)).collect(Collectors.toList());
 	}
 
 	private RPPostResponseDTO toPostResponse(Post post, User user) {
@@ -428,7 +441,7 @@ public class PostServiceImpl implements IPostService {
 		double c = Math.log(comments + 1);
 		double v = Math.log(views + 1);
 
-		double w1 = 2.0, w2 = 3.0, w3 = 1.0;
+		double w1 = 5.0, w2 = 10.0, w3 = 1.0;
 		double raw = w1 * l + w2 * c + w3 * v;
 
 		double decayRate = 0.99; // Giảm dần theo thời gian

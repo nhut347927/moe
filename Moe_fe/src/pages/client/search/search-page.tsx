@@ -1,23 +1,29 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/common/hooks/use-toast";
 import axiosInstance from "@/services/axios/axios-instance";
-import { AccountSearch, PostSearch } from "./types";
-import { getTimeAgo } from "@/common/utils/utils";
 import PostCompo from "@/components/post/post";
+import { getTimeAgo } from "@/common/utils/utils";
+import {
+  ResponseAPI,
+  RPAccountSearchDTO,
+  RPPostSearchDTO,
+  ZRPPageDTO,
+} from "./types";
 
 export function SearchPage() {
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [posts, setPosts] = useState<PostSearch[]>([]);
-  const [accounts, setAccounts] = useState<AccountSearch[]>([]);
+  const [searchInput, setSearchInput] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [posts, setPosts] = useState<RPPostSearchDTO[]>([]);
+  const [accounts, setAccounts] = useState<RPAccountSearchDTO[]>([]);
   const [postPage, setPostPage] = useState<number>(0);
   const [accountPage, setAccountPage] = useState<number>(0);
   const [hasMorePosts, setHasMorePosts] = useState<boolean>(true);
@@ -26,40 +32,68 @@ export function SearchPage() {
   const [activeTab, setActiveTab] = useState<"posts" | "accounts">("posts");
   const [selectedPost, setSelectedPost] = useState<string | null>(null);
   const { toast } = useToast();
-  const pageSize = "10";
+  const pageSize = 10;
+  const sort = "desc";
 
-  // Debounce search
-  const debounce = (func: (...args: any[]) => void, delay: number) => {
-    let timeoutId: NodeJS.Timeout;
-    return (...args: any[]) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => func(...args), delay);
-    };
-  };
-
-  const searchPost = async (keyWord: string, page: string, size: string) => {
+  const searchPost = async (
+    keyWord: string,
+    page: number,
+    size: number,
+    sort: string
+  ) => {
     try {
-      const response = await axiosInstance.post("post/search", {
-        keyWord: keyWord,
-        page: page,
-        size: size,
+      if (!keyWord.trim())
+        return {
+          contents: [],
+          hasNext: false,
+          totalElements: 0,
+          totalPages: 0,
+          page: 0,
+          size: 0,
+          hasPrevious: false,
+        };
+
+      const response = await axiosInstance.get<
+        ResponseAPI<ZRPPageDTO<RPPostSearchDTO>>
+      >("/post/search", {
+        params: { keyWord, page, size, sort },
       });
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || "Failed to search posts");
+      throw new Error(
+        error.response?.data?.message || "Failed to search posts"
+      );
     }
   };
 
-  const searchAccount = async (keyWord: string, page: string, size: string) => {
+  const searchAccount = async (
+    keyWord: string,
+    page: number,
+    size: number,
+    sort: string
+  ) => {
     try {
-      const response = await axiosInstance.post("account/search", {
-        keyWord: keyWord,
-        page: page,
-        size: size,
+      if (!keyWord.trim())
+        return {
+          contents: [],
+          hasNext: false,
+          totalElements: 0,
+          totalPages: 0,
+          page: 0,
+          size: 0,
+          hasPrevious: false,
+        };
+
+      const response = await axiosInstance.get<
+        ResponseAPI<ZRPPageDTO<RPAccountSearchDTO>>
+      >("/account/search", {
+        params: { keyWord, page, size, sort },
       });
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || "Failed to search accounts");
+      throw new Error(
+        error.response?.data?.message || "Failed to search accounts"
+      );
     }
   };
 
@@ -70,42 +104,51 @@ export function SearchPage() {
       });
       return response.data.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || "Failed to toggle follow");
+      throw new Error(
+        error.response?.data?.message || "Failed to toggle follow"
+      );
     }
   };
 
   const fetchSearchResults = useCallback(
-    async (term: string, reset: boolean = false) => {
-      if (!term.trim()) return;
+    async (
+      term: string,
+      reset: boolean = false,
+      tab: "posts" | "accounts" = activeTab
+    ) => {
+      if (!term.trim() || isLoading) return;
 
       setIsLoading(true);
       try {
-        if (activeTab === "posts") {
-          const postResults = await searchPost(
-            term,
-            reset ? "0" : String(postPage),
-            pageSize
+        if (tab === "posts") {
+          const page = reset ? 0 : postPage;
+          const postResults = await searchPost(term, page, pageSize, sort);
+          setPosts((prev) =>
+            reset ? postResults.contents : [...prev, ...postResults.contents]
           );
-          setPosts((prev) => (reset ? postResults : [...prev, ...postResults]));
-          setHasMorePosts(postResults.length === Number(pageSize));
+          setHasMorePosts(postResults.hasNext);
           setPostPage((prev) => (reset ? 1 : prev + 1));
-          if (!reset && postResults.length === 0) {
+          if (!reset && !postResults.hasNext) {
             toast({
               description: "Không còn bài viết để tải!",
             });
           }
         } else {
+          const page = reset ? 0 : accountPage;
           const accountResults = await searchAccount(
             term,
-            reset ? "0" : String(accountPage),
-            pageSize
+            page,
+            pageSize,
+            sort
           );
           setAccounts((prev) =>
-            reset ? accountResults : [...prev, ...accountResults]
+            reset
+              ? accountResults.contents
+              : [...prev, ...accountResults.contents]
           );
-          setHasMoreAccounts(accountResults.length === Number(pageSize));
+          setHasMoreAccounts(accountResults.hasNext);
           setAccountPage((prev) => (reset ? 1 : prev + 1));
-          if (!reset && accountResults.length === 0) {
+          if (!reset && !accountResults.hasNext) {
             toast({
               description: "Không còn tài khoản để tải!",
             });
@@ -123,24 +166,21 @@ export function SearchPage() {
     [activeTab, postPage, accountPage, toast]
   );
 
-  // Debounced search
-  const debouncedSearch = useCallback(
-    debounce((term: string) => fetchSearchResults(term, true), 500),
-    [fetchSearchResults]
-  );
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (searchInput.trim() !== searchTerm) {
+        setSearchTerm(searchInput.trim());
+      }
+    }, 300);
+
+    return () => clearTimeout(handler);
+  }, [searchInput]);
 
   useEffect(() => {
-    if (searchTerm.trim()) {
-      debouncedSearch(searchTerm);
-    } else {
-      setPosts([]);
-      setAccounts([]);
-      setPostPage(0);
-      setAccountPage(0);
-      setHasMorePosts(true);
-      setHasMoreAccounts(true);
+    if (searchTerm !== null || searchTerm !== undefined) {
+      fetchSearchResults(searchTerm, true, activeTab);
     }
-  }, [searchTerm, debouncedSearch]);
+  }, [searchTerm, activeTab]);
 
   const handleFollow = async (userCode: string) => {
     try {
@@ -159,7 +199,11 @@ export function SearchPage() {
         )
       );
       toast({
-        description: `Successfully ${accounts.find((acc) => acc.userCode === userCode)?.isFollowed ? "unfollowed" : "followed"} user!`,
+        description: `Successfully ${
+          accounts.find((acc) => acc.userCode === userCode)?.isFollowed
+            ? "unfollowed"
+            : "followed"
+        } user!`,
       });
     } catch (error: any) {
       toast({
@@ -169,43 +213,39 @@ export function SearchPage() {
     }
   };
 
-  const handleLoadMorePosts = () => {
-    if (hasMorePosts && !isLoading) {
-      fetchSearchResults(searchTerm);
+  const handleLoadMorePosts = useCallback(() => {
+    if (hasMorePosts && !isLoading && searchTerm) {
+      fetchSearchResults(searchTerm, false, "posts");
     }
-  };
+  }, [hasMorePosts, isLoading, searchTerm, fetchSearchResults]);
 
-  const handleLoadMoreAccounts = () => {
+  const handleLoadMoreAccounts = useCallback(() => {
     if (hasMoreAccounts && !isLoading) {
-      fetchSearchResults(searchTerm);
+      fetchSearchResults(searchTerm, false, "accounts");
     }
-  };
+  }, [hasMoreAccounts, isLoading, searchTerm, fetchSearchResults]);
+
+  useEffect(() => {
+    setPostPage(0);
+    setAccountPage(0);
+  }, [activeTab]);
 
   return (
     <div className="w-full h-screen max-h-screen max-w-lg mx-auto px-3 py-4 flex flex-col relative">
-      {/* Nút back + ô tìm kiếm trên cùng 1 hàng */}
       <div className="flex items-center gap-2 mb-4 mt-12">
-      
         <Input
           placeholder="Tìm bài viết hoặc tài khoản..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
           className="flex-1"
         />
       </div>
 
-      {/* Tabs */}
       <Tabs
         defaultValue="posts"
         className="w-full flex-1 flex flex-col overflow-hidden"
         onValueChange={(value) => {
           setActiveTab(value as "posts" | "accounts");
-          if (
-            searchTerm.trim() &&
-            (value === "accounts" ? accounts.length === 0 : posts.length === 0)
-          ) {
-            fetchSearchResults(searchTerm, true);
-          }
         }}
       >
         <TabsList className="w-full h-11 flex justify-around bg-muted rounded-2xl mb-4">
@@ -223,7 +263,6 @@ export function SearchPage() {
           </TabsTrigger>
         </TabsList>
 
-        {/* Bài viết */}
         <TabsContent value="posts" className="flex-1 overflow-hidden">
           <ScrollArea className="h-full pr-2">
             {posts.length === 0 && !isLoading ? (
@@ -297,7 +336,6 @@ export function SearchPage() {
           </ScrollArea>
         </TabsContent>
 
-        {/* Tài khoản */}
         <TabsContent value="accounts" className="flex-1 overflow-hidden">
           <ScrollArea className="h-full pr-2">
             {accounts.length === 0 && !isLoading ? (
@@ -364,7 +402,6 @@ export function SearchPage() {
         </TabsContent>
       </Tabs>
 
-      {/* Post Modal */}
       {selectedPost && (
         <div className="fixed inset-0 z-50 max-h-screen bg-black/60 backdrop-blur-sm flex items-center justify-center">
           <div className="relative m-4 max-w-lg w-full rounded-lg overflow-y-auto max-h-[90vh]">

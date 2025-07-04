@@ -10,11 +10,13 @@ interface AccountProfileProps {
   accountDetail?: AccountDetail;
   handleFollowOrUnfollow: (userCode: string) => Promise<void>;
   handleDeletePost?: (postCode: string) => void;
+  loadMorePost: (userCose: string, page: string) => void;
 }
 
 export function AccountProfile({
   accountDetail,
   handleFollowOrUnfollow,
+  loadMorePost,
 }: AccountProfileProps) {
   const [selectedPost, setSelectedPost] = useState<string | null>(null);
 
@@ -123,6 +125,21 @@ export function AccountProfile({
             </div>
           ))}
         </div>
+        {accountDetail?.hasNext && (
+          <div className="flex justify-center">
+            <button
+              onClick={() => {
+                loadMorePost(
+                  accountDetail.userCode,
+                  String(accountDetail?.page)
+                );
+              }}
+              className="px-4 py-1.5 mt-4 text-sm rounded-full border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+            >
+              Tải thêm bài viết
+            </button>
+          </div>
+        )}
       </div>
       {selectedPost && (
         <div className="fixed inset-0 z-50 max-h-screen bg-black/60 backdrop-blur-sm flex items-center justify-center">

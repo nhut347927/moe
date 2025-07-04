@@ -11,6 +11,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.moe.socialnetwork.models.Post;
+import com.moe.socialnetwork.models.User;
+
 /**
  * Author: nhutnm379
  */
@@ -53,8 +55,12 @@ public interface PostJPA extends JpaRepository<Post, Long> {
       "AND (LOWER(p.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(p.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
   Page<Post> findPostsByTitleOrDescription(@Param("searchTerm") String searchTerm, Pageable pageable);
 
-  @Query("SELECT p FROM Post p WHERE p.isDeleted = false AND p.visibility = 'PUBLIC' AND p.user.id = :userId")
-  List<Post> findListPostByUserId(@Param("userId") Long userid);
+  @Query("SELECT p FROM Post p WHERE p.isDeleted = false AND p.visibility = 'PUBLIC' AND" +
+      "(LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+      "OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+  Page<Post> searchPostsByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
+  @Query("SELECT p FROM Post p WHERE p.isDeleted = false AND p.visibility = 'PUBLIC' AND p.user.code = :userCode")
+  Page<Post> findByUserPaged(@Param("userCode") UUID userCode, Pageable pageable);
 
 }

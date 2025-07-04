@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import com.moe.socialnetwork.api.dtos.ZCodeDto;
+import com.moe.socialnetwork.api.dtos.ZRQCodeDto;
 import com.moe.socialnetwork.api.dtos.RQKeyWordPageSizeDTO;
 import com.moe.socialnetwork.api.dtos.RQTagDTO;
 import com.moe.socialnetwork.api.dtos.RPTagDTO;
@@ -28,8 +28,8 @@ public class TagController {
         this.tagService = tagService;
     }
 
-    @PostMapping("/search-by-code")
-    public ResponseEntity<ResponseAPI<List<RPTagDTO>>> searchTagByCode(@RequestBody ZCodeDto request) {
+    @GetMapping("/search-by-code")
+    public ResponseEntity<ResponseAPI<List<RPTagDTO>>> searchTagByCode(@ModelAttribute  ZRQCodeDto request) {
         List<RPTagDTO> tagList = tagService.searchTags(request.getCode());
 
         ResponseAPI<List<RPTagDTO>> response = new ResponseAPI<>();
@@ -41,8 +41,8 @@ public class TagController {
     }
 
     // Phương thức tìm kiếm tag theo keyword ()
-    @PostMapping("/search")
-    public ResponseEntity<ResponseAPI<List<RPTagDTO>>> searchTags(@RequestBody RQKeyWordPageSizeDTO request) {
+    @GetMapping("/search")
+    public ResponseEntity<ResponseAPI<List<RPTagDTO>>> searchTags(@ModelAttribute  RQKeyWordPageSizeDTO request) {
         List<RPTagDTO> tagList = tagService.searchTags(request.getKeyWord());
 
         ResponseAPI<List<RPTagDTO>> response = new ResponseAPI<>();

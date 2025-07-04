@@ -109,6 +109,10 @@ export interface AccountDetail {
   likeCount: string; // tổng lượt like
   isFollowing: boolean; // người dùng hiện tại có đang theo dõi không
   posts: AccountPost[]; // danh sách bài viết
+
   userAccountCode: string;
   userCurrentCode: string;
+
+  page:Number;          
+  hasNext: boolean;    
 }

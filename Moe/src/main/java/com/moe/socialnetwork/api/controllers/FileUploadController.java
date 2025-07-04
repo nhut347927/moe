@@ -1,6 +1,6 @@
 package com.moe.socialnetwork.api.controllers;
 
-import com.moe.socialnetwork.api.dtos.ZCodeDto;
+import com.moe.socialnetwork.api.dtos.ZRQCodeDto;
 import com.moe.socialnetwork.api.dtos.RQFileUploadDTO;
 import com.moe.socialnetwork.api.services.ICloudinaryService;
 import com.moe.socialnetwork.api.services.impl.CloudinaryServiceImpl;
@@ -63,7 +63,7 @@ public class FileUploadController {
 
     // Xóa file theo publicId
     @PostMapping("/delete")
-    public ResponseEntity<ResponseAPI<String>> deleteFile(@RequestBody ZCodeDto request) throws IOException {
+    public ResponseEntity<ResponseAPI<String>> deleteFile(@RequestBody ZRQCodeDto request) throws IOException {
         boolean deleted = cloudinaryService.deleteFile(request.getCode());
         ResponseAPI<String> response = new ResponseAPI<>();
         if (deleted) {

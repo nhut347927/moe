@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ZFilterPageRequestDTO {
+public class ZRQFilterPageDTO {
     private String code;
-    private String keyword;
+    private String keyWord;
 
     @Min(value = 0, message = "Page must be greater than or equal to 0.")
     private Integer page = 0;

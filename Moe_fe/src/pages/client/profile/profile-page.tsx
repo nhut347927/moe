@@ -31,8 +31,8 @@ export function ProfilePage() {
 
   const fetchAccountProfile = async (code: string) => {
     try {
-      const response = await axiosInstance.post(`account/get-account-detail`, {
-        code,
+      const response = await axiosInstance.get(`account/get-account`, {
+        params: { code: code },
       });
 
       return response.data.data;
@@ -82,8 +82,18 @@ export function ProfilePage() {
   useEffect(() => {
     if (userCode) {
       setIsLoading(true);
-      fetchAccountProfile(userCode)
-        .then((data) => setAccountDetail(data))
+      Promise.all([
+        fetchAccountProfile(userCode),
+        fetchAccountPost(userCode, "0"),
+      ])
+        .then(([profileData, postsData]) => {
+          setAccountDetail({
+            ...profileData,
+            posts: postsData.contents, // assuming postsData has a 'posts' array
+            page: 1,
+            hasNext: postsData.hasNext,
+          });
+        })
         .catch((error) => {
           toast({
             variant: "destructive",
@@ -99,6 +109,40 @@ export function ProfilePage() {
     }
   }, [userCode]);
 
+  const loadMorePost = (userCode: string, page: string) => {
+    fetchAccountPost(userCode, page)
+      .then((newPosts) => {
+        setAccountDetail((prev) =>
+          prev
+            ? {
+                ...prev,
+                posts: [...(prev.posts || []), ...(newPosts.contents || [])],
+                page: Number(prev.page) + 1,
+                hasNext: newPosts.hasNext,
+              }
+            : prev
+        );
+      })
+      .catch((error) => {
+        toast({
+          variant: "destructive",
+          description:
+            error.response?.data?.message || "Failed to fetch more posts!",
+        });
+      });
+  };
+
+  const fetchAccountPost = async (code: string, page: string) => {
+    const response = await axiosInstance.get(`account/posts`, {
+      params: {
+        code: code,
+        page: page,
+        size: "12",
+        sort: "desc",
+      },
+    });
+    return response.data.data;
+  };
 
   if (!userCode) {
     return (
@@ -133,8 +177,12 @@ export function ProfilePage() {
   return (
     <div className="relative flex-1 flex justify-center">
       <div className="absolute p-2 z-50 top-0 right-24">
-        <Button variant="outline" size="icon"   className="bg-zinc-100/60 text-zinc-800 hover:bg-zinc-200 border border-zinc-300 dark:bg-white/5 dark:text-white dark:border-white/10 dark:hover:bg-white/10 transition-colors rounded-full">
-          <EllipsisVertical  className="w-5 h-5" />
+        <Button
+          variant="outline"
+          size="icon"
+          className="bg-zinc-100/60 text-zinc-800 hover:bg-zinc-200 border border-zinc-300 dark:bg-white/5 dark:text-white dark:border-white/10 dark:hover:bg-white/10 transition-colors rounded-full"
+        >
+          <EllipsisVertical className="w-5 h-5" />
         </Button>
       </div>
       <ScrollArea
@@ -204,7 +252,7 @@ export function ProfilePage() {
                 : "Follow"}
             </Button>
           </div>
-     <p className="flex justify-center mb-6">{accountDetail?.bio}</p>
+          <p className="flex justify-center mb-6">{accountDetail?.bio}</p>
           {/* Posts */}
           <div className="grid grid-cols-3 gap-2">
             {accountDetail.posts?.map((post) => (
@@ -238,6 +286,21 @@ export function ProfilePage() {
               </div>
             ))}
           </div>
+          {accountDetail?.hasNext && (
+            <div className="flex justify-center">
+              <button
+                onClick={() => {
+                  loadMorePost(
+                    accountDetail.userCode,
+                    String(accountDetail?.page)
+                  );
+                }}
+                className="px-4 py-1.5 mt-4 text-sm rounded-full border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+              >
+                Tải thêm bài viết
+              </button>
+            </div>
+          )}
         </div>
       </ScrollArea>
 
@@ -252,7 +315,7 @@ export function ProfilePage() {
             >
               ✕
             </button>
-            <PostCompo postCode={selectedPost}/>
+            <PostCompo postCode={selectedPost} />
           </div>
         </div>
       )}

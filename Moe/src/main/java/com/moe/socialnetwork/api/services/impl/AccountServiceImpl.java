@@ -6,24 +6,29 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.moe.socialnetwork.api.dtos.RPAccountDetailDTO;
 import com.moe.socialnetwork.api.dtos.RPAccountSearchDTO;
+import com.moe.socialnetwork.api.dtos.ZRPPageDTO;
 import com.moe.socialnetwork.api.services.IAccountService;
 import com.moe.socialnetwork.api.services.ICloudinaryService;
 import com.moe.socialnetwork.jpa.FollowerJPA;
 import com.moe.socialnetwork.jpa.PostJPA;
 import com.moe.socialnetwork.jpa.UserJPA;
 import com.moe.socialnetwork.models.Follower;
+import com.moe.socialnetwork.models.Post;
 import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.exception.AppException;
 import com.moe.socialnetwork.util.Base64Util;
 
 import jakarta.transaction.Transactional;
+
 /**
  * Author: nhutnm379
  */
@@ -34,7 +39,8 @@ public class AccountServiceImpl implements IAccountService {
     private final ICloudinaryService cloudinaryService;
     private final PostJPA postJpa;
 
-    public AccountServiceImpl(UserJPA userJpa, FollowerJPA followerJpa, ICloudinaryService cloudinaryService,PostJPA postJpa) {
+    public AccountServiceImpl(UserJPA userJpa, FollowerJPA followerJpa, ICloudinaryService cloudinaryService,
+            PostJPA postJpa) {
         this.userJpa = userJpa;
         this.followerJpa = followerJpa;
         this.cloudinaryService = cloudinaryService;
@@ -92,23 +98,41 @@ public class AccountServiceImpl implements IAccountService {
         userJpa.save(user);
     }
 
-    public List<RPAccountSearchDTO> searchUsers(String searchTerm, int page, int size, User userLogin) {
-        Pageable pageable = PageRequest.of(page, size);
-        var userPage = userJpa.findUsersByUsernameOrDisplayName(searchTerm, pageable);
-        List<User> users = userPage.getContent();
-        return users.stream().map(user -> {
-            RPAccountSearchDTO response = new RPAccountSearchDTO();
-            response.setUserCode(user.getCode().toString());
-            response.setUserName(user.getUsername());
-            response.setDisplayName(user.getDisplayName());
-            response.setAvatarUrl(user.getAvatar());
-            response.setFollowerCount(String.valueOf(user.getFolloweds().size()));
-            response.setUserCurrentCode(userLogin != null ? userLogin.getCode().toString() : null);
-            boolean isFollowing = followerJpa.checkExistsByUserFollowerCodeAndUserFollowedCode(userLogin.getCode(),
-                    user.getCode());
-            response.setIsFollowed(isFollowing);
-            return response;
+    @Override
+    public ZRPPageDTO<RPAccountSearchDTO> searchUsers(String searchTerm, int page, int size, String sort,
+            User userLogin) {
+        Pageable pageable = PageRequest.of(page, size,
+                "desc".equalsIgnoreCase(sort) ? org.springframework.data.domain.Sort.by("id").descending()
+                        : org.springframework.data.domain.Sort.by("id").ascending());
+        Page<User> userPage = userJpa.findUsersByKeyword(searchTerm, pageable);
+
+        List<RPAccountSearchDTO> dtoList = userPage.getContent().stream().map(user -> {
+            RPAccountSearchDTO dto = new RPAccountSearchDTO();
+            dto.setUserCode(user.getCode().toString());
+            dto.setUserName(user.getUsername());
+            dto.setDisplayName(user.getDisplayName());
+            dto.setAvatarUrl(user.getAvatar());
+            dto.setFollowerCount(String.valueOf(user.getFolloweds() != null ? user.getFolloweds().size() : 0));
+
+            boolean isFollowed = false;
+            if (userLogin != null) {
+                isFollowed = followerJpa.checkExistsByUserFollowerCodeAndUserFollowedCode(
+                        userLogin.getCode(), user.getCode());
+                dto.setUserCurrentCode(userLogin.getCode().toString());
+            }
+
+            dto.setIsFollowed(isFollowed);
+            return dto;
         }).collect(Collectors.toList());
+
+        return new ZRPPageDTO<>(
+                dtoList,
+                userPage.getTotalElements(),
+                userPage.getTotalPages(),
+                userPage.getNumber(),
+                userPage.getSize(),
+                userPage.hasNext(),
+                userPage.hasPrevious());
     }
 
     @Transactional
@@ -139,58 +163,66 @@ public class AccountServiceImpl implements IAccountService {
         }
     }
 
-    public RPAccountDetailDTO getAccountDetail(UUID userCode, User userLogin) {
-        if (userLogin == null) {
-            throw new AppException("User not authenticated", 401);
-        }
-
+    public RPAccountDetailDTO getAccountSummary(UUID userCode, User userLogin) {
         User user = userJpa.findByCode(userCode)
                 .orElseThrow(() -> new AppException("User not found with code: " + userCode, 404));
 
-        RPAccountDetailDTO accountDetail = new RPAccountDetailDTO();
-        accountDetail.setUserCode(user.getCode());
-        accountDetail.setBio(user.getBio());
-        accountDetail.setUserName(user.getUsername());
-        accountDetail.setDisplayName(user.getDisplayName());
-        accountDetail.setAvatarUrl(user.getAvatar());
-        accountDetail.setFollower(String.valueOf(user.getFollowers().size()));
-        accountDetail.setFollowed(String.valueOf(user.getFolloweds().size()));
-
-        accountDetail.setUserAccountCode(userCode.toString());
-        accountDetail.setUserCurrentCode(userLogin.getCode().toString());
+        RPAccountDetailDTO dto = new RPAccountDetailDTO();
+        dto.setUserCode(user.getCode());
+        dto.setBio(user.getBio());
+        dto.setUserName(user.getUsername());
+        dto.setDisplayName(user.getDisplayName());
+        dto.setAvatarUrl(user.getAvatar());
+        dto.setFollower(String.valueOf(user.getFollowers().size()));
+        dto.setFollowed(String.valueOf(user.getFolloweds().size()));
+        dto.setUserAccountCode(userCode.toString());
+        dto.setUserCurrentCode(userLogin.getCode().toString());
 
         boolean isFollowing = followerJpa.checkExistsByUserFollowerCodeAndUserFollowedCode(
                 userLogin.getCode(), userCode);
-        accountDetail.setIsFollowing(isFollowing);
+        dto.setIsFollowing(isFollowing);
 
         int totalLikeCount = user.getPosts().stream()
                 .mapToInt(post -> post.getLikes().size())
                 .sum();
-        accountDetail.setLikeCount(String.valueOf(totalLikeCount));
+        dto.setLikeCount(String.valueOf(totalLikeCount));
 
-        List<RPAccountDetailDTO.AccountPostDTO> posts = postJpa.findListPostByUserId(userLogin.getId()).stream()
+        return dto;
+    }
+
+    public ZRPPageDTO<RPAccountDetailDTO.RPAccountPostDTO> getAccountPosts(
+            UUID userCode, int page, int size, String sort) {
+        Sort.Direction direction = "asc".equalsIgnoreCase(sort) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "id")); // sort theo id
+
+        Page<Post> postPage = postJpa.findByUserPaged(userCode, pageable); // bước này cần viết method query mới
+
+        List<RPAccountDetailDTO.RPAccountPostDTO> contents = postPage.getContent().stream()
                 .map(post -> {
-                    RPAccountDetailDTO.AccountPostDTO postDTO = new RPAccountDetailDTO.AccountPostDTO();
-                    postDTO.setPostCode(post.getCode());
-                    postDTO.setPostType(post.getType() != null ? post.getType().toString() : null);
-                    postDTO.setViewCount(String.valueOf(post.getViews().size()));
-                    postDTO.setVideoThumbnail(post.getVideoThumbnail());
+                    RPAccountDetailDTO.RPAccountPostDTO dto = new RPAccountDetailDTO.RPAccountPostDTO();
+                    dto.setPostCode(post.getCode());
+                    dto.setPostType(post.getType() != null ? post.getType().toString() : null);
+                    dto.setVideoThumbnail(post.getVideoThumbnail());
+                    dto.setViewCount(String.valueOf(post.getViews().size()));
 
                     if (post.getType() != null && post.getType().toString().equals("VID")) {
-                        postDTO.setMediaUrl(post.getVideoUrl());
-                    } else {
-                        if (post.getImages() != null && !post.getImages().isEmpty()) {
-                            postDTO.setMediaUrl(post.getImages().get(0).getImageName());
-                        }
+                        dto.setMediaUrl(post.getVideoUrl());
+                    } else if (post.getImages() != null && !post.getImages().isEmpty()) {
+                        dto.setMediaUrl(post.getImages().get(0).getImageName());
                     }
 
-                    return postDTO;
+                    return dto;
                 })
                 .collect(Collectors.toList());
 
-        accountDetail.setPosts(posts);
-
-        return accountDetail;
+        return new ZRPPageDTO<>(
+                contents,
+                postPage.getTotalElements(),
+                postPage.getTotalPages(),
+                postPage.getNumber(),
+                postPage.getSize(),
+                postPage.hasNext(),
+                postPage.hasPrevious());
     }
 
 }

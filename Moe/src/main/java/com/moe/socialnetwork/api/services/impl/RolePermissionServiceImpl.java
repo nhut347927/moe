@@ -7,7 +7,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.moe.socialnetwork.models.Role;
-import com.moe.socialnetwork.api.dtos.ZDeleteDTO;
+import com.moe.socialnetwork.api.dtos.ZRQDeleteDTO;
 import com.moe.socialnetwork.api.dtos.RPListRolePerDTO;
 import com.moe.socialnetwork.api.dtos.RPRolePermissionDTO;
 import com.moe.socialnetwork.api.services.IRolePermissionService;
@@ -85,7 +85,7 @@ public class RolePermissionServiceImpl implements IRolePermissionService {
         rolePermissionJpa.saveAll(result);
     }
 
-    public void deletePermission(ZDeleteDTO code) {
+    public void deletePermission(ZRQDeleteDTO code) {
         rolePermissionJpa.deleteByUserCode(code.getCode());
     }
 

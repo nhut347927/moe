@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.moe.socialnetwork.api.dtos.ZDeleteDTO;
+import com.moe.socialnetwork.api.dtos.ZRQDeleteDTO;
 import com.moe.socialnetwork.api.dtos.RPListRolePerDTO;
 import com.moe.socialnetwork.api.dtos.RPRolePermissionDTO;
 import com.moe.socialnetwork.api.services.IRolePermissionService;
@@ -45,7 +45,7 @@ public class RolePermissionController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<ResponseAPI<String>> deletePermission(@RequestBody @Valid ZDeleteDTO code) {
+    public ResponseEntity<ResponseAPI<String>> deletePermission(@RequestBody @Valid ZRQDeleteDTO code) {
         rolePermissionService.deletePermission(code);
         ResponseAPI<String> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());

@@ -7,14 +7,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.moe.socialnetwork.api.dtos.ZCodeDto;
+import com.moe.socialnetwork.api.dtos.ZRQCodeDto;
+import com.moe.socialnetwork.api.dtos.ZRQFilterPageDTO;
 import com.moe.socialnetwork.api.dtos.RQKeyWordPageSizeDTO;
 import com.moe.socialnetwork.api.dtos.RQPostCreateDTO;
+import com.moe.socialnetwork.api.dtos.ZRPPageDTO;
 import com.moe.socialnetwork.api.dtos.RPPostResponseDTO;
 import com.moe.socialnetwork.api.dtos.RPPostSearchDTO;
 import com.moe.socialnetwork.api.services.IPostService;
@@ -22,6 +26,7 @@ import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.response.ResponseAPI;
 
 import jakarta.validation.Valid;
+
 /**
  * Author: nhutnm379
  */
@@ -29,7 +34,7 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/post")
 public class PostController {
     private final IPostService postService;
-   // private final PostCreationProducer postCreationProducer;
+    // private final PostCreationProducer postCreationProducer;
 
     public PostController(IPostService postService) {
         this.postService = postService;
@@ -37,7 +42,7 @@ public class PostController {
 
     @PostMapping("/delete")
     public ResponseEntity<ResponseAPI<Void>> deletePost(
-            @RequestBody ZCodeDto postCode,
+            @RequestBody ZRQCodeDto postCode,
             @AuthenticationPrincipal User user) {
 
         postService.deletePost(UUID.fromString(postCode.getCode()), user);
@@ -48,22 +53,26 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/search")
-    public ResponseEntity<ResponseAPI<List<RPPostSearchDTO>>> searchPosts(
-            @RequestBody RQKeyWordPageSizeDTO keyPageSize) {
+    @GetMapping("/search")
+    public ResponseEntity<ResponseAPI<ZRPPageDTO<RPPostSearchDTO>>> searchPosts(
+            @ModelAttribute ZRQFilterPageDTO request) {
 
-        ResponseAPI<List<RPPostSearchDTO>> response = new ResponseAPI<>();
-        List<RPPostSearchDTO> posts = postService.searchPosts(keyPageSize.getKeyWord(), keyPageSize.getPage(),
-                keyPageSize.getSize());
+        ResponseAPI<ZRPPageDTO<RPPostSearchDTO>> response = new ResponseAPI<>();
+        ZRPPageDTO<RPPostSearchDTO> posts = postService.searchPosts(
+                request.getKeyWord(),
+                request.getPage(),
+                request.getSize(),
+                request.getSort());
+
         response.setCode(HttpStatus.OK.value());
         response.setMessage("Search completed successfully!");
         response.setData(posts);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/get-post-by-code")
     public ResponseEntity<ResponseAPI<RPPostResponseDTO>> getPostByCode(
-            @RequestBody ZCodeDto postCode,
+            @RequestBody ZRQCodeDto postCode,
             @AuthenticationPrincipal User user) {
         ResponseAPI<RPPostResponseDTO> response = new ResponseAPI<>();
         RPPostResponseDTO post = postService.getPostByCode(postCode.getCode(), user);
@@ -75,7 +84,7 @@ public class PostController {
 
     @PostMapping("/view")
     public ResponseEntity<ResponseAPI<Void>> viewPost(
-            @RequestBody ZCodeDto postCode,
+            @RequestBody ZRQCodeDto postCode,
             @AuthenticationPrincipal User user) {
 
         postService.viewPost(postCode.getCode(), user);
@@ -88,7 +97,7 @@ public class PostController {
 
     @PostMapping("/like")
     public ResponseEntity<ResponseAPI<Void>> likePost(
-            @RequestBody ZCodeDto postCode,
+            @RequestBody ZRQCodeDto postCode,
             @AuthenticationPrincipal User user) {
 
         postService.likePost(postCode.getCode(), user);

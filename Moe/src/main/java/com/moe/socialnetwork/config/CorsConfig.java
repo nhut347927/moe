@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+
 /**
  * Author: nhutnm379
  */
@@ -26,7 +27,9 @@ public class CorsConfig {
 
 		config.setAllowCredentials(true);
 		config.addAllowedOrigin(allowedOrigin); // Đảm bảo đúng URL
+		config.addAllowedOrigin("http://192.168.1.93:3000");
 		config.addAllowedHeader("*");
+		config.addExposedHeader("*");
 		config.addAllowedMethod("*");
 
 		source.registerCorsConfiguration("/**", config);

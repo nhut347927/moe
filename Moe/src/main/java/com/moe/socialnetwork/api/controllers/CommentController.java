@@ -4,7 +4,7 @@ import com.moe.socialnetwork.api.dtos.RPCommentDTO;
 import com.moe.socialnetwork.api.dtos.RQCodePageSizeDTO;
 import com.moe.socialnetwork.api.dtos.RQCreateCommentDTO;
 import com.moe.socialnetwork.api.dtos.RQCreateReplyDTO;
-import com.moe.socialnetwork.api.dtos.ZCodeDto;
+import com.moe.socialnetwork.api.dtos.ZRQCodeDto;
 import com.moe.socialnetwork.api.dtos.RPReplyDTO;
 import com.moe.socialnetwork.api.services.ICommentService;
 import com.moe.socialnetwork.models.User;
@@ -61,7 +61,7 @@ public class CommentController {
 
     @PostMapping("/like")
     public ResponseEntity<ResponseAPI<Void>> likeComment(
-            @RequestBody @Valid ZCodeDto request,
+            @RequestBody @Valid ZRQCodeDto request,
             @AuthenticationPrincipal User user) {
 
         commentService.likeComment(UUID.fromString(request.getCode()), user);
@@ -76,7 +76,7 @@ public class CommentController {
 
     @PostMapping("/delete")
     public ResponseEntity<ResponseAPI<Void>> deleteComment(
-            @RequestBody @Valid ZCodeDto request,
+            @RequestBody @Valid ZRQCodeDto request,
             @AuthenticationPrincipal User user) {
 
         commentService.deleteComment(UUID.fromString(request.getCode()), user);

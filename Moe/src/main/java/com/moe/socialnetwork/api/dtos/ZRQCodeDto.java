@@ -6,7 +6,7 @@ import lombok.Data;
  * Author: nhutnm379
  */
 @Data
-public class ZCodeDto {
+public class ZRQCodeDto {
     @NotBlank(message = "Code must not be blank.")
     private String code;
 }

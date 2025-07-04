@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.moe.socialnetwork.models.User;
+
 /**
  * Author: nhutnm379
  */
@@ -26,10 +27,13 @@ public interface UserJPA extends JpaRepository<User, Long> {
 	@Query("SELECT u FROM User u WHERE u.code = :code AND u.isDeleted = false")
 	Optional<User> findByCode(@Param("code") UUID code);
 
-	@Query("SELECT u FROM User u WHERE u.isDeleted = false " +
-			"AND (LOWER(u.userName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-			"OR LOWER(u.displayName) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
-	Page<User> findUsersByUsernameOrDisplayName(@Param("searchTerm") String searchTerm, Pageable pageable);
+	@Query("""
+			    SELECT u FROM User u
+			    WHERE u.isDeleted = false
+			      AND (LOWER(u.userName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+			        OR LOWER(u.displayName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+			""")
+	Page<User> findUsersByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
 	// Query kiểm tra userName đã tồn tại, trừ chính người dùng có id
 	@Query("SELECT COUNT(u) > 0 FROM User u WHERE u.userName = :userName AND u.id <> :excludedId")
