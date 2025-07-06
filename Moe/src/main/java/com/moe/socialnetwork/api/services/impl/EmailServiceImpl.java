@@ -36,13 +36,6 @@ public class EmailServiceImpl implements IEmailService {
 		this.mailSender = mailSender;
 	}
 
-	/**
-	 * Send a password reset email with HTML content to the user.
-	 *
-	 * @param email      User's email address
-	 * @param resetToken Password reset token
-	 * @throws AppException if email sending fails
-	 */
 	public void sendPasswordResetEmail(String email, String resetToken) {
 		validateInputs(email, resetToken);
 		String subject = appName + " - Password Reset Request";
@@ -63,13 +56,6 @@ public class EmailServiceImpl implements IEmailService {
 		}
 	}
 
-	/**
-	 * Validate email and reset token.
-	 *
-	 * @param email      Email address
-	 * @param resetToken Reset token
-	 * @throws AppException if validation fails
-	 */
 	private void validateInputs(String email, String resetToken) {
 		if (email == null || email.isBlank()) {
 			throw new AppException("Email must not be null or empty", 400);

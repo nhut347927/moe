@@ -55,7 +55,7 @@ export function SearchPage() {
 
       const response = await axiosInstance.get<
         ResponseAPI<ZRPPageDTO<RPPostSearchDTO>>
-      >("/post/search", {
+      >("/posts/search", {
         params: { keyWord, page, size, sort },
       });
       return response.data.data;
@@ -279,7 +279,7 @@ export function SearchPage() {
                     <div className="aspect-square">
                       {post.postType === "VID" ? (
                         <img
-                          src={`https://res.cloudinary.com/dwv76nhoy/video/upload/w_300,so_${
+                          src={`abc/video/upload/w_300,so_${
                             post.videoThumbnail ?? "0"
                           }/${post.mediaUrl}.jpg`}
                           className="w-full h-full object-cover cursor-pointer"
@@ -288,7 +288,7 @@ export function SearchPage() {
                         />
                       ) : (
                         <img
-                          src={`https://res.cloudinary.com/dwv76nhoy/image/upload/${post.mediaUrl}`}
+                          src={`abc/image/upload/${post.mediaUrl}`}
                           className="w-full h-full object-cover cursor-pointer"
                           alt="post"
                           onClick={() => setSelectedPost(post.postCode)}
@@ -299,7 +299,7 @@ export function SearchPage() {
                       <div className="flex items-center gap-2 mb-1">
                         <Avatar className="w-5 h-5">
                           <AvatarImage
-                            src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_40,h_40,c_thumb,f_auto,q_auto/${post.avatarUrl}`}
+                            src={`abc/image/upload/w_40,h_40,c_thumb,f_auto,q_auto/${post.avatarUrl}`}
                           />
                           <AvatarFallback>{post.displayName[0]}</AvatarFallback>
                         </Avatar>
@@ -352,7 +352,7 @@ export function SearchPage() {
                     <div className="flex items-center gap-3">
                       <Avatar className="w-10 h-10">
                         <AvatarImage
-                          src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_40,h_40,c_thumb,f_auto,q_auto/${acc.avatarUrl}`}
+                          src={`abc/image/upload/w_40,h_40,c_thumb,f_auto,q_auto/${acc.avatarUrl}`}
                         />
                         <AvatarFallback>
                           {acc.displayName.charAt(0)}

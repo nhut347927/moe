@@ -8,7 +8,6 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.moe.socialnetwork.auth.services.ITokenService;
@@ -48,11 +47,11 @@ public class TokenServiceImpl implements ITokenService {
     public TokenServiceImpl(UserJPA userJPA, @Value("${app.jwtSecret}") String jwtSecret) {
         this.userJPA = userJPA;
         if (jwtSecret == null || jwtSecret.isBlank()) {
-            throw new IllegalArgumentException("JWT secret key must not be null or empty.");
+            throw new AppException("JWT secret key must not be null or empty.",500);
         }
         byte[] secretBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
         if (secretBytes.length < 32) {
-            throw new IllegalArgumentException("JWT secret key must be at least 32 bytes long.");
+            throw new AppException("JWT secret key must be at least 32 bytes long.",500);
         }
         this.key = Keys.hmacShaKeyFor(secretBytes);
     }
@@ -122,7 +121,7 @@ public class TokenServiceImpl implements ITokenService {
         }
         String email = parseClaims(refreshToken).getSubject();
         User user = userJPA.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found for email: " + email));
+                .orElseThrow(() -> new AppException("User not found for email: " + email,400));
         return generateJwtToken(user);
     }
 

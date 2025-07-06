@@ -7,8 +7,6 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.moe.socialnetwork.models.Role;
-import com.moe.socialnetwork.api.dtos.ZRQDeleteDTO;
-import com.moe.socialnetwork.api.dtos.RPListRolePerDTO;
 import com.moe.socialnetwork.api.dtos.RPRolePermissionDTO;
 import com.moe.socialnetwork.api.services.IRolePermissionService;
 import com.moe.socialnetwork.jpa.RoleJPA;
@@ -33,7 +31,7 @@ public class RolePermissionServiceImpl implements IRolePermissionService {
     }
 
     public List<RPRolePermissionDTO> getPermissionsByUser(String userCode) {
-        List<RolePermission> rolePermission = rolePermissionJpa.findByUserCode(userCode);
+        List<RolePermission> rolePermission = rolePermissionJpa.findByUserCode(UUID.fromString(userCode));
         if (rolePermission.isEmpty()) {
             throw new AppException("No permissions found for user with code: " + userCode, 404);
         }
@@ -42,11 +40,11 @@ public class RolePermissionServiceImpl implements IRolePermissionService {
                 .toList();
     }
 
-    public void createOrUpdatePermission(RPListRolePerDTO dto) {
+    public void createOrUpdatePermission(List<RPRolePermissionDTO> rolePermissions) {
         // Lấy user
-        String userCode = dto.getRolePermissions().get(0).getUserCode();
+        String userCode = rolePermissions.get(0).getUserCode();
         User user = userJpa.findByCode(UUID.fromString(userCode))
-                .orElseThrow(() -> new RuntimeException("User not found or deleted"));
+                .orElseThrow(() -> new AppException("User not found or deleted",404));
 
         // Lấy tất cả role để cache
         List<Role> roles = roleJpa.findAll();
@@ -55,7 +53,7 @@ public class RolePermissionServiceImpl implements IRolePermissionService {
         List<RolePermission> result = new ArrayList<>();
 
         // Xử lý từng RolePermissionDTO
-        for (RPRolePermissionDTO perDto : dto.getRolePermissions()) {
+        for (RPRolePermissionDTO perDto : rolePermissions) {
             Role role = roles.stream()
                     .filter(r -> r.getCode().toString().equals(perDto.getRoleCode()))
                     .findFirst()
@@ -85,8 +83,8 @@ public class RolePermissionServiceImpl implements IRolePermissionService {
         rolePermissionJpa.saveAll(result);
     }
 
-    public void deletePermission(ZRQDeleteDTO code) {
-        rolePermissionJpa.deleteByUserCode(code.getCode());
+    public void deletePermission(String code) {
+        rolePermissionJpa.deleteByUserCode(UUID.fromString(code));
     }
 
     private RPRolePermissionDTO toDTO(RolePermission entity) {

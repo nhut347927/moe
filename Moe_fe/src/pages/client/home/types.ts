@@ -28,7 +28,7 @@ export type Comment = {
 };
 
 export type Post = {
-  postId: string;
+
 
   userCode: string;
   postCode: string;
@@ -42,6 +42,7 @@ export type Post = {
 
   postType: "VID" | "IMG";
   videoUrl: string;
+  thumbnail: string;
   imageUrls: string[];
   title: string;
   description: string;

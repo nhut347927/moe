@@ -6,8 +6,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import com.moe.socialnetwork.models.Tag;
 import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.util.TextNormalizer;
 import com.moe.socialnetwork.exception.AppException;
+
 /**
  * Author: nhutnm379
  */
@@ -57,11 +59,16 @@ public class TagServiceImpl implements ITagService {
     }
 
     @Override
-    public List<RPTagDTO> searchTags(String keyword) {
+    public List<RPTagDTO> searchTags(String keyword, int page, int size, String sort) {
         if (keyword == null || keyword.trim().isEmpty()) {
             keyword = "";
         }
-        List<Tag> tags = tagJpa.searchTags(keyword, PageRequest.of(0, 100));
+
+        Sort.Direction direction = "asc".equalsIgnoreCase(sort) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "id"));
+
+        List<Tag> tags = tagJpa.searchTags(keyword, pageable);
+
         return tags.stream().map(tag -> {
 
             User user = tag.getUserCreate();
@@ -79,7 +86,7 @@ public class TagServiceImpl implements ITagService {
     @Transactional
     public RPTagDTO addTag(String name, User user) {
         String tagName = TextNormalizer.removeVietnameseAccents(name)
-                    .trim();
+                .trim();
         boolean exists = tagJpa.existsByNameIgnoreCase(TextNormalizer.removeWhitespace(tagName));
         if (exists) {
             throw new AppException("Tag already in use", 400);

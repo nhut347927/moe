@@ -14,6 +14,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 import com.moe.socialnetwork.api.services.ICloudinaryService;
+import com.moe.socialnetwork.exception.AppException;
 /**
  * Author: nhutnm379
  */
@@ -43,16 +44,16 @@ public class CloudinaryServiceImpl implements ICloudinaryService {
     public String uploadVideo(MultipartFile file) throws IOException {
         // Validate file
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("Video file cannot be null or empty.");
+            throw new AppException("Video file cannot be null or empty.",400);
         }
 
         if (file.getSize() > MAX_SIZE) {
-            throw new IllegalArgumentException("Video file is too large. Maximum size allowed is 100MB.");
+            throw new AppException("Video file is too large. Maximum size allowed is 100MB.",400);
         }
 
         String contentType = file.getContentType();
         if (contentType == null || !contentType.startsWith("video/")) {
-            throw new IllegalArgumentException("File must be a video (e.g., MP4, AVI).");
+            throw new AppException("File must be a video (e.g., MP4, AVI).",400);
         }
 
         // Choose upload method based on file size
@@ -74,7 +75,7 @@ public class CloudinaryServiceImpl implements ICloudinaryService {
 
             return (String) response.get("public_id");
         } catch (Exception e) {
-            throw new IOException("Failed to upload small video to Cloudinary: " + e.getMessage(), e);
+            throw new AppException("Failed to upload small video to Cloudinary: " + e.getMessage(), 500);
         }
     }
 
@@ -113,7 +114,7 @@ public class CloudinaryServiceImpl implements ICloudinaryService {
 
             // If async, poll for public_id
             if (batchId == null) {
-                throw new IOException("Neither public_id nor batch_id found in Cloudinary response.");
+                throw new AppException("Neither public_id nor batch_id found in Cloudinary response.",500);
             }
 
             // Poll for upload completion
@@ -131,7 +132,7 @@ public class CloudinaryServiceImpl implements ICloudinaryService {
                             String status = (String) resource.get("status");
                             publicId = (String) resource.get("public_id");
                             if ("failed".equals(status)) {
-                                throw new IOException("Cloudinary upload failed for public_id: " + publicId);
+                                throw new AppException("Cloudinary upload failed for public_id: " + publicId,500);
                             }
                             if (publicId != null && status != null && status.equals("active")) {
                                 return publicId;
@@ -142,15 +143,15 @@ public class CloudinaryServiceImpl implements ICloudinaryService {
                     Thread.sleep(POLL_INTERVAL_MS);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                    throw new IOException("Polling interrupted for batch_id: " + batchId, e);
+                    throw new AppException("Polling interrupted for batch_id: " + batchId, 500);
                 } catch (Exception e) {
-                    throw new IOException("Failed to check upload status for batch_id: " + batchId, e);
+                    throw new AppException("Failed to check upload status for batch_id: " + batchId, 500);
                 }
             }
 
-            throw new IOException("Timeout waiting for Cloudinary upload to complete for batch_id: " + batchId);
+            throw new AppException("Timeout waiting for Cloudinary upload to complete for batch_id: " + batchId,500);
         } catch (Exception e) {
-            throw new IOException("Failed to upload large video to Cloudinary: " + e.getMessage(), e);
+            throw new AppException("Failed to upload large video to Cloudinary: " + e.getMessage(), 500);
         }
     }
 

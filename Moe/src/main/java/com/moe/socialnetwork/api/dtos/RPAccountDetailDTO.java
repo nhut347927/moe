@@ -1,6 +1,9 @@
 package com.moe.socialnetwork.api.dtos;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.UUID;
 
 import java.util.List;
@@ -8,6 +11,8 @@ import java.util.List;
  * Author: nhutnm379
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class RPAccountDetailDTO {
     private UUID userCode;
     private String userName;

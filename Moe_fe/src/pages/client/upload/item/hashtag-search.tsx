@@ -260,7 +260,7 @@ export default function HashtagSearch({
                       <AvatarImage
                         src={
                           hashtag.avatar
-                            ? `https://res.cloudinary.com/dwv76nhoy/image/upload/w_80,h_80,c_thumb,f_auto,q_auto/${hashtag.avatar}`
+                            ? `abc/image/upload/w_80,h_80,c_thumb,f_auto,q_auto/${hashtag.avatar}`
                             : undefined
                         }
                         alt={`${hashtag.username}'s avatar`}

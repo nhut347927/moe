@@ -82,6 +82,8 @@ axiosInstance.interceptors.response.use(
         window.location.href = "/auth/login";
         return Promise.reject(refreshError);
       }
+    }else if(error.response.status === 403){
+        window.location.href = "/auth/login";
     }
 
     // Nếu lỗi không phải 401 hoặc đã retry → reject

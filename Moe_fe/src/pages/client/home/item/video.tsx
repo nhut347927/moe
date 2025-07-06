@@ -5,24 +5,25 @@ import {
   useImperativeHandle,
   forwardRef,
 } from "react";
-import { Play} from "lucide-react";
+import { Play } from "lucide-react";
 
 export interface PostVideoProps {
   videoSrc: string;
   initialMuted?: boolean;
   initialPlaying?: boolean;
+  thumbnail: string;
 }
 
 const PostVideo = forwardRef<HTMLDivElement, PostVideoProps>(
-  ({ videoSrc, initialPlaying = false }, ref) => {
+  ({ videoSrc, initialPlaying = false, thumbnail }, ref) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const progressBarRef = useRef<HTMLDivElement>(null);
     const [isPlaying, setIsPlaying] = useState(initialPlaying);
     //const [progress, setProgress] = useState(0);
- //   const [isMuted, setIsMuted] = useState(initialMuted);
+    //   const [isMuted, setIsMuted] = useState(initialMuted);
     const [isDragging, setIsDragging] = useState(false);
-//    const [currentTime, setCurrentTime] = useState(0);
- //   const [duration, setDuration] = useState(0);
+    //    const [currentTime, setCurrentTime] = useState(0);
+    //   const [duration, setDuration] = useState(0);
 
     const containerRef = useRef<HTMLDivElement>(null);
     useImperativeHandle(ref, () => containerRef.current as HTMLDivElement);
@@ -31,8 +32,8 @@ const PostVideo = forwardRef<HTMLDivElement, PostVideoProps>(
       const video = videoRef.current;
       if (!video) return;
 
-    //  video.muted = initialMuted;
-    //  setIsMuted(initialMuted);
+      //  video.muted = initialMuted;
+      //  setIsMuted(initialMuted);
 
       if (initialPlaying) {
         video
@@ -58,12 +59,12 @@ const PostVideo = forwardRef<HTMLDivElement, PostVideoProps>(
       const handlePlay = () => setIsPlaying(true);
       const handlePause = () => setIsPlaying(false);
 
-    //  video.addEventListener("timeupdate", updateProgress);
+      //  video.addEventListener("timeupdate", updateProgress);
       video.addEventListener("play", handlePlay);
       video.addEventListener("pause", handlePause);
 
       return () => {
-      //  video.removeEventListener("timeupdate", updateProgress);
+        //  video.removeEventListener("timeupdate", updateProgress);
         video.removeEventListener("play", handlePlay);
         video.removeEventListener("pause", handlePause);
       };
@@ -119,19 +120,19 @@ const PostVideo = forwardRef<HTMLDivElement, PostVideoProps>(
     return (
       <div ref={containerRef} className="h-full flex items-center">
         <div
-          className="w-full relative flex justify-center items-center"
+          className="h-full w-full relative flex justify-center items-center"
           onClick={togglePlay}
         >
+          {/* Video hiển thị phía trên */}
           <video
             ref={videoRef}
-            src={`https://res.cloudinary.com/dwv76nhoy/video/upload/${videoSrc}`}
-            className="h-full object-contain cursor-pointer moe-style rounded-[50px]"
+            src={`abc/video/upload/${videoSrc}`}
+            className="z-20 max-h-full object-contain cursor-pointer moe-style rounded-[50px]"
             autoPlay={isPlaying}
-           // muted={isMuted}
             loop
             playsInline
           />
-          <div className="absolute inset-0 flex flex-col justify-between">
+          <div className="absolute z-30 inset-0 flex flex-col justify-between">
             <div className="flex-1 flex items-center justify-center">
               <button
                 onClick={togglePlay}

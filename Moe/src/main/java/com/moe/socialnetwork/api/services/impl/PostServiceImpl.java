@@ -17,7 +17,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
 import com.moe.socialnetwork.api.dtos.RQPostCreateDTO;
-import com.moe.socialnetwork.api.dtos.RPPostResponseDTO;
+import com.moe.socialnetwork.api.dtos.RPPostDTO;
+import com.moe.socialnetwork.api.dtos.RPPostDetailDTO;
 import com.moe.socialnetwork.api.dtos.RPPostSearchDTO;
 import com.moe.socialnetwork.api.dtos.RQPostCreateDTO.FFmpegMergeParams;
 import com.moe.socialnetwork.api.dtos.ZRPPageDTO;
@@ -71,7 +72,8 @@ public class PostServiceImpl implements IPostService {
 		this.viewJPA = viewJPA;
 	}
 
-	public ZRPPageDTO<RPPostSearchDTO> searchPosts(String keyword, int page, int size, String sort) { //sort trả về desc hoặc asc
+	public ZRPPageDTO<RPPostSearchDTO> searchPosts(String keyword, int page, int size, String sort) { // sort trả về
+																										// desc hoặc asc
 		Sort.Direction direction = "asc".equalsIgnoreCase(sort) ? Sort.Direction.ASC : Sort.Direction.DESC;
 		Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "id"));
 		Page<Post> postPage = postJPA.searchPostsByKeyword(keyword, pageable);
@@ -122,11 +124,11 @@ public class PostServiceImpl implements IPostService {
 				postPage.hasPrevious());
 	}
 
-	public RPPostResponseDTO getPostByCode(String postCode, User user) {
+	public RPPostDetailDTO getPostByCode(String postCode, User user) {
 		UUID code = UUID.fromString(postCode);
 		Post post = postJPA.findPostByPostCode(code)
 				.orElseThrow(() -> new AppException("Post not found with provided postCode", 404));
-		return toPostResponse(post, user);
+		return toPostDetailResponse(post, user);
 	}
 
 	@Transactional
@@ -308,15 +310,13 @@ public class PostServiceImpl implements IPostService {
 			post.setUserDelete(user);
 			postJPA.save(post);
 
-		} catch (AppException e) {
-			throw e;
 		} catch (Exception e) {
 			throw new AppException("Failed to delete post: " + e.getMessage(), 500);
 		}
 	}
 
 	@Override
-	public List<RPPostResponseDTO> getPostList(User user) {
+	public List<RPPostDTO> getPostList(User user) {
 		// 1. Lấy top 25 tagId mà user đã like
 		List<Long> tagIds = postJPA.findTopTagIdsUserLiked(user.getId(), PageRequest.of(0, 24));
 
@@ -376,21 +376,43 @@ public class PostServiceImpl implements IPostService {
 		return result.stream().limit(9).map(post -> this.toPostResponse(post, user)).collect(Collectors.toList());
 	}
 
-	private RPPostResponseDTO toPostResponse(Post post, User user) {
-		RPPostResponseDTO dto = new RPPostResponseDTO();
-		dto.setPostId(post.getId().toString());
+	private RPPostDTO toPostResponse(Post post, User user) {
+		RPPostDTO dto = new RPPostDTO();
+		dto.setUserCode(String.valueOf(post.getUser().getCode()));
+		dto.setPostCode(String.valueOf(post.getCode()));
+		dto.setAvatarUrl(dto.getAvatarUrl());
+		dto.setCreatedAt(post.getCreatedAt().toString());
+		dto.setPostType(post.getType().toString());
+		dto.setVideoUrl(post.getVideoUrl());
+		dto.setThumbnail(post.getVideoThumbnail());
+		dto.setTitle(post.getTitle());
+		List<String> imageUrls = new ArrayList<>();
+		for (Image image : post.getImages()) {
+			imageUrls.add(image.getImageName());
+		}
+		dto.setImageUrls(imageUrls);
+		boolean isLiked = post.getLikes().stream()
+				.anyMatch(like -> like.getUser().getId().equals(user.getId()));
+		dto.setIsLiked(isLiked);
+		dto.setComments(null);
+		return dto;
+	}
+
+	private RPPostDetailDTO toPostDetailResponse(Post post, User user) {
+		RPPostDetailDTO dto = new RPPostDetailDTO();
 		dto.setUserCode(String.valueOf(post.getUser().getCode()));
 		dto.setPostCode(String.valueOf(post.getCode()));
 		dto.setCreatedAt(post.getCreatedAt().toString());
 
 		dto.setUserCurrentCode(user.getCode().toString());
 
-		dto.setUserAvatar(post.getUser().getAvatar());
+		dto.setAvatarUrl(post.getUser().getAvatar());
 		dto.setUserDisplayName(post.getUser().getDisplayName());
 		dto.setUserName(post.getUser().getUsername());
 
 		dto.setPostType(post.getType().toString());
 		dto.setVideoUrl(post.getVideoUrl());
+		dto.setThumbnail(post.getVideoThumbnail());
 
 		dto.setTitle(post.getTitle());
 		dto.setDescription(post.getDescription());

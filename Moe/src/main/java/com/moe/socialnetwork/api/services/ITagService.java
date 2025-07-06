@@ -9,6 +9,6 @@ import com.moe.socialnetwork.models.User;
  */
 public interface ITagService {
    List<RPTagDTO> searchByCode(String code);
-    List<RPTagDTO> searchTags(String keyword);
+    List<RPTagDTO> searchTags(String keyword, int page, int size, String sort);
     RPTagDTO addTag(String name, User user);
 }

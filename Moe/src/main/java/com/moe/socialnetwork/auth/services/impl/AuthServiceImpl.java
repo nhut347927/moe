@@ -27,7 +27,6 @@ import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.exception.AppException;
 import com.moe.socialnetwork.util.AuthorityUtil;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 /**
  * Author: nhutnm379
@@ -84,7 +83,7 @@ public class AuthServiceImpl implements IAuthService {
                 .orElseThrow(() -> new AppException("Email is not registered", HttpStatus.NOT_FOUND.value()));
 
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
-            throw new AppException("Email or password is incorrect", HttpStatus.UNAUTHORIZED.value());
+            throw new AppException("Email or password is incorrect", 400);
         }
 
         return buildLoginResponse(user);
@@ -153,7 +152,7 @@ public class AuthServiceImpl implements IAuthService {
 
     public User findByEmail(String email) {
         return userJpa.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("User with email " + email + " not found"));
+                .orElseThrow(() -> new AppException("User with email " + email + " not found",400));
     }
 
     public User findByResetToken(String token) {

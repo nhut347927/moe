@@ -27,7 +27,7 @@ public class CorsConfig {
 
 		config.setAllowCredentials(true);
 		config.addAllowedOrigin(allowedOrigin); // Đảm bảo đúng URL
-		config.addAllowedOrigin("http://192.168.1.93:3000");
+		config.addAllowedOrigin("http://172.22.64.1:3000");
 		config.addAllowedHeader("*");
 		config.addExposedHeader("*");
 		config.addAllowedMethod("*");

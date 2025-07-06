@@ -4,37 +4,19 @@ import { Post, Comment, TabType } from "./types";
 import PostHeader from "./item/post-header";
 import PostContent from "./item/post-content";
 import PostComments from "./item/post-comments";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Blend,
-  Heart,
-  MessageCircle,
-  Proportions,
-  User,
-  Bell,
-  Search,
-  Home,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Heart, MessageSquareHeart, Proportions } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { AccountProfile } from "./item/AccountProfile";
 import { Link } from "react-router-dom";
 import axiosInstance from "@/services/axios/axios-instance";
-import { cn } from "@/common/utils/utils";
+import { cn, getTimeAgo } from "@/common/utils/utils";
 
 // Define the Home component
 const HomePage = () => {
   // ------------------- State Management -------------------
   // State để lưu danh sách bài post
   const [postData, setPostData] = useState<Post[]>([]);
-  // State để kiểm soát chế độ toàn màn hình
-  const [isFullscreen, setIsFullscreen] = useState(false);
+
   // State and Refs
   const mediaRefs = useRef<(HTMLDivElement | null)[]>([]);
   const currentIndex = useRef<number>(0);
@@ -63,7 +45,7 @@ const HomePage = () => {
   const [hasMoreComments, setHasMoreComments] = useState<{
     [key: string]: boolean;
   }>({});
-
+  const [openComment, setOpenComment] = useState(false);
   // ------------------- Data Fetching Logic -------------------
   // Effect để lấy dữ liệu ban đầu và khởi tạo states
   useEffect(() => {
@@ -109,15 +91,6 @@ const HomePage = () => {
     fetchData();
   }, []);
 
-  // ------------------- Fullscreen Handling -------------------
-  useEffect(() => {
-    const handleChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-    document.addEventListener("fullscreenchange", handleChange);
-    return () => document.removeEventListener("fullscreenchange", handleChange);
-  }, []);
-
   // ------------------- Scroll Navigation Logic -------------------
   const isFetching = useRef(false);
   useEffect(() => {
@@ -152,9 +125,11 @@ const HomePage = () => {
                 fetchPost()
                   .then((newPosts) => {
                     setPostData((prev) => {
-                      const existingIds = new Set(prev.map((p) => p.postId));
+                      const existingCodes = new Set(
+                        prev.map((p) => p.postCode)
+                      );
                       const filteredPosts = newPosts.filter(
-                        (post: Post) => !existingIds.has(post.postId)
+                        (post: Post) => !existingCodes.has(post.postCode)
                       );
                       const enrichedPosts = filteredPosts.map((post: Post) => ({
                         ...post,
@@ -570,68 +545,6 @@ const HomePage = () => {
     });
   };
 
-  const handleFollowOrUnfollow = async (userCode: string) => {
-    try {
-      await followOrUnfollow(userCode);
-
-      setPostData((prev) =>
-        prev.map((post) => {
-          if (post.userCode !== userCode) return post;
-
-          if (!post.accountDetail) return post;
-
-          return {
-            ...post,
-            accountDetail: {
-              ...post.accountDetail,
-              isFollowing: !post.accountDetail.isFollowing,
-              followed: post.accountDetail.isFollowing
-                ? (Number(post.accountDetail.followed) - 1).toString()
-                : (Number(post.accountDetail.followed) + 1).toString(),
-            },
-          };
-        })
-      );
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        description:
-          error.response?.data?.message || "Failed to follow/unfollow!",
-      });
-    }
-  };
-
-  const loadMorePost = (userCode: string, page: string) => {
-    fetchAccountPost(userCode, page)
-      .then((newPosts) => {
-        setPostData((prev) => {
-          const newPostData = [...prev];
-          const current = newPostData[currentPostIndex];
-
-          if (!current.accountDetail) return prev; // Phòng hờ nhưng chắc chắn đã có
-
-          newPostData[currentPostIndex] = {
-            ...current,
-            accountDetail: {
-              ...current.accountDetail,
-              posts: [...current.accountDetail.posts, ...newPosts.contents], // nối post cũ + mới
-              page: Number(page) + 1, // cập nhật page
-              hasNext: newPosts.hasNext,
-            },
-          };
-
-          return newPostData;
-        });
-      })
-      .catch((error) => {
-        toast({
-          variant: "destructive",
-          description:
-            error.response?.data?.message || "Failed to fetch more posts!",
-        });
-      });
-  };
-
   const handleDeletePost = async (postCode: string) => {
     try {
       await deletePost(postCode);
@@ -647,7 +560,7 @@ const HomePage = () => {
 
   // ------------------- API Functions -------------------
   const fetchPost = async () => {
-    const response = await axiosInstance.get("post/get-post");
+    const response = await axiosInstance.get("posts");
     return response.data.data;
   };
 
@@ -707,7 +620,7 @@ const HomePage = () => {
   };
 
   const viewPost = async (postCode: string) => {
-    const response = await axiosInstance.post("post/view", {
+    const response = await axiosInstance.post("posts/view", {
       code: postCode,
     });
     return response.data.data;
@@ -732,13 +645,6 @@ const HomePage = () => {
     return response.data.data;
   };
 
-  const followOrUnfollow = async (userCode: string) => {
-    const response = await axiosInstance.post("account/follow", {
-      code: userCode,
-    });
-    return response.data.data;
-  };
-
   const deletePost = async (postCode: string) => {
     const response = await axiosInstance.post("post/delete", {
       code: postCode,
@@ -749,69 +655,26 @@ const HomePage = () => {
   // ------------------- Render Logic -------------------
   return (
     <div className="max-h-screen h-screen w-full relative">
-      <div className="absolute top-11 left-0 p-2 z-10 flex justify-start">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              className="p-2.5 bg-zinc-100/60 text-zinc-800 hover:bg-zinc-200 border border-zinc-300 dark:bg-white/5 dark:text-white dark:border-white/10 dark:hover:bg-white/10 transition-colors rounded-full"
-            >
-              <Blend className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="overflow-hidden bg-muted rounded-3xl mt-2"
-            align="start"
-          >
-            <ScrollArea
-              className="w-[300px] h-[300px] p-6 pt-0 space-y-3"
-              data-scroll-ignore
-            >
-              <div className="space-y-1">
-                <h4 className="text-sm font-medium text-zinc-800 dark:text-zinc-100">
-                  Filter by Tags
-                </h4>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  Select one or more tags to personalize the feed.
-                </p>
-              </div>
-
-              <div className="relative p-1">
-                <input
-                  type="text"
-                  placeholder="Search tags..."
-                  className="w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-zinc-500 dark:bg-zinc-800 dark:text-zinc-200"
-                />
-              </div>
-
-              <div className="flex items-center mb-2">
-                <span className="text-sm text-zinc-600 dark:text-zinc-300 mr-2">
-                  Sort Tags
-                </span>
-                <button className="flex items-center gap-2 px-3 py-1 text-sm font-medium text-zinc-700 dark:text-zinc-200 rounded-full border border-zinc-300 dark:border-zinc-600 transition-all duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-700">
-                  <span className="text-base">↕</span>
-                  {true ? "Unsort" : "Sort"}
-                </button>
-              </div>
-
-              <div className="flex flex-wrap gap-2 mb-9">#fdfdfdfdf</div>
-            </ScrollArea>
-          </DropdownMenuContent>
-        </DropdownMenu>
+      <div className="absolute z-30 right-3 top-3 px-2 h-[30px] bg-zinc-100/70 dark:bg-zinc-800/60 backdrop-blur-sm flex items-center rounded-xl shadow-sm">
+        <Proportions className="h-3.5 w-3.5 mr-1 text-zinc-500 dark:text-zinc-500" />
+        <span className="text-zinc-500 dark:text-zinc-500">
+          {currentIndex.current + 1}/{postData.length}
+        </span>
       </div>
-      <div className="absolute top-0 left-11 p-2 z-50 flex justify-start">
-        <Link to={"/client/search"}>
-          <Button
-            variant="outline"
-            className=" p-2.5 bg-zinc-100/60 text-zinc-800 hover:bg-zinc-200 border border-zinc-300 dark:bg-white/5 dark:text-white dark:border-white/10 dark:hover:bg-white/10 transition-colors rounded-full"
-          >
-            <Search className="h-4 w-4" />
-          </Button>
-        </Link>
+
+      <div className="z-10 absolute inset-0 flex justify-center items-center">
+        <img
+          src={`abc/video/upload/so_${
+            postData[currentIndex.current]?.thumbnail ?? "0"
+          }/${postData[currentIndex.current]?.videoUrl}.jpg`}
+          className="z-10 max-w-full max-h-full object-contain blur-3xl scale-125 opacity-90 brightness-75 transition-all"
+          alt="Blur background"
+        />
       </div>
+
       <div
         id="video-container"
-        className="overflow-y-auto scroll-but-hidden snap-y snap-mandatory h-full w-full"
+        className="z-10 overflow-y-auto scroll-but-hidden snap-y snap-mandatory h-full w-full"
       >
         {postData.map((post, index) => (
           <div
@@ -819,167 +682,125 @@ const HomePage = () => {
             ref={(el) => (mediaRefs.current[index] = el)}
             className="h-screen snap-center flex flex-col"
           >
-            <div className=" flex-1 flex justify-center items-center overflow-hidden">
-              {(() => {
-                switch (post.currentTab || "home") {
-                  case "home":
-                    return (
-                      <PostContent
-                        post={post}
-                        index={index}
-                        mediaRefs={mediaRefs}
-                        isPlaying={post.isPlaying}
-                        handleLikePost={handleLikePost}
-                      />
-                    );
-                  case "cmt":
-                    return (
-                      <ScrollArea
-                        className="flex-1 max-h-full h-full overflow-y-auto w-full sm:max-w-lg mt-20 overflow-x-hidden"
-                        data-scroll-ignore
-                      >
-                        <PostHeader
-                          post={post}
-                          onchangeTab={onchangeTab}
-                          handleDeletePost={handleDeletePost}
-                        />
-                        <PostComments
-                          post={post}
-                          newComment={newComment}
-                          setNewComment={setNewComment}
-                          replyTarget={replyTarget}
-                          setReplyTarget={setReplyTarget}
-                          activePostId={activePostId}
-                          setActivePostId={setActivePostId}
-                          visibleReplies={visibleReplies}
-                          loadingReplies={loadingReplies}
-                          hasMoreReplies={hasMoreReplies}
-                          hasMoreComments={
-                            hasMoreComments[post.postCode] || false
-                          }
-                          toggleReplies={toggleReplies}
-                          handleLoadMoreComments={handleLoadMoreComments}
-                          handleLoadMoreReplies={handleLoadMoreReplies}
-                          handleSendComment={handleSendComment}
-                          handleLikeOrUnlike={handleLikeOrUnlike}
-                          handleDeleteComment={handleDeleteComment}
-                          isFullscreen={isFullscreen}
-                        />
-                      </ScrollArea>
-                    );
-                  case "acc":
-                    return (
-                      <AccountProfile
-                        accountDetail={post.accountDetail}
-                        handleFollowOrUnfollow={handleFollowOrUnfollow}
-                        handleDeletePost={handleDeletePost}
-                        loadMorePost={loadMorePost}
-                      />
-                    );
-                  default:
-                    return <div>Không có tab phù hợp</div>;
-                }
-              })()}
-            </div>
-
-            <div
-              className={`flex justify-center mt-1 
-                          ${
-                            isFullscreen
-                              ? "pb-4"
-                              : "pb-[50px] sm:pb-[env(safe-area-inset-bottom)]"
-                          }`}
-            >
-              <div className="w-full sm:w-auto flex gap-2 items-center pb-2 mx-2">
-                <Tabs
-                  value={post.currentTab || "home"}
-                  onValueChange={(value) => {
-                    onchangeTab(value as TabType);
-                  }}
-                  className="w-full"
-                >
-                  <TabsList
-                    className="
-        w-full sm:w-[400px]
-        mx-auto
-        bg-zinc-200 dark:bg-zinc-800
-        flex justify-between
-        rounded-3xl
-        h-[45px]
-      "
-                  >
-                    <TabsTrigger
-                      value="home"
-                      className="
-          data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-700
-          h-[38px] data-[state=active]:px-6
-          rounded-3xl
-          text-zinc-800 dark:text-zinc-200
-          w-full flex justify-center
-        "
-                    >
-                      <Home className="h-5 w-5 mr-1" />
-                      {post.currentTab === "home" ? (
-                        <span className="w-f flex justify-center text-xs">
-                          Home
-                        </span>
-                      ) : (
-                        ""
-                      )}
-                    </TabsTrigger>
-
-                    <TabsTrigger
-                      value="cmt"
-                      className="
-          data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-700
-          h-[38px] data-[state=active]:px-6
-          rounded-3xl
-          text-zinc-800 dark:text-zinc-200
-         
-        "
-                    >
-                      <MessageCircle className="h-5 w-5 mr-1" />
-                      {post.currentTab === "cmt" ? (
-                        <span className="w-full flex justify-center text-xs">
-                          Comment
-                        </span>
-                      ) : (
-                        ""
-                      )}
-                    </TabsTrigger>
-
-                    <TabsTrigger
-                      value="acc"
-                      className="
-          data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-700
-          h-[38px] data-[state=active]:px-6
-          rounded-3xl
-          text-zinc-800 dark:text-zinc-200
-          w-full flex justify-center
-          
-        "
-                    >
-                      <User className="h-5 w-5 mr-1" />
-                      {post.currentTab === "acc" ? (
-                        <span className=" text-xs">Account</span>
-                      ) : (
-                        ""
-                      )}
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
-
-                <div className="px-4 h-[45px] bg-zinc-200 dark:bg-zinc-800 flex items-center rounded-3xl">
-                  <Proportions className="h-4 w-4 mr-1 text-zinc-500 dark:text-zinc-400" />
-                  <span className="inline-block text-zinc-600 dark:text-zinc-300 text-sm">
-                    {index + 1}/{postData.length}
-                  </span>
-                </div>
-              </div>
-            </div>
+            <PostContent
+              post={post}
+              index={index}
+              mediaRefs={mediaRefs}
+              isPlaying={post.isPlaying}
+              handleLikePost={handleLikePost}
+            />
           </div>
         ))}
       </div>
+      <div className="z-30 absolute  bottom-2 left-0 right-0 px-4 flex items-end justify-between">
+        {/* Left: User info + caption */}
+        <div className="opacity-80 mb-2 max-w-full flex items-center space-x-3">
+          <Link
+            to={`/client/profile?code=${
+              postData[currentIndex.current]?.userCode
+            }`}
+          >
+            <Avatar className="w-10 h-10 transition-all">
+              <AvatarImage
+                src={`abc/image/upload/w_80,h_80/${
+                  postData[currentIndex.current]?.userAvatar
+                }`}
+              />
+              <AvatarFallback className="bg-zinc-400 text-white text-sm">
+                CN
+              </AvatarFallback>
+            </Avatar>
+          </Link>
+          <span
+            onClick={() =>
+              handleLikePost?.(postData[currentIndex.current]?.postCode)
+            }
+            className={cn(
+              "w-[42px] h-[42px] p-2 rounded-full flex items-center justify-center transition-all",
+              postData[currentIndex.current]?.isLiked
+                ? "bg-red-100 hover:bg-red-200"
+                : "bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+            )}
+          >
+            <Heart
+              className={cn(
+                "w-5 h-5 mt-0.5 transition-colors",
+                postData[currentIndex.current]?.isLiked
+                  ? "text-red-500 fill-red-500"
+                  : "text-zinc-500 dark:text-zinc-500"
+              )}
+            />
+          </span>
+
+          <span
+            className="w-[42px] h-[42px] p-2 rounded-full flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+            onClick={() => setOpenComment(true)}
+          >
+            <MessageSquareHeart className="w-5 h-5 mt-0.5 text-zinc-500 dark:text-zinc-500" />
+          </span>
+
+          <div className="leading-tight">
+            <p className="text-[12px] text-zinc-400 dark:text-zinc-500 mb-0.5">
+              [{getTimeAgo(postData[currentIndex.current]?.createdAt)}]
+            </p>
+            <p className="text-sm font-medium text-zinc-600 dark:text-zinc-300 truncate">
+              {postData[currentIndex.current]?.title}
+            </p>
+          </div>
+        </div>
+      </div>
+      {openComment && (
+        <>
+          {/* Overlay nền mờ */}
+          <div
+            onClick={() => setOpenComment(false)}
+            className="fixed inset-0 top-0 right-0 bg-black/40 z-40 transition-opacity"
+          />
+
+          {/* Popup bình luận */}
+          <div className="fixed inset-0 z-50 flex justify-center items-center pointer-events-none">
+            <div
+              className={`
+          max-w-2xl w-full  mt-auto
+          transform transition-all duration-300 ease-in-out
+          ${
+            openComment
+              ? "opacity-100 translate-y-0 scale-100"
+              : "opacity-0 translate-y-10 scale-95"
+          }
+          pointer-events-auto
+        `}
+            >
+              <div className="max-h-[80vh] " data-scroll-ignore>
+                <PostComments
+                  post={postData[currentIndex.current]}
+                  onchangeTab={onchangeTab}
+                  handleDeletePost={handleDeletePost}
+                  newComment={newComment}
+                  setNewComment={setNewComment}
+                  replyTarget={replyTarget}
+                  setReplyTarget={setReplyTarget}
+                  activePostId={activePostId}
+                  setActivePostId={setActivePostId}
+                  visibleReplies={visibleReplies}
+                  loadingReplies={loadingReplies}
+                  hasMoreReplies={hasMoreReplies}
+                  hasMoreComments={
+                    hasMoreComments[postData[currentIndex.current]?.postCode] ||
+                    false
+                  }
+                  toggleReplies={toggleReplies}
+                  handleLoadMoreComments={handleLoadMoreComments}
+                  handleLoadMoreReplies={handleLoadMoreReplies}
+                  handleSendComment={handleSendComment}
+                  handleLikeOrUnlike={handleLikeOrUnlike}
+                  handleDeleteComment={handleDeleteComment}
+                />
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

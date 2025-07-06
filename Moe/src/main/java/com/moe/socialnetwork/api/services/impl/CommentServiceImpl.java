@@ -3,6 +3,7 @@ package com.moe.socialnetwork.api.services.impl;
 import com.moe.socialnetwork.api.dtos.RPCommentDTO;
 import com.moe.socialnetwork.api.dtos.RPReplyDTO;
 import com.moe.socialnetwork.api.services.ICommentService;
+import com.moe.socialnetwork.exception.AppException;
 import com.moe.socialnetwork.jpa.CommentJPA;
 import com.moe.socialnetwork.jpa.CommentLikeJPA;
 import com.moe.socialnetwork.jpa.PostJPA;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 /**
  * Author: nhutnm379
  */
@@ -100,11 +102,15 @@ public class CommentServiceImpl implements ICommentService {
             commentLikeJpa.delete(existingLike.get());
         } else {
             // Like
-            CommentLike newLike = new CommentLike();
-            newLike.setUser(user);
-            newLike.setComment(comment);
-            comment.getCommentLikes().add(newLike);
-            commentLikeJpa.save(newLike); // 👈 Thêm dòng này
+            try {
+                CommentLike newLike = new CommentLike();
+                newLike.setUser(user);
+                newLike.setComment(comment);
+                comment.getCommentLikes().add(newLike);
+                commentLikeJpa.save(newLike);
+            } catch (Exception e) {
+                throw new AppException(e.getMessage(), 500);
+            }
         }
 
         // đã đặt cascade = CascadeType.PERSIST và orphanRemoval = true ở entity Comment
@@ -113,14 +119,19 @@ public class CommentServiceImpl implements ICommentService {
 
     public void deleteComment(UUID commentCode, User user) {
         Comment comment = commentJpa.findCommentByCommentCode(commentCode)
-                .orElseThrow(() -> new IllegalArgumentException("Comment not found with code: " + commentCode));
+                .orElseThrow(() -> new AppException("Comment not found with code: " + commentCode, 404));
 
         if (!comment.getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException("You can only delete your own comments.");
+            throw new AppException("You can only delete your own comments.", 400);
         }
-        comment.setUserDelete(user);
-        comment.softDelete();
-        commentJpa.save(comment);
+
+        try {
+            comment.setUserDelete(user);
+            comment.softDelete();
+            commentJpa.save(comment);
+        } catch (Exception e) {
+            throw new AppException(e.getMessage(), 500);
+        }
     }
 
     @Override

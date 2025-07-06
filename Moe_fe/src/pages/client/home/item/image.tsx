@@ -90,7 +90,7 @@ const PostMultiImg = forwardRef<HTMLDivElement, PostMultiImgProps>(
           >
             <motion.img
               key={currentImageIndex}
-              src={`https://res.cloudinary.com/dwv76nhoy/image/upload/${images[currentImageIndex]}`}
+              src={`abc/image/upload/${images[currentImageIndex]}`}
               className="h-full moe-style object-contain rounded-[50px]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -154,7 +154,7 @@ const PostMultiImg = forwardRef<HTMLDivElement, PostMultiImgProps>(
 
           <audio
             ref={audioRef}
-            src={`https://res.cloudinary.com/dwv76nhoy/video/upload/${audioSrc}`}
+            src={`abc/video/upload/${audioSrc}`}
             onEnded={() => {
               if (audioRef.current) {
                 audioRef.current.currentTime = 0;

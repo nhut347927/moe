@@ -13,6 +13,7 @@ import com.cloudinary.Cloudinary;
 import com.moe.socialnetwork.api.dtos.RQPostCreateDTO.FFmpegMergeParams;
 import com.moe.socialnetwork.api.services.ICloudinaryService;
 import com.moe.socialnetwork.api.services.IFFmpegService;
+import com.moe.socialnetwork.exception.AppException;
 
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
@@ -128,7 +129,7 @@ public class FFmpegServiceImpl implements IFFmpegService {
         }
         int exitCode = process.waitFor();
         if (exitCode != 0) {
-            throw new RuntimeException("FFmpeg command failed with exit code " + exitCode);
+            throw new AppException("FFmpeg command failed with exit code " + exitCode,500);
         }
     }
 
@@ -148,8 +149,6 @@ public class FFmpegServiceImpl implements IFFmpegService {
         final long retryDelayMillis = 3_000; // 3 giây giữa mỗi lần thử
         final long startTime = System.currentTimeMillis();
 
-        IOException lastException = null;
-
         while (System.currentTimeMillis() - startTime < timeoutMillis) {
             try (InputStream in = new BufferedInputStream(new URL(fileUrl).openStream());
                     FileOutputStream out = new FileOutputStream(file)) {
@@ -164,20 +163,18 @@ public class FFmpegServiceImpl implements IFFmpegService {
                 return file;
 
             } catch (IOException e) {
-                lastException = e;
                 System.err.println("Lỗi khi tải file, sẽ thử lại sau...: " + e.getMessage());
-
                 try {
                     Thread.sleep(retryDelayMillis);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
-                    throw new RuntimeException("Thread bị gián đoạn trong khi retry tải file.", ie);
+                    throw new AppException("Thread bị gián đoạn trong khi retry tải file.", 500);
                 }
             }
         }
 
         // ❌ Sau 1 phút vẫn không thành công
-        throw new RuntimeException("Tải file thất bại sau nhiều lần thử.", lastException);
+        throw new AppException("Tải file thất bại sau nhiều lần thử.", 500);
     }
 
     public File extractAudioFromVideo(File videoFile) throws IOException {
@@ -201,7 +198,7 @@ public class FFmpegServiceImpl implements IFFmpegService {
             new FFmpegExecutor(ffmpeg, ffprobe).createJob(builder).run();
             return audioFile;
         } catch (Exception e) {
-            throw new IOException("Lỗi khi trích xuất âm thanh: " + e.getMessage(), e);
+            throw new AppException("Lỗi khi trích xuất âm thanh: " + e.getMessage(), 500);
         }
     }
 
@@ -229,7 +226,7 @@ public class FFmpegServiceImpl implements IFFmpegService {
             new FFmpegExecutor(ffmpeg, ffprobe).createJob(builder).run();
             return outputVideo;
         } catch (Exception e) {
-            throw new IOException("Lỗi khi ghép video và audio: " + e.getMessage(), e);
+            throw new AppException("Lỗi khi ghép video và audio: " + e.getMessage(), 500);
         }
     }
 

@@ -27,7 +27,7 @@ const PostHeader = ({
   {/* Avatar */}
   <Avatar className="w-9 h-9 shrink-0">
     <AvatarImage
-      src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_80,h_80/${post.userAvatar}`}
+      src={`abc/image/upload/w_80,h_80/${post.userAvatar}`}
     />
     <AvatarFallback>{post.userDisplayName.charAt(0)}</AvatarFallback>
   </Avatar>

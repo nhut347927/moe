@@ -9,6 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 /**
  * Author: nhutnm379
  */
@@ -33,7 +34,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/google-login",
                                 "/api/auth/change-password", "/api/auth//password-reset-request",
-                                "/api/auth/password-reset", "/api/auth/refresh-token", //"/api/auth/logout",
+                                "/api/auth/password-reset", "/api/auth/refresh-token", // "/api/auth/logout",
                                 "api/file/upload-image", "api/file/upload-video", "/api/file/upload-audio",
                                 "/api/file/upload-any")
                         .permitAll()

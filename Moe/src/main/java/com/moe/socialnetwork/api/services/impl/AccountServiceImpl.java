@@ -80,22 +80,26 @@ public class AccountServiceImpl implements IAccountService {
 
         // Kiểm tra userName trùng
         if (userJpa.existsUserNameExcludingId(userName, userId)) {
-            throw new IllegalArgumentException("Username đã được sử dụng.");
+            throw new AppException("Username already in use", 409);
         }
 
         // Kiểm tra displayName trùng
         if (userJpa.existsDisplayNameExcludingId(displayName, userId)) {
-            throw new IllegalArgumentException("DisplayName đã được sử dụng.");
+            throw new AppException("DisplayName already in use", 409);
         }
 
         // Cập nhật thông tin
-        user.setDisplayName(displayName);
-        user.setUserName(userName);
-        user.setBio(bio);
-        user.setUpdatedAt(LocalDateTime.now());
-        user.setUserUpdate(user);
+        try {
+            user.setDisplayName(displayName);
+            user.setUserName(userName);
+            user.setBio(bio);
+            user.setUpdatedAt(LocalDateTime.now());
+            user.setUserUpdate(user);
 
-        userJpa.save(user);
+            userJpa.save(user);
+        } catch (Exception e) {
+            throw new AppException("Failed to update user information", 500);
+        }
     }
 
     @Override

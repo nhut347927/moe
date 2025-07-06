@@ -1,6 +1,5 @@
 package com.moe.socialnetwork.api.controllers;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -9,17 +8,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.moe.socialnetwork.api.dtos.RPAccountDetailDTO;
 import com.moe.socialnetwork.api.dtos.RPAccountSearchDTO;
-import com.moe.socialnetwork.api.dtos.ZRQCodeDto;
+import com.moe.socialnetwork.api.dtos.ZRQCodeAndContentDTO;
 import com.moe.socialnetwork.api.dtos.ZRQFilterPageDTO;
-import com.moe.socialnetwork.api.dtos.RQKeyWordPageSizeDTO;
 import com.moe.socialnetwork.api.dtos.RQProfileUpdateDTO;
 import com.moe.socialnetwork.api.dtos.ZRPPageDTO;
 import com.moe.socialnetwork.api.services.IAccountService;
@@ -32,13 +28,13 @@ import jakarta.validation.Valid;
  * Author: nhutnm379
  */
 @RestController
-@RequestMapping("/api/account")
+@RequestMapping("/api/accounts")
 public class AccountController {
+
     private final IAccountService accountService;
 
     public AccountController(IAccountService accountService) {
         this.accountService = accountService;
-
     }
 
     @PostMapping("/update-profile")
@@ -49,20 +45,20 @@ public class AccountController {
         accountService.updateProfileAccUser(dto.getDisplayName(), dto.getUserName(), dto.getBio(), userLogin);
         ResponseAPI<Void> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Profile updated successfully");
+        response.setMessage("Profile updated successfully.");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/update-avatar")
     public ResponseEntity<ResponseAPI<String>> updateAvatar(
-            @RequestBody @Valid ZRQCodeDto request,
+            @RequestBody @Valid ZRQCodeAndContentDTO request,
             @AuthenticationPrincipal User userLogin) {
 
         String img = accountService.updateImgAccUserFromBase64(request.getCode(), userLogin);
 
         ResponseAPI<String> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Avatar updated successfully");
+        response.setMessage("Avatar updated successfully.");
         response.setData(img);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -73,15 +69,11 @@ public class AccountController {
             @AuthenticationPrincipal User userLogin) {
 
         ZRPPageDTO<RPAccountSearchDTO> result = accountService.searchUsers(
-                request.getKeyWord(),
-                request.getPage(),
-                request.getSize(),
-                request.getSort(),
-                userLogin);
+                request.getKeyWord(), request.getPage(), request.getSize(), request.getSort(), userLogin);
 
         ResponseAPI<ZRPPageDTO<RPAccountSearchDTO>> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Search completed successfully");
+        response.setMessage("User search completed successfully.");
         response.setData(result);
 
         return ResponseEntity.ok(response);
@@ -89,53 +81,52 @@ public class AccountController {
 
     @PostMapping("/follow")
     public ResponseEntity<ResponseAPI<Void>> followUser(
-            @RequestBody @Valid ZRQCodeDto code,
+            @RequestBody @Valid ZRQCodeAndContentDTO code,
             @AuthenticationPrincipal User userLogin) {
 
         accountService.followUser(UUID.fromString(code.getCode()), userLogin);
         ResponseAPI<Void> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Follow/Unfollow action completed successfully");
+        response.setMessage("Follow/unfollow action completed successfully.");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/get-my-account")
+    @GetMapping("/me")
     public ResponseEntity<ResponseAPI<RPAccountDetailDTO>> getMyAccountDetail(
             @AuthenticationPrincipal User userLogin) {
 
         RPAccountDetailDTO accountDetail = accountService.getAccountSummary(userLogin.getCode(), userLogin);
         ResponseAPI<RPAccountDetailDTO> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Account detail retrieved successfully");
+        response.setMessage("Logged-in user account detail retrieved successfully.");
         response.setData(accountDetail);
         return ResponseEntity.status(HttpStatus.OK).body(response);
-
     }
 
-    @GetMapping("/get-account")
+    @GetMapping("/detail")
     public ResponseEntity<ResponseAPI<RPAccountDetailDTO>> getAccountDetail(
-            @ModelAttribute ZRQCodeDto code,
+            @ModelAttribute ZRQCodeAndContentDTO code,
             @AuthenticationPrincipal User userLogin) {
 
         RPAccountDetailDTO accountDetail = accountService.getAccountSummary(UUID.fromString(code.getCode()), userLogin);
         ResponseAPI<RPAccountDetailDTO> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Account detail retrieved successfully");
+        response.setMessage("Account detail retrieved successfully.");
         response.setData(accountDetail);
         return ResponseEntity.status(HttpStatus.OK).body(response);
-
     }
 
     @GetMapping("/posts")
     public ResponseEntity<ResponseAPI<ZRPPageDTO<RPAccountDetailDTO.RPAccountPostDTO>>> getAccountPosts(
             @ModelAttribute ZRQFilterPageDTO request) {
+
         UUID userCode = UUID.fromString(request.getCode());
-        ZRPPageDTO<RPAccountDetailDTO.RPAccountPostDTO> postPage = accountService.getAccountPosts(userCode,
-                request.getPage(), request.getSize(), request.getSort());
+        ZRPPageDTO<RPAccountDetailDTO.RPAccountPostDTO> postPage = accountService.getAccountPosts(
+                userCode, request.getPage(), request.getSize(), request.getSort());
 
         ResponseAPI<ZRPPageDTO<RPAccountDetailDTO.RPAccountPostDTO>> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Account detail retrieved successfully");
+        response.setMessage("User's post list retrieved successfully.");
         response.setData(postPage);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

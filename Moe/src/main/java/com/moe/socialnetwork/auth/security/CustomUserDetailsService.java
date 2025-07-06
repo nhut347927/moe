@@ -24,8 +24,11 @@ import com.moe.socialnetwork.util.AuthorityUtil;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-	@Autowired
-	private UserJPA userJPA;
+	private final UserJPA userJPA;
+
+	public CustomUserDetailsService(UserJPA userJPA) {
+		this.userJPA = userJPA;
+	}
 
 	@Override
 	@Transactional(readOnly = true)

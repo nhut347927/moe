@@ -36,14 +36,23 @@ public class ActivityLog {
 	@Column(unique = true, nullable = false, updatable = false)
 	private UUID code;
 
-	@Column(name = "message", length = 255)
-	private String message;	
+	@Column(name = "type", length = 255)
+	private String type;	  //get/post/put/delete/path
 
-	@Column(name = "data", columnDefinition = "TEXT")
-	private String data;
+	@Column(name = "ip", length = 255)
+	private String ip;	//ip user
+	
+	@Column(name = "response_code", length = 255)
+	private String responseCode;//200, 500, 400, 404...
+
+	@Column(name = "message", columnDefinition = "TEXT")
+	private String message;	// sự kiện gì
 
 	@Column(name = "error", columnDefinition = "TEXT")
-	private String error;
+	private String error; // lỗi cụ thể
+
+	@Column(name = "data", columnDefinition = "TEXT")
+	private String data; //data json của request đó
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", updatable = false)
@@ -58,14 +67,5 @@ public class ActivityLog {
 		this.createdAt = LocalDateTime.now();
 		this.code = UUID.randomUUID();
 
-	}
-
-	public enum LogActionType {
-		ADD, UPDATE, DELETE, VIEW, LIKE, UNLIKE, FOLLOW, UNFOLLOW, BLOCK, UNBLOCK, SHARE, REPORT, COMMENT
-	}
-
-	public enum LogTargetType {
-		POST, COMMENT, COMMENT2, LIKE, LIKECOMENT, LIKECOMENT2, MESSAGE, PERMISSION, LOGIN, REGISTER, STORY, REPORT,
-		SETTING
 	}
 }

@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
  * Author: nhutnm379
  */
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class RQPlaylistCodeDTO {
-    @NotBlank(message = "playlistCode cannot be blank")
-    private String playlistCode;
+@NoArgsConstructor
+public class ZRQContent {
+    @NotBlank(message = "Content must not be blank")
+    private String content;
 }

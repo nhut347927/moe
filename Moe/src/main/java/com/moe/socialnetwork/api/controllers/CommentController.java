@@ -1,10 +1,8 @@
 package com.moe.socialnetwork.api.controllers;
 
 import com.moe.socialnetwork.api.dtos.RPCommentDTO;
-import com.moe.socialnetwork.api.dtos.RQCodePageSizeDTO;
-import com.moe.socialnetwork.api.dtos.RQCreateCommentDTO;
-import com.moe.socialnetwork.api.dtos.RQCreateReplyDTO;
-import com.moe.socialnetwork.api.dtos.ZRQCodeDto;
+import com.moe.socialnetwork.api.dtos.ZRQCodeAndContentDTO;
+import com.moe.socialnetwork.api.dtos.ZRQFilterPageDTO;
 import com.moe.socialnetwork.api.dtos.RPReplyDTO;
 import com.moe.socialnetwork.api.services.ICommentService;
 import com.moe.socialnetwork.models.User;
@@ -18,42 +16,45 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+
 /**
  * Author: nhutnm379
  */
 @RestController
-@RequestMapping("/api/comment")
+@RequestMapping("/api/comments")
 public class CommentController {
 
     private final ICommentService commentService;
+
     public CommentController(ICommentService commentService) {
         this.commentService = commentService;
     }
 
-    @PostMapping("/comment")
+    @PostMapping
     public ResponseEntity<ResponseAPI<RPCommentDTO>> createComment(
-            @RequestBody @Valid RQCreateCommentDTO request,
+            @RequestBody @Valid ZRQCodeAndContentDTO request,
             @AuthenticationPrincipal User user) {
 
-        RPCommentDTO comment = commentService.addComment(UUID.fromString(request.getPostCode()), request.getContent(), user);
+        RPCommentDTO comment = commentService.addComment(UUID.fromString(request.getCode()), request.getContent(), user);
 
         ResponseAPI<RPCommentDTO> response = new ResponseAPI<>();
         response.setCode(HttpStatus.CREATED.value());
-        response.setMessage("Tạo comment thành công");
+        response.setMessage("Comment created successfully");
         response.setData(comment);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
     @PostMapping("/reply")
     public ResponseEntity<ResponseAPI<RPReplyDTO>> createReply(
-            @RequestBody @Valid RQCreateReplyDTO request,
+            @RequestBody @Valid ZRQCodeAndContentDTO request,
             @AuthenticationPrincipal User user) {
 
-        RPReplyDTO reply = commentService.addReply(UUID.fromString(request.getCommentCode()), request.getContent(), user);
+        RPReplyDTO reply = commentService.addReply(UUID.fromString(request.getCode()), request.getContent(), user);
 
         ResponseAPI<RPReplyDTO> response = new ResponseAPI<>();
         response.setCode(HttpStatus.CREATED.value());
-        response.setMessage("Tạo reply thành công");
+        response.setMessage("Reply created successfully");
         response.setData(reply);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -61,14 +62,14 @@ public class CommentController {
 
     @PostMapping("/like")
     public ResponseEntity<ResponseAPI<Void>> likeComment(
-            @RequestBody @Valid ZRQCodeDto request,
+            @RequestBody @Valid ZRQCodeAndContentDTO request,
             @AuthenticationPrincipal User user) {
 
         commentService.likeComment(UUID.fromString(request.getCode()), user);
 
         ResponseAPI<Void> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Like comment thành công");
+        response.setMessage("Comment liked successfully");
         response.setData(null);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -76,44 +77,44 @@ public class CommentController {
 
     @PostMapping("/delete")
     public ResponseEntity<ResponseAPI<Void>> deleteComment(
-            @RequestBody @Valid ZRQCodeDto request,
+            @RequestBody @Valid ZRQCodeAndContentDTO request,
             @AuthenticationPrincipal User user) {
 
         commentService.deleteComment(UUID.fromString(request.getCode()), user);
 
         ResponseAPI<Void> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Xóa comment thành công");
+        response.setMessage("Comment deleted successfully");
         response.setData(null);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/get-main-comment")
+    @GetMapping("/comments")
     public ResponseEntity<ResponseAPI<List<RPCommentDTO>>> getCommentsByPost(
-            @RequestBody @Valid RQCodePageSizeDTO request,
+            @ModelAttribute @Valid ZRQFilterPageDTO request,
             @AuthenticationPrincipal User user) {
 
         List<RPCommentDTO> comments = commentService.getCommentsByPost(UUID.fromString(request.getCode()), user, request.getPage(), request.getSize());
 
         ResponseAPI<List<RPCommentDTO>> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Lấy danh sách comment thành công");
+        response.setMessage("Comments fetched successfully");
         response.setData(comments);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/get-replies")
+    @GetMapping("/replies")
     public ResponseEntity<ResponseAPI<List<RPReplyDTO>>> getRepliesByComment(
-            @RequestBody @Valid RQCodePageSizeDTO request,
+            @ModelAttribute @Valid ZRQFilterPageDTO request,
             @AuthenticationPrincipal User user) {
 
         List<RPReplyDTO> replies = commentService.getRepliesByComment(UUID.fromString(request.getCode()), user, request.getPage(), request.getSize());
 
         ResponseAPI<List<RPReplyDTO>> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Lấy danh sách trả lời thành công");
+        response.setMessage("Replies fetched successfully");
         response.setData(replies);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
