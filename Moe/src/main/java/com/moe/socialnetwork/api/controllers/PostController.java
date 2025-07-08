@@ -66,9 +66,9 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/get")
+    @GetMapping("/get")
     public ResponseEntity<ResponseAPI<RPPostDetailDTO>> getPostByCode(
-            @RequestBody @Valid ZRQCodeAndContentDTO request,
+            @ModelAttribute @Valid ZRQCodeAndContentDTO request,
             @AuthenticationPrincipal User user) {
 
         RPPostDetailDTO post = postService.getPostByCode(request.getCode(), user);

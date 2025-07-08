@@ -138,7 +138,7 @@ export default function Header() {
             {/* Avatar người dùng */}
             <div className="mt-0">
               <Link to="/client/my-profile" title="Tài khoản">
-                <Avatar className="w-10 h-10 hover:ring-2 hover:ring-blue-400 transition">
+                <Avatar className="w-10 h-10 bg-zinc-400 text-white text-sm">
                   <AvatarImage
                     src={
                       avatar

@@ -15,7 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/common/hooks/use-toast";
 import axiosInstance from "@/services/axios/axios-instance";
 import { Bell, EllipsisVertical, Eye, Home, Settings } from "lucide-react";
-import { AccountDetail } from "../home/types";
+import { AccountDetail } from "../types";
 
 export function ProfilePage() {
   const { toast } = useToast();

@@ -1,14 +1,13 @@
 import { RefObject } from "react";
 import PostMultiImg from "./image";
 import PostVideo from "./video";
-import { Post } from "../types";
+import { Post } from "../../types";
 
 interface PostContentProps {
   post: Post;
   isPlaying: boolean;
   index: number;
   mediaRefs: RefObject<(HTMLDivElement | null)[]>;
-  handleLikePost?: (postCode: string) => void;
 }
 
 const PostContent = ({

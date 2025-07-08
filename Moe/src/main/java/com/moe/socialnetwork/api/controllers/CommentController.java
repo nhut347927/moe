@@ -4,6 +4,7 @@ import com.moe.socialnetwork.api.dtos.RPCommentDTO;
 import com.moe.socialnetwork.api.dtos.ZRQCodeAndContentDTO;
 import com.moe.socialnetwork.api.dtos.ZRQFilterPageDTO;
 import com.moe.socialnetwork.api.dtos.RPReplyDTO;
+import com.moe.socialnetwork.api.dtos.ZRPPageDTO;
 import com.moe.socialnetwork.api.services.ICommentService;
 import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.response.ResponseAPI;
@@ -14,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -91,13 +91,13 @@ public class CommentController {
     }
 
     @GetMapping("/comments")
-    public ResponseEntity<ResponseAPI<List<RPCommentDTO>>> getCommentsByPost(
+    public ResponseEntity<ResponseAPI<ZRPPageDTO<RPCommentDTO>>> getCommentsByPost(
             @ModelAttribute @Valid ZRQFilterPageDTO request,
             @AuthenticationPrincipal User user) {
 
-        List<RPCommentDTO> comments = commentService.getCommentsByPost(UUID.fromString(request.getCode()), user, request.getPage(), request.getSize());
+        ZRPPageDTO<RPCommentDTO> comments = commentService.getCommentsByPost(UUID.fromString(request.getCode()), user, request.getPage(), request.getSize(), request.getSort());
 
-        ResponseAPI<List<RPCommentDTO>> response = new ResponseAPI<>();
+        ResponseAPI<ZRPPageDTO<RPCommentDTO>> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
         response.setMessage("Comments fetched successfully");
         response.setData(comments);
@@ -106,13 +106,13 @@ public class CommentController {
     }
 
     @GetMapping("/replies")
-    public ResponseEntity<ResponseAPI<List<RPReplyDTO>>> getRepliesByComment(
+    public ResponseEntity<ResponseAPI<ZRPPageDTO<RPReplyDTO>>> getRepliesByComment(
             @ModelAttribute @Valid ZRQFilterPageDTO request,
             @AuthenticationPrincipal User user) {
 
-        List<RPReplyDTO> replies = commentService.getRepliesByComment(UUID.fromString(request.getCode()), user, request.getPage(), request.getSize());
+        ZRPPageDTO<RPReplyDTO> replies = commentService.getRepliesByComment(UUID.fromString(request.getCode()), user, request.getPage(), request.getSize(),request.getSort());
 
-        ResponseAPI<List<RPReplyDTO>> response = new ResponseAPI<>();
+        ResponseAPI<ZRPPageDTO<RPReplyDTO>> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
         response.setMessage("Replies fetched successfully");
         response.setData(replies);

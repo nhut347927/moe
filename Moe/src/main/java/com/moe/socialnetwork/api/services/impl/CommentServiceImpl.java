@@ -2,6 +2,7 @@ package com.moe.socialnetwork.api.services.impl;
 
 import com.moe.socialnetwork.api.dtos.RPCommentDTO;
 import com.moe.socialnetwork.api.dtos.RPReplyDTO;
+import com.moe.socialnetwork.api.dtos.ZRPPageDTO;
 import com.moe.socialnetwork.api.services.ICommentService;
 import com.moe.socialnetwork.exception.AppException;
 import com.moe.socialnetwork.jpa.CommentJPA;
@@ -14,7 +15,10 @@ import com.moe.socialnetwork.models.User;
 
 import jakarta.transaction.Transactional;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -135,11 +139,15 @@ public class CommentServiceImpl implements ICommentService {
     }
 
     @Override
-    public List<RPCommentDTO> getCommentsByPost(UUID postCode, User user, int page, int size) {
-        PageRequest pageable = PageRequest.of(page, size);
+    public ZRPPageDTO<RPCommentDTO> getCommentsByPost(UUID postCode, User user, int page, int size, String sort) {
+        Sort.Direction direction = "asc".equalsIgnoreCase(sort) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "id")); // Bạn có thể đổi "id" thành
+                                                                                  // "createdAt" nếu muốn sort theo thời
+                                                                                  // gian tạo
 
-        return commentJpa.findTopLevelCommentsByPostCode(postCode, pageable)
-                .stream()
+        Page<Comment> commentPage = commentJpa.findTopLevelCommentsByPostCode(postCode, pageable);
+
+        List<RPCommentDTO> contents = commentPage.stream()
                 .map(comment -> {
                     RPCommentDTO dto = new RPCommentDTO();
                     dto.setCommentCode(comment.getCode().toString());
@@ -148,37 +156,47 @@ public class CommentServiceImpl implements ICommentService {
                     dto.setDisplayName(comment.getUser().getDisplayName());
                     dto.setUserAvatar(comment.getUser().getAvatar());
 
-                    // Like count dưới dạng chuỗi
                     dto.setLikeCount(String.valueOf(comment.getCommentLikes().size()));
 
-                    // Kiểm tra xem người dùng đã like comment này chưa
                     boolean isLiked = comment.getCommentLikes()
                             .stream()
                             .anyMatch(like -> like.getUser().getId().equals(user.getId()));
                     dto.setLiked(isLiked);
-                    // Đếm số reply không bị xoá
+
                     long replyCount = comment.getReplies()
                             .stream()
                             .filter(reply -> !Boolean.TRUE.equals(reply.getIsDeleted()))
                             .count();
                     dto.setReplyCount(String.valueOf(replyCount));
 
-                    dto.setReplies(null); // Không load replies ở đây
-
-                    // Lưu thông tin userCommentCode và userCurrentCode
+                    dto.setReplies(null);
                     dto.setUserCommentCode(comment.getUser().getCode().toString());
                     dto.setUserCurrentCode(user.getCode().toString());
+
                     return dto;
                 })
                 .collect(Collectors.toList());
+
+        return new ZRPPageDTO<>(
+                contents,
+                commentPage.getTotalElements(),
+                commentPage.getTotalPages(),
+                commentPage.getNumber(),
+                commentPage.getSize(),
+                commentPage.hasNext(),
+                commentPage.hasPrevious());
     }
 
     @Override
-    public List<RPReplyDTO> getRepliesByComment(UUID commentCode, User user, int page, int size) {
-        PageRequest pageable = PageRequest.of(page, size);
+    public ZRPPageDTO<RPReplyDTO> getRepliesByComment(UUID commentCode, User user, int page, int size, String sort) {
+        Sort.Direction direction = "asc".equalsIgnoreCase(sort) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "id"));
 
-        return commentJpa.findRepliesByParentCode(commentCode, pageable)
-                .stream()
+        // Lấy dữ liệu phân trang từ JPA
+        Page<Comment> replyPage = commentJpa.findRepliesByParentCode(commentCode, pageable);
+
+        // Map từng reply thành DTO
+        List<RPReplyDTO> contents = replyPage.stream()
                 .map(reply -> {
                     RPReplyDTO dto = new RPReplyDTO();
                     dto.setCommentCode(reply.getCode().toString());
@@ -187,20 +205,31 @@ public class CommentServiceImpl implements ICommentService {
                     dto.setDisplayName(reply.getUser().getDisplayName());
                     dto.setUserAvatar(reply.getUser().getAvatar());
 
-                    // Like count dưới dạng chuỗi
+                    // Số lượt like dưới dạng chuỗi
                     dto.setLikeCount(String.valueOf(reply.getCommentLikes().size()));
-                    // Kiểm tra xem người dùng đã like reply này chưa
-                    boolean isLiked = reply.getCommentLikes()
-                            .stream()
+
+                    // Kiểm tra đã like hay chưa
+                    boolean isLiked = reply.getCommentLikes().stream()
                             .anyMatch(like -> like.getUser().getId().equals(user.getId()));
                     dto.setLiked(isLiked);
 
-                    // Lưu thông tin userCommentCode và userCurrentCode
+                    // Thêm thông tin mã người dùng
                     dto.setUserCommentCode(reply.getUser().getCode().toString());
                     dto.setUserCurrentCode(user.getCode().toString());
 
                     return dto;
                 })
                 .collect(Collectors.toList());
+
+        // Trả về trang đã map
+        return new ZRPPageDTO<>(
+                contents,
+                replyPage.getTotalElements(),
+                replyPage.getTotalPages(),
+                replyPage.getNumber(),
+                replyPage.getSize(),
+                replyPage.hasNext(),
+                replyPage.hasPrevious());
     }
+
 }

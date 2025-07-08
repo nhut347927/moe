@@ -19,7 +19,7 @@ import {
   UploadCloud,
   LogOut,
 } from "lucide-react";
-import { AccountDetail } from "../home/types";
+import { AccountDetail } from "../types";
 import { convertFileToBase64 } from "@/common/utils/utils";
 import ActionMenuDialog from "@/components/dialog/action-menu-dialog";
 import { ModeToggle } from "@/components/common/mode-toggle";

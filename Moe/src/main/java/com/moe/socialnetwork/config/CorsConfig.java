@@ -26,8 +26,7 @@ public class CorsConfig {
 		CorsConfiguration config = new CorsConfiguration();
 
 		config.setAllowCredentials(true);
-		config.addAllowedOrigin(allowedOrigin); // Đảm bảo đúng URL
-		config.addAllowedOrigin("http://172.22.64.1:3000");
+		config.addAllowedOrigin(allowedOrigin);
 		config.addAllowedHeader("*");
 		config.addExposedHeader("*");
 		config.addAllowedMethod("*");

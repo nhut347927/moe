@@ -2,9 +2,9 @@ package com.moe.socialnetwork.api.services;
 
 import com.moe.socialnetwork.api.dtos.RPCommentDTO;
 import com.moe.socialnetwork.api.dtos.RPReplyDTO;
+import com.moe.socialnetwork.api.dtos.ZRPPageDTO;
 import com.moe.socialnetwork.models.User;
 
-import java.util.List;
 import java.util.UUID;
 /**
  * Author: nhutnm379
@@ -14,6 +14,6 @@ public interface ICommentService {
     RPReplyDTO addReply(UUID commentCode, String content, User user);
     void likeComment(UUID commentCode, User user);
     void deleteComment(UUID commentCode, User user);
-    List<RPCommentDTO> getCommentsByPost(UUID postCode, User user, int page, int size);
-    List<RPReplyDTO> getRepliesByComment(UUID commentCode, User user, int page, int size);
+    ZRPPageDTO<RPCommentDTO> getCommentsByPost(UUID postCode, User user, int page, int size, String sort);
+    ZRPPageDTO<RPReplyDTO> getRepliesByComment(UUID commentCode, User user, int page, int size, String sort);
 }

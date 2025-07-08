@@ -1,9 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/common/hooks/use-toast";
-import { Post, Comment, TabType } from "@/pages/client/home/types";
-import PostHeader from "@/pages/client/home/item/post-header";
-import PostContent from "@/pages/client/home/item/post-content";
-import PostComments from "@/pages/client/home/item/post-comments";
+import { Post, Comment, TabType } from "@/pages/client/types";
+import PostContent from "@/pages/client/home/item/media";
+import PostComments from "@/pages/client/home/item/comments";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Home, MessageCircle } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -531,7 +530,7 @@ const PostCompo = ({ postCode }: PostProps) => {
                     handleSendComment={handleSendComment}
                     handleLikeOrUnlike={handleLikeOrUnlike}
                     handleDeleteComment={handleDeleteComment}
-                    isFullscreen={isFullscreen}
+                  
                   />
                 </ScrollArea>
               );

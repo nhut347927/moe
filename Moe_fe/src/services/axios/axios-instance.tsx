@@ -38,7 +38,6 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   async (error: AxiosError) => {
-    console.warn("⚠️ Caught error:", error);
 
     const originalRequest = error.config as AxiosRequestConfig & {
       _retry?: boolean;
@@ -46,7 +45,6 @@ axiosInstance.interceptors.response.use(
 
     // Trường hợp không có response (CORS, lỗi mạng, ...)
     if (!error.response) {
-      console.error("❌ No response from server. Check network or CORS.");
       return Promise.reject(error);
     }
 
@@ -55,7 +53,6 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true;
       try {
         const refreshToken = getCookie("refreshToken_fe");
-        console.log("🔐 Refresh token:", refreshToken);
 
         if (!refreshToken) {
           throw new Error("❌ No refresh token in cookie");
@@ -72,17 +69,15 @@ axiosInstance.interceptors.response.use(
         const newAccessToken = res.data?.data;
         if (newAccessToken) {
           setAccessTokenFe(newAccessToken);
-          console.log("🔁 Retry original request:", originalRequest.url);
         }
 
         // Retry request với token mới
         return axiosInstance(originalRequest);
       } catch (refreshError) {
-        console.error("❌ Refresh failed. Redirect to login.");
         window.location.href = "/auth/login";
         return Promise.reject(refreshError);
       }
-    }else if(error.response.status === 403){
+    }else if(error.response.status === 403 || error.response.status === 401){
         window.location.href = "/auth/login";
     }
 

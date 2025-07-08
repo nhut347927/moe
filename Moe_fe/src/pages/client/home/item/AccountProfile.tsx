@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { AccountDetail } from "../types";
+import { AccountDetail } from "../../types";
 import { Eye } from "lucide-react";
 import { useState } from "react";
 import PostCompo from "@/components/post/post";
