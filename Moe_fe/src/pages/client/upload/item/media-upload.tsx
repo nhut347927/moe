@@ -50,7 +50,7 @@ export default function MediaUpload({
     formData.append("file", file);
     try {
       const endpoint =
-        mediaType === "image" ? "file/upload/image" : "file/upload/video";
+        mediaType === "image" ? "files/images" : "files/videos";
       const response = await axiosInstance.post(endpoint, formData);
       return response.data.publicId || response.data.data; // Handle both response formats
     } catch (error: any) {
@@ -196,7 +196,7 @@ export default function MediaUpload({
         <video
           controls
           className="w-full aspect-video bg-black dark:bg-zinc-900 rounded-xl border border-gray-300 dark:border-zinc-600"
-          src={`abc/video/upload/w_640,c_fill,q_auto/${postCreateForm.videoPublicId}`}
+          src={`https://res.cloudinary.com/dwv76nhoy/video/upload/w_640,c_fill,q_auto/${postCreateForm.videoPublicId}`}
         />
       </div>
     );
@@ -232,7 +232,7 @@ export default function MediaUpload({
               className="relative group border rounded-xl overflow-hidden border-gray-300 dark:border-zinc-600"
             >
               <img
-                src={`abc/image/upload/w_300,c_fill,q_auto/${id}`}
+                src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_300,c_fill,q_auto/${id}`}
                 alt={`Image ${index + 1}`}
                 className="w-full aspect-square object-cover"
                 onClick={() => setShowSlider(true)}

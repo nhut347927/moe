@@ -141,7 +141,7 @@ const HomePage = () => {
 
       <div className="z-10 absolute inset-0 flex justify-center items-center">
         <img
-          src={`abc/video/upload/so_${
+          src={`https://res.cloudinary.com/dwv76nhoy/video/upload/so_${
             postData[currentIndex.current]?.thumbnail ?? "0"
           }/${postData[currentIndex.current]?.videoUrl}.jpg`}
           className="z-10 max-w-full max-h-full object-contain blur-3xl scale-125 opacity-90 brightness-75 transition-all"
@@ -191,7 +191,7 @@ const HomePage = () => {
           >
             <Avatar className="w-10 h-10 transition-all">
               <AvatarImage
-                src={`abc/image/upload/w_80,h_80/${
+                src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_80,h_80/${
                   postData[currentIndex.current]?.avatarUrl
                 }`}
               />

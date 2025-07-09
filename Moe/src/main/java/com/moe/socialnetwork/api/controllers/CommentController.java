@@ -75,7 +75,7 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/delete")
+    @DeleteMapping("/delete")
     public ResponseEntity<ResponseAPI<Void>> deleteComment(
             @RequestBody @Valid ZRQCodeAndContentDTO request,
             @AuthenticationPrincipal User user) {

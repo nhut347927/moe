@@ -15,7 +15,6 @@ interface PostProps {
 const PostCompo = ({ postCode }: PostProps) => {
   // ------------------- State Management -------------------
   const [postData, setPostData] = useState<Post | null>(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const mediaRef = useRef<HTMLDivElement | null>(null);
   const { toast } = useToast();
 
@@ -71,15 +70,6 @@ const PostCompo = ({ postCode }: PostProps) => {
 
     fetchData();
   }, [postCode, toast]);
-
-  // ------------------- Fullscreen Handling -------------------
-  useEffect(() => {
-    const handleChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-    document.addEventListener("fullscreenchange", handleChange);
-    return () => document.removeEventListener("fullscreenchange", handleChange);
-  }, []);
 
   // ------------------- Comment Handling Logic -------------------
   const toggleReplies = async (commentCode: string) => {
@@ -260,8 +250,8 @@ const PostCompo = ({ postCode }: PostProps) => {
                 if (comment.commentCode === code) {
                   return {
                     ...comment,
-                    liked: !comment.liked,
-                    likeCount: comment.liked
+                    liked: !comment.isLiked,
+                    likeCount: comment.isLiked
                       ? (Number(comment.likeCount) - 1).toString()
                       : (Number(comment.likeCount) + 1).toString(),
                   };
@@ -271,8 +261,8 @@ const PostCompo = ({ postCode }: PostProps) => {
                   reply.commentCode === code
                     ? {
                         ...reply,
-                        liked: !reply.liked,
-                        likeCount: reply.liked
+                        liked: !reply.isLiked,
+                        likeCount: reply.isLiked
                           ? (Number(reply.likeCount) - 1).toString()
                           : (Number(reply.likeCount) + 1).toString(),
                       }

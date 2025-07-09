@@ -98,7 +98,7 @@ export default function UploadPage() {
       setIsSubmitting(true);
 
       // Không cần await, cứ gửi request rồi chuyển luôn
-      axiosInstance.post("/post/create-new-post", postCreateForm);
+      axiosInstance.post("/posts", postCreateForm);
 
       toast({
         title: "Thành công",

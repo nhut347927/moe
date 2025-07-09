@@ -5,7 +5,7 @@ export interface ResponseAPI<T> {
   errors?: Record<string, string>;
 }
 export interface Page<T> {
-  contents: T | null;
+  contents: T[];
   totalElements: Number;
   totalPages: Number;
   page: Number;

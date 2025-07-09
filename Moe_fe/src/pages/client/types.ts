@@ -31,7 +31,7 @@ export type Reply = {
   content: string;
   displayName: string;
   likeCount: string;
-  isLiked: boolean;
+  liked: boolean;
   createdAt: string;
 
   userCommentCode: string;
@@ -44,14 +44,14 @@ export type Comment = {
   content: string;
   displayName: string;
   likeCount: string;
-  isLiked: boolean;
+  liked: boolean;
   replyCount: string;
   createdAt: string;
 
   userCommentCode: string;
   userCurrentCode: string;
 
-  replies: Reply[] | null;
+  replies: Reply[];
   replyPage: number;
   hasNext: boolean;
   isOpenReply: boolean;
@@ -87,7 +87,7 @@ export type Post = {
   audioOwnerDisplayName: string;
   audioCode: string;
 
-  comments: Comment[] | null;
+  comments: Comment[];
   commentPage: number;
   hasNext: boolean;
 

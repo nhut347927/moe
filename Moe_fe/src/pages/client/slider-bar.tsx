@@ -81,7 +81,7 @@ const SliderBar: React.FC = () => {
       title: "Relax and let your worries drift away",
       owner: "Nhựt Nguyễn",
       imgSrc:
-        "abc/image/upload/v1739337151/rrspasosi59xmsriilae.png",
+        "https://res.cloudinary.com/dwv76nhoy/image/upload/v1739337151/rrspasosi59xmsriilae.png",
     },
     {
       title: "Enjoy the rhythm of the clouds",

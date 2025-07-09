@@ -5,7 +5,7 @@ interface BackgroundState {
 }
 
 const initialState: BackgroundState = {
-  imageUrl: "abc/image/upload/v1744033332/ChatGPT_Image_19_44_47_7_thg_4_2025_ms7d1u.png",
+  imageUrl: "https://res.cloudinary.com/dwv76nhoy/image/upload/v1744033332/ChatGPT_Image_19_44_47_7_thg_4_2025_ms7d1u.png",
 };
 
 const backgroundSlice = createSlice({

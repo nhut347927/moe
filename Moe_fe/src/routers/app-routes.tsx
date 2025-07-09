@@ -16,7 +16,6 @@ import { SearchPage } from "@/pages/client/search/search-page";
 
 import { ProfilePage } from "@/pages/client/profile/profile-page";
 import KeepAlive from "react-activation";
-import MyProfilePage from "@/pages/client/profile/my-profile-page";
 import UploadPage from "@/pages/client/upload/upload-page";
 // Lazy load layouts
 const ClientLayout = React.lazy(() => import("./client-layout"));
@@ -46,8 +45,14 @@ const AppRoutes = () => {
               </KeepAlive>
             }
           />
-          <Route path="profile" element={<ProfilePage />} />
-          <Route path="my-profile" element={<MyProfilePage />} />
+          <Route
+            path="profile"
+            element={
+              <KeepAlive id="profile">
+                <ProfilePage />
+              </KeepAlive>
+            }
+          />
           <Route path="upload" element={<UploadPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>

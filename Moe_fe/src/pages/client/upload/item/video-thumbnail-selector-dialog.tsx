@@ -35,13 +35,13 @@ export default function VideoThumbnailSelector({
 
   const videoPublicId = postCreateForm?.videoPublicId || "";
   const videoUrl = videoPublicId
-    ? `abc/video/upload/${videoPublicId}.mp4`
+    ? `https://res.cloudinary.com/dwv76nhoy/video/upload/${videoPublicId}.mp4`
     : "";
 
   const getThumbnailUrl = useCallback(
     (seconds: number) =>
       videoPublicId
-        ? `abc/video/upload/so_${Math.floor(
+        ? `https://res.cloudinary.com/dwv76nhoy/video/upload/so_${Math.floor(
             seconds
           )}/${videoPublicId}.jpg`
         : "https://via.placeholder.com/640x360?text=No+Video",

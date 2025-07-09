@@ -67,7 +67,7 @@ export default function ActionMenuDialog({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className={`rounded-xl max-w-[90%] ${sizeClasses[size]} ${positionClasses[position]} ${className}`}>
+      <DialogContent className={`rounded-3xl max-w-[90%] ${sizeClasses[size]} ${positionClasses[position]} ${className}`}>
         {title && (
           <div className="border-b pb-2 mb-2">
             <h3 className="text-lg font-medium">{title}</h3>

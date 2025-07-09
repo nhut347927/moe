@@ -1,8 +1,11 @@
 import {
   ChevronDown,
+  ChevronUp,
   Copy,
   Ellipsis,
   EllipsisVertical,
+  FileX,
+  Flag,
   Heart,
   Send,
   Smile,
@@ -25,11 +28,10 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ReportDialog from "@/components/dialog/report-dialog";
-import { usePostApi } from "@/common/hooks/usePostApi";
-import { useToast } from "@/common/hooks/use-toast";
-import { useGetApi } from "@/common/hooks/useGetApi";
-import { Page } from "@/common/hooks/type";
 import axiosInstance from "@/services/axios/axios-instance";
+import { useToast } from "@/common/hooks/use-toast";
+import { Page } from "@/common/hooks/type";
+import Spinner from "@/components/common/spiner";
 
 interface CommentsProps {
   postCode: string;
@@ -37,380 +39,444 @@ interface CommentsProps {
 
 const Comments = ({ postCode }: CommentsProps) => {
   const [expanded, setExpanded] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [activePostId, setActivePostId] = useState<string | null>(null);
-  const [visibleReplies, setVisibleReplies] = useState<Record<string, boolean>>(
-    {}
-  );
-  const [hasMoreReplies, setHasMoreReplies] = useState<Record<string, boolean>>(
-    {}
-  );
+  const [isLoadingComments, setIsLoadingComments] = useState(false);
+  const [isLoadingPost, setIsLoadingPost] = useState(false);
+  const [activePostCode, setActivePostCode] = useState<string | null>(null);
   const [loadingReplies, setLoadingReplies] = useState<Record<string, boolean>>(
+    {}
+  );
+  const [visibleReplies, setVisibleReplies] = useState<Record<string, boolean>>(
     {}
   );
   const { toast } = useToast();
 
   // ------------------- State Management -------------------
-  const [post, setPost] = useState<Post | undefined>(undefined);
+  const [postData, setPostData] = useState<Post | null>(null);
   const [newComment, setNewComment] = useState<string>("");
   const [replyTarget, setReplyTarget] = useState<{
     commentCode: string;
     displayName: string;
   } | null>(null);
 
-  // ----------------------- FETCH POST ----------------------------
-  const { loading: loadingPost } = useGetApi<Post>({
-    endpoint: "/posts/get",
-    params: { code: postCode },
-    enabled: !!postCode,
-    onSuccess: (data) => {
-      if (!data) return;
-      setPost({
-        ...data,
-        comments: [],
-        commentPage: 0,
-        hasNext: Number(data.commentCount) > 5,
-        isPlaying: false,
-      });
-    },
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-    },
-  });
+  // ------------------- API Functions -------------------
+  const fetchPostByCode = async (postCode: string): Promise<Post> => {
+    const response = await axiosInstance.get<{ data: Post }>("/posts/get", {
+      params: { code: postCode },
+    });
+    return response.data.data;
+  };
 
-  // ----------------------- FETCH COMMENTS ----------------------------
-  const fetchComments = async (postCode: string, commentPage: number = 0) => {
-    if (isLoading) return;
-    setIsLoading(true);
-
-    try {
-      const res = await axiosInstance.get<Page<Comment[]>>(
-        "/comments/comments",
-        {
-          params: {
-            code: postCode,
-            page: commentPage,
-            size: 5,
-            sort: "desc",
-          },
-        }
-      );
-
-      const data = res.data;
-      if (!data || !data.contents) {
-        setIsLoading(false);
-        return;
+  const fetchComments = async (
+    code: string,
+    page: number
+  ): Promise<Page<Comment>> => {
+    const response = await axiosInstance.get<{ data: Page<Comment> }>(
+      "/comments/comments",
+      {
+        params: { code, page, size: 5, sort: "desc" },
       }
+    );
+    return response.data.data;
+  };
 
-      setPost((prev) => {
-        if (!prev) return undefined;
+  const fetchReplies = async (
+    code: string,
+    page: number
+  ): Promise<Page<Reply>> => {
+    const response = await axiosInstance.get<{ data: Page<Reply> }>(
+      "/comments/replies",
+      {
+        params: { code, page, size: 5, sort: "desc" },
+      }
+    );
+    return response.data.data;
+  };
 
-        const mappedComments: Comment[] =
-          data.contents?.map((d: Comment) => ({
-            ...d,
+  const addComment = async (
+    postCode: string,
+    content: string
+  ): Promise<Comment> => {
+    const response = await axiosInstance.post<{ data: Comment }>("/comments", {
+      code: postCode,
+      content,
+    });
+    return {
+      ...response.data.data,
+      replies: [], // Initialize replies for new comment
+      replyPage: 0,
+      hasNext: false,
+      isOpenReply: false,
+    };
+  };
+
+  const addReply = async (
+    commentCode: string,
+    content: string
+  ): Promise<Reply> => {
+    const response = await axiosInstance.post<{ data: Reply }>(
+      "/comments/reply",
+      {
+        code: commentCode,
+        content,
+      }
+    );
+    return response.data.data;
+  };
+
+  const likeOrUnlike = async (code: string): Promise<void> => {
+    await axiosInstance.post<{ data: void }>("/comments/like", { code });
+  };
+
+  const deleteComment = async (code: string): Promise<void> => {
+    await axiosInstance.delete<{ data: void }>("/comments/delete", {
+      data: { code },
+    });
+  };
+
+  const deletePost = async (postCode: string): Promise<void> => {
+    await axiosInstance.delete<{ data: void }>("/posts/delete", {
+      data: { code: postCode },
+    });
+  };
+
+  // ------------------- Data Fetching Logic -------------------
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!postCode || postData) return;
+
+      setIsLoadingPost(true);
+      try {
+        const post = await fetchPostByCode(postCode);
+        setPostData({
+          ...post,
+          comments: [],
+          commentPage: 0,
+          hasNext: Number(post.commentCount) > 0,
+          isPlaying: false,
+        });
+        await handleLoadComments();
+      } catch (error: any) {
+        toast({
+          variant: "destructive",
+          description: error.response?.data?.message || "Failed to load post!",
+        });
+      } finally {
+        setIsLoadingPost(false);
+      }
+    };
+
+    fetchData();
+  }, [postCode]);
+
+  // ------------------- Comment Handling Logic -------------------
+  const handleLoadComments = async () => {
+    if (isLoadingComments) return;
+
+    setIsLoadingComments(true);
+    try {
+      const data = await fetchComments(postCode, postData?.commentPage ?? 0);
+
+      setPostData((prev) => {
+        if (!prev) return prev;
+
+        const existingCodes = new Set(prev.comments.map((c) => c.commentCode));
+
+        const newComments = (Array.isArray(data?.contents) ? data.contents : [])
+          .filter((c: Comment) => !existingCodes.has(c.commentCode)) // ❌ loại trùng
+          .map((c: Comment) => ({
+            ...c,
             replies: [],
             replyPage: 0,
-            hasNext: Number(d?.replyCount ?? 0) > 5,
+            hasNext: Number(c.replyCount) > 0,
             isOpenReply: false,
-            isLoading: false,
-          })) ?? [];
+          }));
 
         return {
           ...prev,
-          comments:
-            commentPage === 0
-              ? mappedComments
-              : [...(prev.comments ?? []), ...mappedComments],
-          commentPage: Number(data.page ?? commentPage) + 1,
-          hasNext: data.hasNext ?? false,
+          comments: [...prev.comments, ...newComments],
+          commentPage: Number(data?.page ?? prev.commentPage) + 1,
+          hasNext: data?.hasNext ?? false,
         };
       });
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Lỗi tải bình luận",
-        description: error?.response?.data?.message ?? "Đã xảy ra lỗi",
+        description:
+          error.response?.data?.message || "Failed to load comments!",
       });
     } finally {
-      setIsLoading(false);
+      setIsLoadingComments(false);
     }
   };
 
-  // ----------------------- FETCH REPLIES ----------------------------
-  const fetchReplies = async (commentCode: string, replyPage: number = 0) => {
-    setLoadingReplies((prev) => ({ ...prev, [commentCode]: true }));
-
-    try {
-      const res = await axiosInstance.get<Page<Reply[]>>("/comments/replies", {
-        params: {
-          code: commentCode,
-          page: replyPage,
-          size: 5,
-          sort: "desc",
-        },
-      });
-
-      const data = res.data;
-      if (!data || !data.contents) {
-        setLoadingReplies((prev) => ({ ...prev, [commentCode]: false }));
-        return;
-      }
-
-      setPost((prev) => {
-        if (!prev) return prev;
-
-        const updatedComments: Comment[] =
-          prev.comments?.map((comment) =>
-            comment.commentCode === commentCode
-              ? {
-                  ...comment,
-                  replies:
-                    replyPage === 0
-                      ? data?.contents ?? []
-                      : [...(comment.replies ?? []), ...(data?.contents ?? [])],
-                  replyPage: Number(data.page ?? replyPage) + 1,
-                  hasNext: data.hasNext ?? false,
-                }
-              : comment
-          ) ?? [];
-
-        return {
-          ...prev,
-          comments: updatedComments.length > 0 ? updatedComments : null,
-        };
-      });
-
-      setHasMoreReplies((prev) => ({
+  const toggleReplies = async (commentCode: string) => {
+    if (!postData || visibleReplies[commentCode]) {
+      setVisibleReplies((prev) => ({ ...prev, [commentCode]: false }));
+      return;
+    }
+    const cmt = postData.comments.find((c) => c.commentCode === commentCode);
+    if (!cmt) return;
+    if (cmt?.replies?.length > 0 && !visibleReplies[commentCode]) {
+      setVisibleReplies((prev) => ({
         ...prev,
-        [commentCode]: data.hasNext ?? false,
+        [commentCode]: true,
       }));
+      return;
+    }
+
+    const comment = postData.comments.find(
+      (c) => c.commentCode === commentCode
+    );
+    if (!comment || comment.replies?.length) return;
+
+    setLoadingReplies((prev) => ({ ...prev, [commentCode]: true }));
+    try {
+      const data = await fetchReplies(commentCode, 0);
+      setPostData((prev) =>
+        prev
+          ? {
+              ...prev,
+              comments: prev.comments.map((c) =>
+                c.commentCode === commentCode
+                  ? {
+                      ...c,
+                      replies: Array.isArray(data.contents)
+                        ? data.contents
+                        : [],
+                      replyPage: Number(data.page ?? c.replyPage) + 1,
+                      hasNext: data.hasNext ?? false,
+                    }
+                  : c
+              ),
+            }
+          : prev
+      );
+
+      setVisibleReplies((prev) => ({ ...prev, [commentCode]: true }));
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Lỗi tải phản hồi",
-        description: error?.response?.data?.message ?? "Đã xảy ra lỗi",
+        description: error.response?.data?.message || "Failed to load replies!",
       });
     } finally {
       setLoadingReplies((prev) => ({ ...prev, [commentCode]: false }));
     }
   };
 
-  // ----------------------- API HOOKS ----------------------------
-  const { callApi: callAddCommentApi } = usePostApi<Comment>({
-    endpoint: "/comments",
-    onSuccess: (newComment) => {
-    setPost((prev) => {
-  if (!prev) return undefined;
+  const handleLoadReplies = async (commentCode: string) => {
+    if (!postData || loadingReplies[commentCode]) return;
 
-  // Lọc bỏ null và undefined trong mảng comments
-  const filteredComments = (prev.comments ?? []).filter(
-    (c): c is Comment => c !== null && c !== undefined
-  );
+    const comment = postData.comments.find(
+      (c) => c.commentCode === commentCode
+    );
+    if (!comment || !comment.hasNext) return;
 
-  return {
-    ...prev,
-    comments: [newComment, ...filteredComments],
-    commentCount: String(Number(prev.commentCount) + 1),
-  };
-});
-
-      setNewComment("");
-    },
-    onError: (error) => {
+    setLoadingReplies((prev) => ({ ...prev, [commentCode]: true }));
+    try {
+      const data = await fetchReplies(commentCode, comment.replyPage);
+      setPostData((prev) =>
+        prev
+          ? {
+              ...prev,
+              comments: prev.comments.map((c) =>
+                c.commentCode === commentCode
+                  ? {
+                      ...c,
+                      replies: [
+                        ...(c.replies || []),
+                        ...(Array.isArray(data.contents) ? data.contents : []),
+                      ],
+                      replyPage: Number(data.page ?? c.replyPage) + 1,
+                      hasNext: data.hasNext ?? false,
+                    }
+                  : c
+              ),
+            }
+          : prev
+      );
+    } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error.message,
+        description: error.response?.data?.message || "Failed to load replies!",
       });
-    },
-  });
+    } finally {
+      setLoadingReplies((prev) => ({ ...prev, [commentCode]: false }));
+    }
+  };
 
-  const { callApi: callAddReplyApi } = usePostApi<Reply>({
-    endpoint: "/comments/reply",
-    onSuccess: (newReply) => {
-      setPost((prev) => {
-        if (!prev || !replyTarget) return undefined;
-        const updatedComments = prev.comments.map((comment) =>
-          comment.commentCode === replyTarget.commentCode
+  const handleSendComment = async () => {
+    if (!newComment.trim() || !postData) return;
+
+    try {
+      if (replyTarget) {
+        const res = await addReply(replyTarget.commentCode, newComment);
+        setPostData((prev) =>
+          prev
             ? {
-                ...comment,
-                replies: [newReply, ...(comment.replies ?? [])],
-                replyCount: String(Number(comment.replyCount) + 1),
+                ...prev,
+                comments: prev.comments.map((comment) =>
+                  comment.commentCode === replyTarget.commentCode
+                    ? {
+                        ...comment,
+                        replies: [res, ...(comment.replies || [])],
+                        replyCount: String(Number(comment.replyCount) + 1),
+                      }
+                    : comment
+                ),
               }
-            : comment
+            : prev
         );
-        return { ...prev, comments: updatedComments };
-      });
+      } else {
+        const res = await addComment(postData.postCode, newComment);
+        setPostData((prev) =>
+          prev
+            ? {
+                ...prev,
+                comments: [res, ...(prev.comments || [])],
+                commentCount: String(Number(prev.commentCount) + 1),
+              }
+            : prev
+        );
+      }
       setNewComment("");
       setReplyTarget(null);
-    },
-    onError: (error) => {
+    } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-    },
-  });
-
-  const { callApi: callDeleteCommentApi } = usePostApi<void>({
-    endpoint: "/comments/delete",
-    onSuccess: () => {
-      toast({
-        variant: "default",
-        title: "Success",
-        description: "Comment deleted successfully",
-      });
-    },
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-    },
-  });
-
-  const { callApi: callDeletePostApi } = usePostApi<void>({
-    endpoint: "/posts/delete",
-    onSuccess: () => {
-      toast({
-        variant: "default",
-        title: "Success",
-        description: "Post deleted successfully",
-      });
-      setPost(undefined);
-    },
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-    },
-  });
-
-  const { callApi: callReportApi } = usePostApi<void>({
-    endpoint: "/reports",
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-    },
-  });
-
-  const { callApi: callLikeApi } = usePostApi<void>({
-    endpoint: "/comments/like",
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-    },
-  });
-
-  // ----------------------- HANDLERS ----------------------------
-  const handleSendComment = async () => {
-    if (!newComment.trim() || !post) return;
-
-    if (replyTarget) {
-      await callAddReplyApi({
-        code: replyTarget.commentCode,
-        content: newComment,
-      });
-    } else {
-      await callAddCommentApi({
-        code: post.postCode,
-        content: newComment,
+        description:
+          error.response?.data?.message || "Failed to send comment/reply!",
       });
     }
   };
 
-  const handleDeleteComment = async (commentCode: string) => {
-    await callDeleteCommentApi({ code: commentCode });
-    setPost((prev) => {
-      if (!prev) return undefined;
-      const updatedComments = prev.comments.filter(
-        (comment) => comment.commentCode !== commentCode
+  const handleLikeOrUnlike = async (code: string) => {
+    try {
+      await likeOrUnlike(code);
+      setPostData((prev) =>
+        prev
+          ? {
+              ...prev,
+              comments: prev.comments.map((comment) => {
+                if (comment.commentCode === code) {
+                  return {
+                    ...comment,
+                    isLiked: !comment.liked,
+                    likeCount: String(
+                      Number(comment.likeCount) + (comment.liked ? -1 : 1)
+                    ),
+                  };
+                }
+                return {
+                  ...comment,
+                  replies: comment.replies?.map((reply) =>
+                    reply.commentCode === code
+                      ? {
+                          ...reply,
+                          isLiked: !reply.liked,
+                          likeCount: String(
+                            Number(reply.likeCount) + (reply.liked ? -1 : 1)
+                          ),
+                        }
+                      : reply
+                  ),
+                };
+              }),
+            }
+          : prev
       );
-      return {
-        ...prev,
-        comments: updatedComments,
-        commentCount: String(Number(prev.commentCount) - 1),
-      };
-    });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        description: error.response?.data?.message || "Failed to like/unlike!",
+      });
+    }
+  };
+
+  const handleDeleteComment = async (code: string) => {
+    try {
+      await deleteComment(code);
+      setPostData((prev) =>
+        prev
+          ? {
+              ...prev,
+              comments: prev.comments
+                .map((comment) => {
+                  if (comment.commentCode === code) return null;
+                  if (
+                    comment.replies?.some((reply) => reply.commentCode === code)
+                  ) {
+                    return {
+                      ...comment,
+                      replies: comment.replies.filter(
+                        (reply) => reply.commentCode !== code
+                      ),
+                      replyCount: String(Number(comment.replyCount) - 1),
+                    };
+                  }
+                  return comment;
+                })
+                .filter((comment): comment is Comment => comment !== null),
+              commentCount: prev.comments.some((c) => c.commentCode === code)
+                ? String(Number(prev.commentCount) - 1)
+                : prev.commentCount,
+            }
+          : prev
+      );
+      toast({
+        variant: "default",
+        description: "Comment deleted successfully!",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        description:
+          error.response?.data?.message || "Failed to delete comment!",
+      });
+    }
   };
 
   const handleDeletePost = async (postCode: string) => {
-    await callDeletePostApi({ code: postCode });
-  };
-
-  const handleLikeOrUnlike = async (commentCode: string) => {
-    await callLikeApi({ code: commentCode });
-    setPost((prev) => {
-      if (!prev) return undefined;
-      const updatedComments = prev.comments.map((comment) =>
-        comment.commentCode === commentCode
-          ? {
-              ...comment,
-              isLiked: !comment.isLiked,
-              likeCount: comment.isLiked
-                ? Number(comment.likeCount) - 1
-                : Number(comment.likeCount) + 1,
-            }
-          : comment
-      );
-      return { ...prev, comments: updatedComments };
-    });
-  };
-
-  const toggleReplies = (commentCode: string) => {
-    setVisibleReplies((prev) => ({
-      ...prev,
-      [commentCode]: !prev[commentCode],
-    }));
-    if (!visibleReplies[commentCode]) {
-      fetchReplies(commentCode, 0);
+    try {
+      await deletePost(postCode);
+      setPostData(null);
+      toast({
+        variant: "default",
+        description: "Post deleted successfully!",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        description: error.response?.data?.message || "Failed to delete post!",
+      });
     }
   };
 
-  const handleLoadMoreReplies = (commentCode: string) => {
-    const comment = post?.comments?.find((c) => c.commentCode === commentCode);
-    if (comment) {
-      fetchReplies(commentCode, comment.replyPage);
-    }
-  };
-
-  const handleLoadMoreComments = () => {
-    if (post && post.hasNext) {
-      fetchComments(postCode, post.commentPage);
-    }
-  };
-
-  // ----------------------- FETCH INITIAL DATA ----------------------------
-  useEffect(() => {
-    if (postCode && post) {
-      fetchComments(postCode, 0);
-    }
-  }, [postCode, post]);
-
+  // ------------------- Render Logic -------------------
   return (
-    <ScrollArea className="max-h-full flex-1 h-full overflow-y-auto w-full overflow-x-hidden rounded-t-3xl shadow-xl bg-white dark:bg-zinc-900">
-      <div className="p-3 pt-4 w-full space-y-4">
+    <ScrollArea className="relative max-h-screen flex-1 h-full scroll-but-hidden rounded-t-[50px] bg-white dark:bg-zinc-900">
+      {isLoadingPost && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm text-muted-foreground">
+          <Spinner className="h-8 w-8 mb-3" />
+          <p className="text-sm font-medium">Loading post...</p>
+        </div>
+      )}
+
+      {!isLoadingPost && !postData && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm text-muted-foreground">
+          <FileX className="h-10 w-10 mb-3 text-zinc-400" />
+          <p className="text-sm font-medium">Post not found.</p>
+        </div>
+      )}
+      <div className="p-6 w-full space-y-4">
         <div className="w-full flex flex-wrap items-center gap-3">
           {/* Avatar */}
           <Avatar className="w-9 h-9 shrink-0">
             <AvatarImage
-              src={`abc/image/upload/w_80,h_80/${post?.avatarUrl}`}
+              src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_80,h_80/${postData?.avatarUrl}`}
             />
-            <AvatarFallback>{post?.userDisplayName?.charAt(0)}</AvatarFallback>
+            <AvatarFallback>
+              {postData?.userDisplayName?.charAt(0) ?? "MOE"}
+            </AvatarFallback>
           </Avatar>
 
           {/* User info */}
@@ -418,26 +484,28 @@ const Comments = ({ postCode }: CommentsProps) => {
             <h3 className="flex items-center space-x-1 overflow-hidden">
               <div className="flex space-x-1 overflow-hidden max-w-full">
                 <Link
-                  to={`/client/profile?code=${post?.userCode}`}
+                  to={`/client/profile?code=${postData?.userCode}`}
                   className="truncate block max-w-[60%]"
                 >
                   <span className="truncate block font-semibold text-[15px] text-zinc-800 dark:text-zinc-50">
-                    {post?.userDisplayName}
+                    {postData?.userDisplayName ?? "[DisplayName]"}
                   </span>
                 </Link>
                 <span className="text-zinc-400 text-sm">•</span>
                 <Link
-                  to={`/client/profile?code=${post?.userCode}`}
+                  to={`/client/profile?code=${postData?.userCode}`}
                   className="truncate block max-w-[60%] md:max-w-full"
                 >
                   <span className="truncate block text-zinc-500 text-sm hover:underline hover:text-zinc-800 dark:text-zinc-300 dark:hover:text-zinc-50">
-                    @{post?.userName}
+                    @{postData?.userName ?? "[UserName]"}
                   </span>
                 </Link>
               </div>
             </h3>
             <p className="text-xs text-muted-foreground">
-              {post?.createdAt ? getTimeAgo(post.createdAt) : "Unknown time"}
+              {postData?.createdAt
+                ? getTimeAgo(postData?.createdAt)
+                : "Unknown time"}
             </p>
           </div>
 
@@ -460,56 +528,66 @@ const Comments = ({ postCode }: CommentsProps) => {
                 </Button>
               }
               size="sm"
-              className="rounded-3xl p-0 overflow-hidden"
+              className="!rounded-3xl p-2 overflow-hidden"
             >
-              <div className="flex flex-col text-center text-sm">
-                <div className="py-3 font-semibold text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800">
-                  <ReportDialog
-                    postCode={post?.postCode ?? "0.0.0.0"}
-                    trigger={<span>Report</span>}
-                    onConfirm={(data) => callReportApi(data)}
-                  />
-                </div>
-                {post?.userCode === post?.userCurrentCode && (
-                  <div className="py-3 font-semibold text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800">
-                    <DeleteConfirmationDialog
-                      trigger={<span>Delete</span>}
-                      itemName="Post"
-                      onConfirm={() => handleDeletePost(post?.postCode ?? "")}
-                    />
-                  </div>
-                )}
-              </div>
+              <ReportDialog
+                postCode={postData?.postCode ?? "0"}
+                trigger={
+                  <ActionMenuItem
+                    icon={<Flag className="h-4 w-4 text-red-500" />}
+                    className="text-red-500 font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  >
+                    Report
+                  </ActionMenuItem>
+                }
+              />
+
+              {postData?.userCode === postData?.userCurrentCode && (
+                <DeleteConfirmationDialog
+                  itemName="Post"
+                  onConfirm={() => handleDeletePost(postData?.postCode ?? "0")}
+                  trigger={
+                    <ActionMenuItem
+                      icon={<Trash2 className="h-4 w-4 text-red-500" />}
+                      className="text-red-500 font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                    >
+                      Delete
+                    </ActionMenuItem>
+                  }
+                />
+              )}
             </ActionMenuDialog>
           </div>
         </div>
 
-        <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-          {post?.title}
+        <h2 className="text-3xl font-bold tracking-tight">
+          {postData?.title ?? "[Title]"}
         </h2>
         <div className="mt-4">
           <p
-            className={`w-full text-muted-foreground text-base md:text-lg leading-relaxed break-all whitespace-pre-wrap transition-all duration-300 overflow-hidden ${
+            className={`w-full text-muted-foreground text-sm leading-relaxed whitespace-pre-wrap transition-all duration-300 overflow-hidden ${
               !expanded
-                ? (post?.title?.length ?? 0) * 2 +
-                    (post?.description?.length ?? 0) >
-                    400 && (post?.title?.length ?? 0) * 2 > 60
+                ? (postData?.title?.length ?? 0) * 2 +
+                    (postData?.description?.length ?? 0) >
+                    400 && (postData?.title?.length ?? 0) * 2 > 60
                   ? "line-clamp-8"
-                  : (post?.title?.length ?? 0) * 2 +
-                      (post?.description?.length ?? 0) >
+                  : (postData?.title?.length ?? 0) * 2 +
+                      (postData?.description?.length ?? 0) >
                     500
                   ? "line-clamp-10"
                   : ""
                 : ""
             }`}
           >
-            {post?.description ?? ""}
+            {postData?.description ?? "[Description]"}
           </p>
 
-          {(((post?.title?.length ?? 0) * 2 + (post?.description?.length ?? 0) >
+          {(((postData?.title?.length ?? 0) * 2 +
+            (postData?.description?.length ?? 0) >
             400 &&
-            (post?.title?.length ?? 0) * 2 > 60) ||
-            (post?.title?.length ?? 0) * 2 + (post?.description?.length ?? 0) >
+            (postData?.title?.length ?? 0) * 2 > 60) ||
+            (postData?.title?.length ?? 0) * 2 +
+              (postData?.description?.length ?? 0) >
               500) && (
             <button
               onClick={() => setExpanded(!expanded)}
@@ -521,7 +599,7 @@ const Comments = ({ postCode }: CommentsProps) => {
         </div>
 
         <div className="flex flex-wrap gap-2 mt-4">
-          {post?.tags?.map((tag, index) => (
+          {postData?.tags?.map((tag, index) => (
             <span
               key={index}
               className="
@@ -539,27 +617,27 @@ const Comments = ({ postCode }: CommentsProps) => {
       </div>
 
       {/* Comments Section */}
-      <div className="p-3 space-y-6 pb-32">
-        <div className="flex flex-col items-center justify-center py-6 text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
+      <div className="p-6 space-y-6 pb-96">
+        <div className="flex flex-col items-center justify-center text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
           <p className="text-sm font-medium">
-            View {post?.comments?.length ?? 0} comments
+            View {postData?.comments?.length ?? 0} comments
           </p>
           <ChevronDown className="h-5 w-5 mt-1 animate-bounce" />
         </div>
 
-        <div className="pt-10 mt-10 border-t">
+        <div className="pt-5 mt-10 border-t">
           <h3 className="font-medium mb-6">
-            Comments ({post?.comments?.length ?? 0})
+            Comments ({postData?.comments?.length ?? 0})
           </h3>
 
           <div className="space-y-6">
-            {post && post.comments && post.comments.length > 0 ? (
-              post.comments.map((comment) => (
+            {postData?.comments && postData?.comments.length > 0 ? (
+              postData?.comments?.map((comment) => (
                 <div key={comment.commentCode} className="space-y-3">
                   <div className="flex gap-3">
                     <Avatar className="h-9 w-9">
                       <AvatarImage
-                        src={`abc/image/upload/w_80,h_80/${comment.avatarUrl}`}
+                        src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_80,h_80/${comment.avatarUrl}`}
                       />
                       <AvatarFallback>{comment.displayName[0]}</AvatarFallback>
                     </Avatar>
@@ -572,7 +650,7 @@ const Comments = ({ postCode }: CommentsProps) => {
                           {comment.displayName}
                         </span>
                       </Link>
-                      {comment.userCommentCode === post.userCode && (
+                      {comment.userCommentCode === postData.userCode && (
                         <span className="ml-2 px-2 py-0.5 text-[11px] text-black bg-zinc-300 rounded-full">
                           author
                         </span>
@@ -596,13 +674,12 @@ const Comments = ({ postCode }: CommentsProps) => {
                             Reply
                           </button>
                           <ActionMenuDialog
-                            title="Options"
                             trigger={
                               <button className="rounded-full hover:bg-muted transition">
                                 <Ellipsis className="w-4 h-4 text-muted-foreground" />
                               </button>
                             }
-                            className="rounded-3xl"
+                            className="!rounded-3xl p-2"
                           >
                             <ActionMenuItem
                               icon={
@@ -610,141 +687,173 @@ const Comments = ({ postCode }: CommentsProps) => {
                               }
                               className="justify-start text-sm px-4 py-2 hover:bg-accent rounded-lg transition-colors"
                               onClick={() => {
-                                navigator.clipboard
-                                  .writeText(comment.content)
-                                  .then(() => {
-                                    toast({
-                                      title: "Success",
-                                      description:
-                                        "Content copied to clipboard!",
-                                    });
-                                  })
-                                  .catch(() => {
-                                    toast({
-                                      variant: "destructive",
-                                      title: "Error",
-                                      description: "Failed to copy content.",
-                                    });
+                                const textToCopy = comment?.content ?? "";
+                                if (!textToCopy) {
+                                  toast({
+                                    variant: "destructive",
+                                    title: "Error",
+                                    description: "No content to copy.",
                                   });
+                                  return;
+                                }
+
+                                if (
+                                  navigator.clipboard &&
+                                  typeof navigator.clipboard.writeText ===
+                                    "function"
+                                ) {
+                                  navigator.clipboard
+                                    .writeText(textToCopy)
+                                    .then(() => {
+                                      toast({
+                                        title: "Success",
+                                        description:
+                                          "Content copied to clipboard!",
+                                      });
+                                    })
+                                    .catch((err) => {
+                                      console.error(
+                                        "Clipboard copy failed:",
+                                        err
+                                      );
+                                      toast({
+                                        variant: "destructive",
+                                        title: "Error",
+                                        description: "Failed to copy content.",
+                                      });
+                                    });
+                                } else {
+                                  toast({
+                                    variant: "destructive",
+                                    title: "Clipboard API not supported",
+                                    description:
+                                      "Your browser does not support clipboard copying.",
+                                  });
+                                }
                               }}
                             >
                               Copy
                             </ActionMenuItem>
 
-                            {comment.userCommentCode ===
-                              comment.userCurrentCode && (
-                              <DeleteConfirmationDialog
-                                itemName="this comment"
-                                onConfirm={() =>
-                                  handleDeleteComment(comment.commentCode)
-                                }
-                                trigger={
-                                  <ActionMenuItem
-                                    icon={
-                                      <Trash2 className="h-4 w-4 text-destructive" />
-                                    }
-                                    variant="destructive"
-                                    className="justify-start text-sm px-4 py-2 hover:bg-destructive/10 rounded-lg transition-colors"
-                                  >
-                                    Delete
-                                  </ActionMenuItem>
-                                }
-                              />
-                            )}
+                            <DeleteConfirmationDialog
+                              itemName="this comment"
+                              onConfirm={() =>
+                                handleDeleteComment(comment.commentCode)
+                              }
+                              trigger={
+                                <ActionMenuItem
+                                  icon={
+                                    <Trash2 className="h-4 w-4 text-destructive text-red-500" />
+                                  }
+                                  variant="destructive"
+                                  className="justify-start text-sm text-red-500 px-4 py-2 hover:bg-destructive/10 rounded-lg transition-colors"
+                                >
+                                  Delete
+                                </ActionMenuItem>
+                              }
+                            />
                           </ActionMenuDialog>
                         </div>
 
                         <div className="flex items-center me-2 gap-1 text-xs text-muted-foreground">
-                          {!comment.isLiked ? (
-                            <Heart
-                              onClick={() =>
-                                handleLikeOrUnlike(comment.commentCode)
-                              }
-                              className="h-4 w-4 cursor-pointer"
-                            />
-                          ) : (
-                            <Heart
-                              onClick={() =>
-                                handleLikeOrUnlike(comment.commentCode)
-                              }
-                              className="w-4 h-4 text-red-500 fill-red-500 cursor-pointer"
-                            />
-                          )}
+                          <Heart
+                            onClick={() =>
+                              handleLikeOrUnlike(comment.commentCode)
+                            }
+                            className={`h-4 w-4 cursor-pointer ${
+                              comment.liked ? "text-red-500 fill-red-500" : ""
+                            }`}
+                          />
                           {comment.likeCount}
                         </div>
                       </div>
 
-                      {parseInt(comment.replyCount) > 0 &&
+                      {Number(comment.replyCount) > 0 &&
                         !visibleReplies[comment.commentCode] && (
                           <div className="mt-2">
                             <button
-                              className="flex text-sm text-muted-foreground hover:underline"
+                              className="flex text-xs text-muted-foreground hover:underline"
                               onClick={() => toggleReplies(comment.commentCode)}
                             >
-                              ——View {comment.replyCount} replies{" "}
+                              ——View {comment.replyCount} replies
                               <ChevronDown className="h-4 w-4 ms-1 mt-0.5" />
                             </button>
                           </div>
                         )}
 
                       {visibleReplies[comment.commentCode] && (
-                        <div className="mt-3 space-y-3 border-l border-gray-300 ps-4">
-                          {loadingReplies[comment.commentCode] ? (
-                            <p className="text-sm text-muted-foreground italic">
-                              Loading replies...
-                            </p>
-                          ) : (
-                            comment.replies?.map((reply) => (
-                              <div key={reply.commentCode}>
-                                <div className="flex gap-2">
-                                  <Avatar className="h-7 w-7">
-                                    <AvatarImage
-                                      src={`abc/image/upload/w_80,h_80/${reply.avatarUrl}`}
-                                    />
-                                    <AvatarFallback>
-                                      {reply.displayName[0]}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <div className="flex-1">
-                                    <Link
-                                      to={`/client/profile?code=${reply.userCommentCode}`}
-                                    >
-                                      <span className="font-medium text-black dark:text-white">
-                                        {reply.displayName}
-                                      </span>
-                                    </Link>
-                                    {reply.userCommentCode ===
-                                      post.userCode && (
-                                      <span className="ml-2 px-2 py-0.5 text-[11px] text-black bg-zinc-300 rounded-full">
-                                        author
-                                      </span>
-                                    )}
-                                    <p className="text-sm text-black/90 mt-0.5 dark:text-zinc-300 break-all">
-                                      {reply.content}
-                                    </p>
+                        <div
+                          className={`mt-3 space-y-3 border-l border-zinc-600 ps-4 overflow-hidden transition-all duration-500 ease-in-out ${
+                            visibleReplies[comment.commentCode]
+                              ? "max-h-[1000px] opacity-100 translate-y-0"
+                              : "max-h-0 opacity-0 -translate-y-2"
+                          }`}
+                        >
+                          {comment.replies?.map((reply) => (
+                            <div key={reply.commentCode}>
+                              <div className="flex gap-2">
+                                <Avatar className="h-7 w-7">
+                                  <AvatarImage
+                                    src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_80,h_80/${reply.avatarUrl}`}
+                                  />
+                                  <AvatarFallback>
+                                    {reply.displayName[0]}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1">
+                                  <Link
+                                    to={`/client/profile?code=${reply.userCommentCode}`}
+                                  >
+                                    <span className="text-sm font-medium text-black dark:text-white">
+                                      {reply.displayName}
+                                    </span>
+                                  </Link>
+                                  {reply.userCommentCode ===
+                                    postData.userCode && (
+                                    <span className="ml-2 px-2 py-0.5 text-[11px] text-black bg-zinc-300 rounded-full">
+                                      author
+                                    </span>
+                                  )}
+                                  <p className="text-sm text-black/90 dark:text-zinc-300 mt-0.5 break-all">
+                                    {reply.content}
+                                  </p>
 
-                                    <div className="flex justify-between gap-4 text-xs text-muted-foreground mt-1">
-                                      <div className="space-x-3 flex items-center">
-                                        <span>
-                                          {getTimeAgo(reply.createdAt)}
-                                        </span>
-                                        <ActionMenuDialog
-                                          title="Options"
-                                          trigger={
-                                            <button className="rounded-full hover:bg-muted transition">
-                                              <Ellipsis className="w-4 h-4 text-muted-foreground" />
-                                            </button>
+                                  <div className="flex justify-between gap-4 text-xs text-muted-foreground mt-1">
+                                    <div className="space-x-3 flex items-center">
+                                      <span>{getTimeAgo(reply.createdAt)}</span>
+                                      <ActionMenuDialog
+                                        trigger={
+                                          <button className="rounded-full hover:bg-muted transition">
+                                            <Ellipsis className="w-4 h-4 text-muted-foreground" />
+                                          </button>
+                                        }
+                                        className="!rounded-3xl p-2"
+                                      >
+                                        <ActionMenuItem
+                                          icon={
+                                            <Copy className="h-4 w-4 text-muted-foreground" />
                                           }
-                                          className="rounded-3xl"
-                                        >
-                                          <ActionMenuItem
-                                            icon={
-                                              <Copy className="h-4 w-4 text-muted-foreground" />
+                                          className="justify-start text-sm px-4 py-2 hover:bg-accent rounded-lg transition-colors"
+                                          onClick={() => {
+                                            const textToCopy =
+                                              reply?.content ?? "";
+                                            if (!textToCopy) {
+                                              toast({
+                                                variant: "destructive",
+                                                title: "Error",
+                                                description:
+                                                  "No content to copy.",
+                                              });
+                                              return;
                                             }
-                                            className="justify-start text-sm px-4 py-2 hover:bg-accent rounded-lg transition-colors"
-                                            onClick={() => {
+
+                                            if (
+                                              navigator.clipboard &&
+                                              typeof navigator.clipboard
+                                                .writeText === "function"
+                                            ) {
                                               navigator.clipboard
-                                                .writeText(reply.content)
+                                                .writeText(textToCopy)
                                                 .then(() => {
                                                   toast({
                                                     title: "Success",
@@ -752,7 +861,11 @@ const Comments = ({ postCode }: CommentsProps) => {
                                                       "Content copied to clipboard!",
                                                   });
                                                 })
-                                                .catch(() => {
+                                                .catch((err) => {
+                                                  console.error(
+                                                    "Clipboard copy failed:",
+                                                    err
+                                                  );
                                                   toast({
                                                     variant: "destructive",
                                                     title: "Error",
@@ -760,82 +873,101 @@ const Comments = ({ postCode }: CommentsProps) => {
                                                       "Failed to copy content.",
                                                   });
                                                 });
-                                            }}
-                                          >
-                                            Copy
-                                          </ActionMenuItem>
+                                            } else {
+                                              toast({
+                                                variant: "destructive",
+                                                title:
+                                                  "Clipboard API not supported",
+                                                description:
+                                                  "Your browser does not support clipboard copying.",
+                                              });
+                                            }
+                                          }}
+                                        >
+                                          Copy
+                                        </ActionMenuItem>
 
-                                          {reply.userCommentCode ===
-                                            reply.userCurrentCode && (
-                                            <DeleteConfirmationDialog
-                                              itemName="this reply"
-                                              onConfirm={() =>
-                                                handleDeleteComment(
-                                                  reply.commentCode
-                                                )
-                                              }
-                                              trigger={
-                                                <ActionMenuItem
-                                                  icon={
-                                                    <Trash2 className="h-4 w-4 text-destructive" />
-                                                  }
-                                                  variant="destructive"
-                                                  className="justify-start text-sm px-4 py-2 hover:bg-destructive/10 rounded-lg transition-colors"
-                                                >
-                                                  Delete
-                                                </ActionMenuItem>
-                                              }
-                                            />
-                                          )}
-                                        </ActionMenuDialog>
-                                      </div>
-                                      <span className="flex items-center me-2 gap-1">
-                                        {!reply.isLiked ? (
-                                          <Heart
-                                            onClick={() =>
-                                              handleLikeOrUnlike(
+                                        {reply.userCommentCode ===
+                                          reply.userCurrentCode && (
+                                          <DeleteConfirmationDialog
+                                            itemName="this reply"
+                                            onConfirm={() =>
+                                              handleDeleteComment(
                                                 reply.commentCode
                                               )
                                             }
-                                            className="h-4 w-4 cursor-pointer"
-                                          />
-                                        ) : (
-                                          <Heart
-                                            onClick={() =>
-                                              handleLikeOrUnlike(
-                                                reply.commentCode
-                                              )
+                                            trigger={
+                                              <ActionMenuItem
+                                                icon={
+                                                  <Trash2 className="h-4 w-4 text-red-500" />
+                                                }
+                                                variant="destructive"
+                                                className="justify-start text-sm text-red-500 px-4 py-2 hover:bg-destructive/10 rounded-lg transition-colors"
+                                              >
+                                                Delete
+                                              </ActionMenuItem>
                                             }
-                                            className="w-4 h-4 text-red-500 fill-red-500 cursor-pointer"
                                           />
                                         )}
-                                        {reply.likeCount}
-                                      </span>
+                                      </ActionMenuDialog>
                                     </div>
+                                    <span className="flex items-center me-2 gap-1">
+                                      <Heart
+                                        onClick={() =>
+                                          handleLikeOrUnlike(reply.commentCode)
+                                        }
+                                        className={`h-4 w-4 cursor-pointer ${
+                                          reply.liked
+                                            ? "text-red-500 fill-red-500"
+                                            : ""
+                                        }`}
+                                      />
+                                      {reply.likeCount}
+                                    </span>
                                   </div>
                                 </div>
                               </div>
-                            ))
-                          )}
+                            </div>
+                          ))}
 
-                          {visibleReplies[comment.commentCode] &&
-                            hasMoreReplies[comment.commentCode] && (
-                              <div className="text-center mt-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="rounded-full cursor-pointer text-muted-foreground"
+                          {loadingReplies[comment.commentCode] ? (
+                            <p className="text-xs text-muted-foreground flex items-center">
+                              <Spinner className="h-4 w-4 mr-2" /> Loading
+                              replies...
+                            </p>
+                          ) : (
+                            <div className="flex gap-4">
+                              {comment.hasNext && (
+                                <button
+                                  className="flex items-center text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors mt-2"
                                   onClick={() =>
-                                    handleLoadMoreReplies(comment.commentCode)
+                                    handleLoadReplies(comment.commentCode)
                                   }
                                   disabled={loadingReplies[comment.commentCode]}
                                 >
                                   {loadingReplies[comment.commentCode]
                                     ? "Loading..."
-                                    : "Load more replies"}
-                                </Button>
-                              </div>
-                            )}
+                                    : "—— Load more replies"}
+                                  <ChevronDown className="h-4 w-4 ms-1 " />
+                                </button>
+                              )}
+                              {visibleReplies[comment.commentCode] && (
+                                <button
+                                  onClick={() => {
+                                    setVisibleReplies((prev) => ({
+                                      ...prev,
+                                      [comment.commentCode]:
+                                        !prev[comment.commentCode],
+                                    }));
+                                  }}
+                                  className="flex items-center text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors mt-2"
+                                >
+                                  Hide
+                                  <ChevronUp className="h-4 w-4 ms-1 " />
+                                </button>
+                              )}
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -849,17 +981,17 @@ const Comments = ({ postCode }: CommentsProps) => {
             )}
           </div>
 
-          {post && post.comments && post.comments.length > 0 && (
+          {postData?.comments && postData?.comments.length > 0 && (
             <div className="text-center mt-6">
-              {post.hasNext ? (
+              {postData?.hasNext ? (
                 <Button
                   variant="outline"
                   size="sm"
-                  className="rounded-full cursor-pointer"
-                  onClick={handleLoadMoreComments}
-                  disabled={isLoading}
+                   className="px-4 py-1.5 mt-4 text-sm rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                  onClick={handleLoadComments}
+                  disabled={isLoadingComments}
                 >
-                  {isLoading ? "Loading..." : "Load more comments"}
+                  {isLoadingComments ? "Loading..." : "Load more comments"}
                 </Button>
               ) : (
                 <p className="text-xs text-muted-foreground italic">
@@ -869,9 +1001,7 @@ const Comments = ({ postCode }: CommentsProps) => {
             </div>
           )}
 
-          <div
-            className={`w-full transition-all duration-500 ease-in-out mt-8 sticky bottom-0 backdrop-blur-sm pt-4 pb-2 border-t`}
-          >
+          <div className="w-full fixed bottom-0 left-0 right-0 z-50 backdrop-blur-sm pt-4 pb-2 px-4 border-t bg-white dark:bg-zinc-900">
             {replyTarget && (
               <div className="flex items-center gap-2 mb-2 text-sm text-muted-foreground">
                 Replying to:{" "}
@@ -885,7 +1015,7 @@ const Comments = ({ postCode }: CommentsProps) => {
               </div>
             )}
 
-            <div className="flex gap-2 items-center pb-11">
+            <div className="flex gap-3 items-center pb-2.5">
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="ghost" size="icon" className="h-9 w-9">
@@ -914,10 +1044,10 @@ const Comments = ({ postCode }: CommentsProps) => {
                     ? `Reply to @${replyTarget.displayName}...`
                     : "Add a comment..."
                 }
-                value={activePostId === post?.postCode ? newComment : ""}
+                value={activePostCode === postData?.postCode ? newComment : ""}
                 onChange={(e) => setNewComment(e.target.value)}
-                onFocus={() => setActivePostId(post?.postCode ?? null)}
-                className="flex-1"
+                onFocus={() => setActivePostCode(postData?.postCode ?? "0")}
+                className="flex-1 rounded-full"
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey && newComment.trim()) {
                     e.preventDefault();
@@ -928,7 +1058,7 @@ const Comments = ({ postCode }: CommentsProps) => {
 
               <Button
                 onClick={handleSendComment}
-                disabled={!newComment.trim() || isLoading}
+                disabled={!newComment.trim() || isLoadingComments}
                 className="px-4 bg-zinc-50 rounded-3xl"
               >
                 <Send className="h-4 w-4 text-zinc-500" />

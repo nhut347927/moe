@@ -380,7 +380,7 @@ public class PostServiceImpl implements IPostService {
 		RPPostDTO dto = new RPPostDTO();
 		dto.setUserCode(String.valueOf(post.getUser().getCode()));
 		dto.setPostCode(String.valueOf(post.getCode()));
-		dto.setAvatarUrl(dto.getAvatarUrl());
+		dto.setAvatarUrl(post.getUser().getAvatar());
 		dto.setCreatedAt(post.getCreatedAt().toString());
 		dto.setPostType(post.getType().toString());
 		dto.setVideoUrl(post.getVideoUrl());

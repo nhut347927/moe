@@ -125,10 +125,10 @@ export function SoundSelector({
             <img
               src={
                 selectedPostSearch.postType === "VID"
-                  ? `abc/video/upload/w_300,c_fill,q_auto,so_${
+                  ? `https://res.cloudinary.com/dwv76nhoy/video/upload/w_300,c_fill,q_auto,so_${
                       selectedPostSearch.videoThumbnail ?? "0"
                     }/${selectedPostSearch.mediaUrl}.jpg`
-                  : `abc/image/upload/w_300,c_fill,q_auto/${selectedPostSearch.mediaUrl}`
+                  : `https://res.cloudinary.com/dwv76nhoy/image/upload/w_300,c_fill,q_auto/${selectedPostSearch.mediaUrl}`
               }
               className="w-full h-full object-cover"
               alt={`Thumbnail for ${selectedPostSearch.title}`}
@@ -157,7 +157,7 @@ export function SoundSelector({
             ref={audioRef}
             src={
               selectedPostSearch.audioPublicId
-                ? `abc/video/upload/q_auto:low/${selectedPostSearch.audioPublicId}.mp3`
+                ? `https://res.cloudinary.com/dwv76nhoy/video/upload/q_auto:low/${selectedPostSearch.audioPublicId}.mp3`
                 : undefined
             }
             preload="none"
@@ -194,7 +194,7 @@ export function SoundSelector({
           >
             {sound.postType === "VID" ? (
               <img
-                src={`abc/video/upload/w_300,c_fill,q_auto,so_${
+                src={`https://res.cloudinary.com/dwv76nhoy/video/upload/w_300,c_fill,q_auto,so_${
                   sound.videoThumbnail ?? "0"
                 }/${sound.mediaUrl}.jpg`}
                 className="w-16 h-16 object-cover rounded-md"
@@ -202,7 +202,7 @@ export function SoundSelector({
               />
             ) : (
               <img
-                src={`abc/image/upload/w_300,c_fill,q_auto/${sound.mediaUrl}`}
+                src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_300,c_fill,q_auto/${sound.mediaUrl}`}
                 className="w-16 h-16 object-cover rounded-md"
                 alt={`Thumbnail for ${sound.title}`}
               />

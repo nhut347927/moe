@@ -44,7 +44,7 @@ export default function HashtagSearch({
   const searchTag = useCallback(async () => {
     if (!searchTerm) return [];
     try {
-      const response = await axiosInstance.get("tag/search", {
+      const response = await axiosInstance.get("tags/search", {
         params: { keyWord: searchTerm },
       });
       return response.data.data ?? [];
@@ -63,7 +63,7 @@ export default function HashtagSearch({
       return null;
     }
     try {
-      const response = await axiosInstance.post("tag/create", {
+      const response = await axiosInstance.post("tags", {
         tag: newTagName.trim(),
       });
       return response.data.data;
@@ -79,7 +79,7 @@ export default function HashtagSearch({
   const searchTagByCode = useCallback(async () => {
     if (!postCreateForm?.tagCodeList?.length) return [];
     try {
-      const response = await axiosInstance.get("tag/search-by-code", {
+      const response = await axiosInstance.get("tags/by-code", {
         params: { code: postCreateForm.tagCodeList.join(",") },
       });
       return response.data.data ?? [];
@@ -260,7 +260,7 @@ export default function HashtagSearch({
                       <AvatarImage
                         src={
                           hashtag.avatar
-                            ? `abc/image/upload/w_80,h_80,c_thumb,f_auto,q_auto/${hashtag.avatar}`
+                            ? `https://res.cloudinary.com/dwv76nhoy/image/upload/w_80,h_80,c_thumb,f_auto,q_auto/${hashtag.avatar}`
                             : undefined
                         }
                         alt={`${hashtag.username}'s avatar`}
