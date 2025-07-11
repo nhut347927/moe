@@ -1,10 +1,11 @@
 import { RefObject } from "react";
-import PostMultiImg from "./image";
-import PostVideo from "./video";
 import { Post } from "../../types";
+import PostVideo from "./Video";
+import PostMultiImg from "./Image";
 
 interface PostContentProps {
   post: Post;
+  updateImageSelect: (imageSelect: number) => void;
   isPlaying: boolean;
   index: number;
   mediaRefs: RefObject<(HTMLDivElement | null)[]>;
@@ -12,6 +13,7 @@ interface PostContentProps {
 
 const PostContent = ({
   post,
+  updateImageSelect,
   isPlaying,
   index,
   mediaRefs,
@@ -31,6 +33,7 @@ const PostContent = ({
           />
         ) : (
           <PostMultiImg
+          updateImageSelect={updateImageSelect}
             images={post.imageUrls}
             audioSrc={post.audioUrl}
             initialPlaying={isPlaying}

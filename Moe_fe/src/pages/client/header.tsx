@@ -1,4 +1,4 @@
-import { Home, Search, Info, Menu, X, Bell } from "lucide-react";
+import { Home, Search, Info, Menu, X, Minimize, Maximize, CirclePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -9,7 +9,7 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const currentPath = location.pathname;
-
+  const [isFullscreen, setIsFullscreen] = useState(false);
   function getCookie(name: string): string | undefined {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
@@ -29,7 +29,7 @@ export default function Header() {
 
     const handleTouchMove = (e: TouchEvent) => {
       const deltaX = e.touches[0].clientX - startX;
-      if (deltaX > 100 && !isOpen) {
+      if (deltaX > 230 && !isOpen) {
         setIsOpen(true); // Swipe right to open
       } else if (deltaX < -60 && isOpen) {
         setIsOpen(false); // Swipe left to close
@@ -58,7 +58,37 @@ export default function Header() {
     "w-10 h-10 rounded-xl text-zinc-700 dark:text-zinc-200 transition-colors";
   const btnActive = "w-12 h-10 bg-zinc-300 dark:bg-zinc-700";
   const btnHover = "w-12 h-10 hover:bg-zinc-200 dark:hover:bg-zinc-800";
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement
+        .requestFullscreen()
+        .then(() => {
+          setIsFullscreen(true);
+        })
+        .catch((err) => {
+          console.error("Error attempting to enable fullscreen", err);
+        });
+    } else {
+      document
+        .exitFullscreen()
+        .then(() => {
+          setIsFullscreen(false);
+        })
+        .catch((err) => {
+          console.error("Error attempting to exit fullscreen", err);
+        });
+    }
+  };
 
+  useEffect(() => {
+    const onFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", onFullscreenChange);
+    };
+  }, []);
   return (
     <>
       {/* Nút mở menu (mobile) */}
@@ -73,7 +103,7 @@ export default function Header() {
         className={`fixed top-0 left-0 z-50 h-screen w-full transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } bg-black/30 backdrop-blur-md`}
-        onClick={()=>setIsOpen(!isOpen)}
+        onClick={() => setIsOpen(!isOpen)}
       >
         <div className="flex justify-start items-center h-full">
           <div className="ms-3 w-16 p-3 bg-white dark:bg-zinc-950 shadow-xl rounded-2xl flex flex-col items-center gap-2 h-fit">
@@ -89,7 +119,7 @@ export default function Header() {
 
             {/* Navigation */}
             <nav className="flex flex-col items-center gap-1">
-              <Link to="/client/home" title="Trang chủ">
+              <Link to="/client/home" title="Home">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -100,7 +130,7 @@ export default function Header() {
                   <Home className="w-5 h-5" />
                 </Button>
               </Link>
-              <Link to="/client/search" title="Tìm kiếm">
+              <Link to="/client/search" title="Search">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -111,28 +141,44 @@ export default function Header() {
                   <Search className="w-5 h-5" />
                 </Button>
               </Link>
-              <Link to="/about" title="Giới thiệu">
+               <Link to="/client/upload" title="Upload">
                 <Button
                   variant="ghost"
                   size="icon"
                   className={`${btnBase} ${
-                    isActive("/about") ? btnActive : ""
+                    isActive("/client/upload") ? btnActive : ""
+                  } ${btnHover}`}
+                >
+                  <CirclePlus  className="w-5 h-5" />
+                </Button>
+              </Link>
+              <Link to="/client/about" title="About">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={`${btnBase} ${
+                    isActive("/client/about") ? btnActive : ""
                   } ${btnHover}`}
                 >
                   <Info className="w-5 h-5" />
                 </Button>
               </Link>
-              <Link to="/notifications" title="Thông báo">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={`${btnBase} ${
-                    isActive("/notifications") ? btnActive : ""
-                  } ${btnHover}`}
-                >
-                  <Bell className="w-5 h-5" />
-                </Button>
-              </Link>
+             
+              {/* Nút Fullscreen nằm đây, dưới cùng trong nav */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation(); // tránh đóng sidebar
+                  toggleFullscreen();
+                }}
+                title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+                className={`${btnBase} ${btnHover} mt-auto mb-1 flex items-center justify-center`}
+              >
+                {isFullscreen ? (
+                  <Minimize className="w-5 h-5" />
+                ) : (
+                  <Maximize className="w-5 h-5" />
+                )}
+              </button>
             </nav>
 
             {/* Avatar người dùng */}

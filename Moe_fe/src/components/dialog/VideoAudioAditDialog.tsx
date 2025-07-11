@@ -11,7 +11,6 @@ import {
   ZoomOut,
   GripVertical,
   RotateCcw,
-  ImageIcon,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -63,9 +62,7 @@ export default function VideoAudioEditDialog({
   const [timelineZoom, setTimelineZoom] = React.useState(1);
   const [timelineScroll, setTimelineScroll] = React.useState(0);
   const [isDragging, setIsDragging] = React.useState<string | null>(null);
-  const [dragType, setDragType] = React.useState<
-    "move" | "resize-left" | "resize-right" | "playhead" | null
-  >(null);
+
 
   const [videoSegments, setVideoSegments] = React.useState<TrackSegment[]>([
     { id: "video-1", start: 0, end: 93, type: "video", name: "Main Video" },
@@ -163,7 +160,7 @@ export default function VideoAudioEditDialog({
   const handlePlayheadDrag = (e: React.MouseEvent) => {
     e.preventDefault();
     setIsDragging("playhead");
-    setDragType("playhead");
+  
 
     const handleMouseMove = (e: MouseEvent) => {
       const newTime = getTimeFromPosition(e.clientX);
@@ -172,7 +169,7 @@ export default function VideoAudioEditDialog({
 
     const handleMouseUp = () => {
       setIsDragging(null);
-      setDragType(null);
+   
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
@@ -191,7 +188,7 @@ export default function VideoAudioEditDialog({
       e.preventDefault();
       e.stopPropagation();
       setIsDragging(segmentId);
-      setDragType(dragType);
+  
 
       const segments = type === "video" ? videoSegments : audioSegments;
       const setSegments =
@@ -238,7 +235,7 @@ export default function VideoAudioEditDialog({
 
       const handleMouseUp = () => {
         setIsDragging(null);
-        setDragType(null);
+    
         document.removeEventListener("mousemove", handleMouseMove);
         document.removeEventListener("mouseup", handleMouseUp);
       };

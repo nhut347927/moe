@@ -1,34 +1,40 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import PostCompo from "@/components/post/post";
+import PostCompo from "@/components/post/PostCompo";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/common/hooks/use-toast";
-import axiosInstance from "@/services/axios/axios-instance";
+import axiosInstance from "@/services/axios/AxiosInstance";
 import {
-  Bell,
   EllipsisVertical,
   Eye,
+  Heart,
+  LogOut,
   Pencil,
+  Settings,
   UploadCloud,
   UserCog,
+  Clipboard,
+  Clock,
 } from "lucide-react";
 import { AccountDetail, PostAccount } from "../types";
-import Spinner from "@/components/common/spiner";
 import { Page } from "@/common/hooks/type";
-import ActionMenuDialog from "@/components/dialog/action-menu-dialog";
+import ActionMenuDialog from "@/components/dialog/ActionMenuDialog";
 import { DialogClose } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import Cookies from "js-cookie";
 import { convertFileToBase64 } from "@/common/utils/utils";
+import { ModeToggle } from "@/components/common/ModeToggle";
+import Spinner from "@/components/common/Spiner";
 
 export function ProfilePage() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const location = useLocation();
   const [accountDetail, setAccountDetail] = useState<AccountDetail | null>(
     null
@@ -145,16 +151,16 @@ export function ProfilePage() {
         code ? `accounts/detail` : `accounts/me`,
         code ? { params: { code } } : undefined
       );
-      console.log("fetchAccountProfile response:", response.data); // Debug log
+     // console.log("fetchAccountProfile response:", response.data); // Debug log
       if (!code) {
         setUserCode(response.data.data.userCode);
       }
       return response.data.data;
     } catch (error: any) {
-      console.error(
-        "fetchAccountProfile error:",
-        error.response?.data || error
-      ); // Debug log
+      // console.error(
+      //   "fetchAccountProfile error:",
+      //   error.response?.data || error
+      // ); // Debug log
       throw new Error(
         error.response?.data?.message || "Failed to fetch profile"
       );
@@ -172,10 +178,10 @@ export function ProfilePage() {
           params: { code, page, size: "12", sort: "desc" },
         }
       );
-      console.log("fetchAccountPost response:", response.data); // Debug log
+    //  console.log("fetchAccountPost response:", response.data); // Debug log
       return response.data.data;
     } catch (error: any) {
-      console.error("fetchAccountPost error:", error.response?.data || error); // Debug log
+    //  console.error("fetchAccountPost error:", error.response?.data || error); // Debug log
       throw new Error(error.response?.data?.message || "Failed to fetch posts");
     }
   };
@@ -184,7 +190,7 @@ export function ProfilePage() {
     try {
       await axiosInstance.post<{ data: void }>("accounts/follow", { code });
     } catch (error: any) {
-      console.error("followOrUnfollow error:", error.response?.data || error); // Debug log
+      //console.error("followOrUnfollow error:", error.response?.data || error); // Debug log
       throw new Error(
         error.response?.data?.message || "Failed to toggle follow"
       );
@@ -247,6 +253,11 @@ export function ProfilePage() {
           page: 1,
           hasNext: postsData.hasNext,
         });
+        setForm({
+          displayName: profileData.displayName || "",
+          userName: profileData.userName || "",
+          bio: profileData.bio || "",
+        });
       } catch (error: any) {
         toast({
           variant: "destructive",
@@ -260,6 +271,77 @@ export function ProfilePage() {
     fetchData();
   }, [userCode]);
 
+  const handleLogout = async () => {
+    try {
+      const res = await axiosInstance.post("auth/logout");
+      const message = res.data?.message;
+      document.cookie =
+        "refreshToken_fe=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie =
+        "accessToken_fe=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie =
+        "avatar=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      toast({
+        title: "Success",
+        description: message || "Logged out successfully.",
+      });
+      navigate("/client/home");
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Logout failed",
+        description:
+          error.response?.data?.message || "An unknown error occurred.",
+      });
+    }
+  };
+  const fallbackCopyTextToClipboard = (text: string) => {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed"; // tránh trang bị cuộn
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      const successful = document.execCommand("copy");
+      if (successful) {
+        toast({ description: "Profile URL copied to clipboard!" });
+      } else {
+        toast({ variant: "destructive", description: "Failed to copy URL" });
+      }
+    } catch (err) {
+      toast({ variant: "destructive", description: "Failed to copy URL" });
+     // console.error("Fallback copy error:", err);
+    }
+    document.body.removeChild(textArea);
+  };
+
+  const handleCopyUrl = () => {
+    if (accountDetail?.userCode) {
+      const url = `${window.location.origin}/client/profile?code=${accountDetail.userCode}`;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(
+          () => {
+            toast({ description: "Profile URL copied to clipboard!" });
+          //  console.log("Copied URL:", url);
+          },
+          () => {
+           // console.error("Copy error:", err);
+            fallbackCopyTextToClipboard(url);
+          }
+        );
+      } else {
+        // Clipboard API không tồn tại, fallback
+        fallbackCopyTextToClipboard(url);
+      }
+    } else {
+      toast({
+        variant: "destructive",
+        description: "Profile code is undefined",
+      });
+    }
+  };
+
   return (
     <div className="relative flex-1 flex justify-center">
       {(isLoading || !userCode || !accountDetail) && (
@@ -268,14 +350,72 @@ export function ProfilePage() {
           <p className="text-sm font-medium">Loading profile...</p>
         </div>
       )}
-      <div className="absolute p-2 z-50 top-0 right-1">
-        <Button
-          variant="outline"
-          size="icon"
-          className="bg-zinc-100/60 text-zinc-800 hover:bg-zinc-200 border border-zinc-300 dark:bg-white/5 dark:text-white dark:border-white/10 dark:hover:bg-white/10 transition-colors rounded-full"
-        >
-          <EllipsisVertical className="w-5 h-5" />
-        </Button>
+      <div className="absolute p-2 z-40 top-1 right-1">
+        {accountDetail?.userAccountCode === accountDetail?.userCurrentCode ? (
+          <ActionMenuDialog
+            trigger={
+              <Button
+                variant="outline"
+                className="flex justify-center items-center p-2.5 rounded-full"
+                aria-label="Open settings menu"
+              >
+                <Settings className="h-4 w-4" />
+              </Button>
+            }
+            size="sm"
+            className="!rounded-3xl p-0 overflow-hidden"
+          >
+            <div className="p-4 space-y-4">
+              <div className="w-full my-4 flex items-center justify-between">
+                <ModeToggle />
+              </div>
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-2 text-sm px-3 py-2"
+                onClick={handleCopyUrl}
+                aria-label="Copy username to clipboard"
+              >
+                <Clipboard className="w-4 h-4" />
+                Copy URL
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-2 text-sm px-3 py-2"
+                // onClick={handleViewHistory}
+                aria-label="View history"
+              >
+                <Clock className="w-4 h-4" />
+                View history(Coming soon)
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-2 text-sm px-3 py-2"
+                // onClick={handleViewFavorites}
+                aria-label="View favorite posts"
+              >
+                <Heart className="w-4 h-4" />
+                Favorite posts(Coming soon)
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-2 text-sm text-red-600 px-3 py-2"
+                onClick={handleLogout}
+                aria-label="Logout"
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </Button>
+            </div>
+          </ActionMenuDialog>
+        ) : (
+          <Button
+            variant="outline"
+            size="icon"
+            className="bg-zinc-100/60 text-zinc-800 hover:bg-zinc-200 border border-zinc-300 dark:bg-white/5 dark:text-white dark:border-white/10 dark:hover:bg-white/10 transition-colors rounded-full"
+          >
+            <EllipsisVertical className="w-5 h-5" />
+          </Button>
+        )}
       </div>
       <ScrollArea
         className="flex-1 max-h-full h-screen max-w-3xl w-full p-2 overflow-y-auto overflow-x-hidden relative"
@@ -361,7 +501,7 @@ export function ProfilePage() {
                         aria-label="Edit profile"
                       >
                         <UserCog className="w-4 h-4" />
-                        Edit Profile
+                        Edit
                       </Button>
                     }
                     size="sm"
@@ -501,7 +641,7 @@ export function ProfilePage() {
                 }
                 className="px-4 py-1.5 mt-12 text-sm rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
               >
-                Tải thêm bài viết
+                Load more posts
               </button>
             </div>
           )}
@@ -511,9 +651,9 @@ export function ProfilePage() {
       {/* Post Modal */}
       {selectedPost && (
         <div className="fixed inset-0 z-50 max-h-screen bg-black/60 backdrop-blur-sm flex items-center justify-center">
-          <div className="relative m-4 max-w-lg w-full rounded-lg overflow-y-auto max-h-[90vh]">
+          <div className="relative w-full max-h-screen">
             <button
-              className="absolute top-0 right-0 z-50 w-8 h-8 flex items-center justify-center bg-slate-200 text-zinc-600 rounded-full hover:bg-slate-300 hover:text-zinc-900 dark:bg-slate-700 dark:text-zinc-300 dark:hover:bg-slate-600 dark:hover:text-white transition-colors duration-200"
+              className="absolute top-4 right-4 z-50 w-8 h-8 flex items-center justify-center bg-zinc-200 text-zinc-600 rounded-full hover:bg-zinc-300 hover:text-zinc-900 dark:bg-slate-700 dark:text-zinc-300 dark:hover:bg-slate-600 dark:hover:text-white transition-colors duration-200"
               onClick={() => setSelectedPost(null)}
               aria-label="Close post"
             >

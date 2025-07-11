@@ -1,9 +1,9 @@
 // src/App.tsx
 import React from "react";
 import { BrowserRouter as Router } from "react-router-dom";
-import ErrorBoundary from "./components/common/error-boundary";
-import { ThemeProvider } from "./components/common/theme-provider-props";
-import AppRoutes from "./routers/app-routes";
+import ErrorBoundary from "./components/common/ErrorBoundary";
+import { ThemeProvider } from "./components/common/ThemeProviderProps";
+import AppRoutes from "./routers/AppRoutes";
 
 const App: React.FC = () => {
   return (

@@ -1,6 +1,6 @@
 import React, { ReactNode, ErrorInfo } from "react";
 import { CircleX } from "lucide-react";
-import "../../assets/style/error-boundary.css";
+import "../../assets/style/ErrorBoundary.css";
 
 interface ErrorBoundaryProps {
   children: ReactNode;

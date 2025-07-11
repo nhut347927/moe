@@ -6,12 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { X, Plus, Check } from "lucide-react";
-import axiosInstance from "@/services/axios/axios-instance";
-import { PostCreateForm } from "../type";
+import axiosInstance from "@/services/axios/AxiosInstance";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import ActionMenuDialog from "@/components/dialog/action-menu-dialog";
+import ActionMenuDialog from "@/components/dialog/ActionMenuDialog";
 import { toast } from "@/common/hooks/use-toast";
 import { DialogClose } from "@/components/ui/dialog";
+import { PostCreateForm } from "../../types";
 
 interface Tag {
   code: string;

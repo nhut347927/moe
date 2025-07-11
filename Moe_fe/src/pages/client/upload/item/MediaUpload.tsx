@@ -1,12 +1,13 @@
 "use client";
 
 import type React from "react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Video, ImageIcon, X, Upload, Play, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PostCreateForm } from "../type";
-import axiosInstance from "@/services/axios/axios-instance";
+import axiosInstance from "@/services/axios/AxiosInstance";
 import { useToast } from "@/common/hooks/use-toast";
+import { PostCreateForm } from "../../types";
+import Spinner from "@/components/common/Spiner";
 
 interface MediaUploadProp {
   postCreateForm: PostCreateForm | null;
@@ -22,16 +23,23 @@ export default function MediaUpload({
   const [selectedType, setSelectedType] = useState<"video" | "images" | null>(
     null
   );
-
   const [dragOver, setDragOver] = useState<"video" | "images" | null>(null);
   const [isUploading, setIsUploading] = useState<"video" | "images" | null>(
     null
   );
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [duration, setDuration] = useState(0);
+  const [selectedTime, setSelectedTime] = useState(0);
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
 
   const videoInputRef = useRef<HTMLInputElement>(null);
   const imagesInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const hiddenVideoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
 
+  // Upload media to the server
   const uploadMedia = async (file: File, mediaType: "image" | "video") => {
     if (!file) {
       throw new Error("No file provided for upload");
@@ -49,10 +57,9 @@ export default function MediaUpload({
     const formData = new FormData();
     formData.append("file", file);
     try {
-      const endpoint =
-        mediaType === "image" ? "files/images" : "files/videos";
+      const endpoint = mediaType === "image" ? "files/images" : "files/videos";
       const response = await axiosInstance.post(endpoint, formData);
-      return response.data.publicId || response.data.data; // Handle both response formats
+      return response.data.publicId || response.data.data;
     } catch (error: any) {
       console.error("Upload error:", error);
       throw new Error(
@@ -61,71 +68,89 @@ export default function MediaUpload({
     }
   };
 
+  // Delete media from the server
   const deleteMedia = (publicId: string) => {
-    axiosInstance.post("file/delete", { code: publicId }).catch((error) => {
+    axiosInstance.post("files/delete", { code: publicId }).catch((error) => {
       console.error("Delete error for publicId:", publicId, error);
     });
   };
 
+  // Handle video file selection and upload
   const handleVideoSelect = async (files: FileList | null) => {
-    if (files && files[0]) {
-      const file = files[0];
-      try {
-        setIsUploading("video");
-        const publicId = await uploadMedia(file, "video");
-        setPostCreateForm((prev: PostCreateForm) => ({
-          ...prev,
-          videoPublicId: publicId,
-          imgPublicIdList: undefined,
-          postType: "VID",
-        }));
-
-        setSelectedType("video");
-        toast({ description: "Video uploaded successfully!" });
-      } catch (err: any) {
-        toast({ variant: "destructive", description: err.message });
-      } finally {
-        setIsUploading(null);
-      }
-    } else {
+    if (!files || !files[0]) {
       toast({
         variant: "destructive",
         description: "Please select a valid video file",
       });
+      return;
+    }
+
+    const file = files[0];
+    if (!file.type.startsWith("video/")) {
+      toast({
+        variant: "destructive",
+        description: "File must be a video (e.g., MP4, AVI).",
+      });
+      return;
+    }
+
+    try {
+      setIsUploading("video");
+      setVideoFile(file); // Set videoFile immediately to trigger UI rendering
+      setSelectedType("video"); // Set selectedType to ensure video UI renders
+      const publicId = await uploadMedia(file, "video");
+      setPostCreateForm((prev: PostCreateForm) => ({
+        ...prev,
+        videoPublicId: publicId,
+        imgPublicIdList: undefined,
+        postType: "VID",
+      }));
+      toast({ description: "Video uploaded successfully!" });
+    } catch (err: any) {
+      toast({ variant: "destructive", description: err.message });
+      setVideoFile(null);
+      setSelectedType(null);
+    } finally {
+      setIsUploading(null);
     }
   };
 
+  // Handle image file selection and upload
   const handleImagesSelect = async (files: FileList | null) => {
-    if (files) {
-      const images = Array.from(files)
-        .filter((f) => f.type.startsWith("image/"))
-        .slice(0, 20);
-      if (images.length === 0) {
-        toast({ variant: "destructive", description: "No valid images found" });
-        return;
-      }
-      try {
-        setIsUploading("images");
-        const publicIds = await Promise.all(
-          images.map((file) => uploadMedia(file, "image"))
-        );
-        setPostCreateForm((prev) => ({
-          ...prev,
-          imgPublicIdList: publicIds,
-          videoPublicId: undefined,
-          postType: "IMG",
-        }));
+    if (!files || files.length === 0) {
+      toast({ variant: "destructive", description: "No valid images found" });
+      return;
+    }
 
-        setSelectedType("images");
-        toast({ description: "Images uploaded successfully!" });
-      } catch (err: any) {
-        toast({ variant: "destructive", description: err.message });
-      } finally {
-        setIsUploading(null);
-      }
+    const images = Array.from(files)
+      .filter((f) => f.type.startsWith("image/"))
+      .slice(0, 20);
+    if (images.length === 0) {
+      toast({ variant: "destructive", description: "No valid images found" });
+      return;
+    }
+
+    try {
+      setIsUploading("images");
+      const publicIds = await Promise.all(
+        images.map((file) => uploadMedia(file, "image"))
+      );
+      setPostCreateForm((prev) => ({
+        ...prev,
+        imgPublicIdList: publicIds,
+        videoPublicId: undefined,
+        postType: "IMG",
+      }));
+      setSelectedType("images");
+      toast({ description: "Images uploaded successfully!" });
+    } catch (err: any) {
+      toast({ variant: "destructive", description: err.message });
+    } finally {
+      setIsUploading(null);
     }
   };
 
+  // Drag-and-drop handlers
   const handleDragOver = (e: React.DragEvent, type: "video" | "images") => {
     e.preventDefault();
     if (!isUploading) {
@@ -148,6 +173,7 @@ export default function MediaUpload({
     }
   };
 
+  // Reset all media and states
   const reset = () => {
     if (postCreateForm?.videoPublicId) {
       deleteMedia(postCreateForm.videoPublicId);
@@ -157,9 +183,11 @@ export default function MediaUpload({
         deleteMedia(publicId)
       );
     }
-
     setSelectedType(null);
-
+    setVideoFile(null);
+    setThumbnailUrl(null);
+    setSelectedTime(0);
+    setDuration(0);
     if (videoInputRef.current) videoInputRef.current.value = "";
     if (imagesInputRef.current) imagesInputRef.current.value = "";
     setPostCreateForm({
@@ -170,8 +198,112 @@ export default function MediaUpload({
     });
   };
 
+  // Handle video metadata loading
+  useEffect(() => {
+    if (!videoFile || !hiddenVideoRef.current || !videoRef.current) return;
+
+    const hiddenVideo = hiddenVideoRef.current;
+    const visibleVideo = videoRef.current;
+
+    const hiddenSrc = URL.createObjectURL(videoFile);
+    const visibleSrc = URL.createObjectURL(videoFile);
+
+    hiddenVideo.src = hiddenSrc;
+    visibleVideo.src = visibleSrc;
+
+    const onMetadata = () => {
+      if (hiddenVideo.duration && isFinite(hiddenVideo.duration)) {
+        setDuration(hiddenVideo.duration);
+        const middle = Math.floor(hiddenVideo.duration / 2);
+        setSelectedTime(middle);
+      } else {
+        toast({
+          variant: "destructive",
+          description: "Unable to load video metadata",
+        });
+        setVideoFile(null);
+        setSelectedType(null);
+      }
+    };
+
+    hiddenVideo.addEventListener("loadedmetadata", onMetadata);
+
+    return () => {
+      hiddenVideo.removeEventListener("loadedmetadata", onMetadata);
+      URL.revokeObjectURL(hiddenSrc);
+      URL.revokeObjectURL(visibleSrc);
+    };
+  }, [videoFile, toast]);
+
+  // Generate thumbnail when selectedTime changes
+  useEffect(() => {
+    const video = hiddenVideoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas || !videoFile || duration === 0) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      console.error("Canvas context not available");
+      return;
+    }
+
+    const generate = async () => {
+      await new Promise<void>((resolve, reject) => {
+        const onSeeked = () => {
+          try {
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 360;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            setThumbnailUrl(canvas.toDataURL("image/jpeg"));
+            cleanup();
+            resolve();
+          } catch (err) {
+            console.error("Thumbnail error:", err);
+            toast({
+              variant: "destructive",
+              description: "Failed to generate thumbnail",
+            });
+            cleanup();
+            reject();
+          }
+        };
+
+        const onError = () => {
+          console.error("Seek error");
+          toast({
+            variant: "destructive",
+            description: "Error seeking video for thumbnail",
+          });
+          cleanup();
+          reject();
+        };
+
+        const cleanup = () => {
+          video.removeEventListener("seeked", onSeeked);
+          video.removeEventListener("error", onError);
+        };
+
+        video.addEventListener("seeked", onSeeked);
+        video.addEventListener("error", onError);
+        video.currentTime = selectedTime;
+      });
+    };
+
+    generate();
+  }, [selectedTime, videoFile, duration, toast]);
+
+  // Update postCreateForm with selected thumbnail time
+  useEffect(() => {
+    if (postCreateForm && selectedTime) {
+      setPostCreateForm((prev: PostCreateForm) => ({
+        ...prev,
+        videoThumbnail: selectedTime,
+      }));
+    }
+  }, [selectedTime, setPostCreateForm, postCreateForm]);
+
   // === Display Video ===
-  if (selectedType === "video" && postCreateForm?.videoPublicId) {
+  if (videoFile && selectedType === "video") {
     return (
       <div className="mx-auto mb-4">
         <div className="flex justify-between items-center mb-4">
@@ -183,21 +315,70 @@ export default function MediaUpload({
               Video
             </h2>
           </div>
-          <Button
-            onClick={reset}
-            variant="ghost"
-            size="sm"
-            className="text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-gray-100"
-            aria-label="Remove video"
-          >
-            <X className="w-4 h-4" />
-          </Button>
+          {postCreateForm?.videoPublicId ? (
+            <Button
+              onClick={reset}
+              variant="ghost"
+              size="sm"
+              className="text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-gray-100"
+              aria-label="Remove video"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          ) : (
+            <Spinner className="h-8 w-8" />
+          )}
         </div>
-        <video
-          controls
-          className="w-full aspect-video bg-black dark:bg-zinc-900 rounded-xl border border-gray-300 dark:border-zinc-600"
-          src={`https://res.cloudinary.com/dwv76nhoy/video/upload/w_640,c_fill,q_auto/${postCreateForm.videoPublicId}`}
-        />
+        <div className="max-w-2xl mx-auto  space-y-6">
+          <div className="space-y-4">
+            {/* Visible video for user preview */}
+            <video ref={videoRef} controls className="w-full rounded border" />
+
+            {/* Hidden video for thumbnail generation */}
+            <video
+              ref={hiddenVideoRef}
+              className="hidden"
+              preload="metadata"
+              muted
+            />
+
+            <canvas ref={canvasRef} className="hidden" />
+
+            {duration > 0 && (
+              <>
+                <label className="block text-sm text-zinc-600 dark:text-zinc-300">
+                  Drag to select thumbnail time:
+                </label>
+                <input
+                  type="range"
+                  min={0}
+                  max={duration}
+                  step={0.1}
+                  value={selectedTime}
+                  onChange={(e) => setSelectedTime(Number(e.target.value))}
+                  className="w-full"
+                />
+                <div className="text-sm text-zinc-600 dark:text-zinc-300">
+                  At second: {selectedTime.toFixed(1)} / {duration.toFixed(1)}{" "}
+                  seconds
+                </div>
+              </>
+            )}
+
+            {thumbnailUrl && (
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                  Selected thumbnail:
+                </p>
+                <img
+                  src={thumbnailUrl}
+                  alt="Thumbnail"
+                  className="w-full border rounded shadow"
+                />
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     );
   }

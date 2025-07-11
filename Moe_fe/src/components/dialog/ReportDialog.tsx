@@ -12,7 +12,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { AlertCircle } from "lucide-react";
 import type React from "react";
-import axiosInstance from "@/services/axios/axios-instance";
+import axiosInstance from "@/services/axios/AxiosInstance";
 import { useToast } from "@/common/hooks/use-toast";
 
 interface ReportDialogProps {

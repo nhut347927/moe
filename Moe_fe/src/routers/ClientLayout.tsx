@@ -1,5 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
-import Header from "@/pages/client/header";
+import Header from "@/pages/client/Header";
 import { Outlet } from "react-router-dom";
 
 const ClientLayout = () => {

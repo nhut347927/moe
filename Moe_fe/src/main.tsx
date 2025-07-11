@@ -3,8 +3,8 @@ import ReactDOM from "react-dom/client";
 import { StrictMode } from "react";
 import { Provider } from "react-redux";
 import App from "./App";
-import { store } from "./store/store";
-import { FilterProvider } from "./common/context/filter-context";
+import { store } from "./store/Store";
+import { FilterProvider } from "./common/context/FilterContext";
 import { AliveScope } from "react-activation";
 
 const root = ReactDOM.createRoot(document.getElementById("root")!);

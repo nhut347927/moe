@@ -18,6 +18,7 @@ import com.moe.socialnetwork.api.dtos.RPAccountSearchDTO;
 import com.moe.socialnetwork.api.dtos.ZRPPageDTO;
 import com.moe.socialnetwork.api.services.IAccountService;
 import com.moe.socialnetwork.api.services.ICloudinaryService;
+import com.moe.socialnetwork.api.services.ISearchHistoryService;
 import com.moe.socialnetwork.jpa.FollowerJPA;
 import com.moe.socialnetwork.jpa.PostJPA;
 import com.moe.socialnetwork.jpa.UserJPA;
@@ -38,13 +39,15 @@ public class AccountServiceImpl implements IAccountService {
     private final FollowerJPA followerJpa;
     private final ICloudinaryService cloudinaryService;
     private final PostJPA postJpa;
+    private final ISearchHistoryService searchHistoryService;
 
     public AccountServiceImpl(UserJPA userJpa, FollowerJPA followerJpa, ICloudinaryService cloudinaryService,
-            PostJPA postJpa) {
+            PostJPA postJpa, ISearchHistoryService searchHistoryService) {
         this.userJpa = userJpa;
         this.followerJpa = followerJpa;
         this.cloudinaryService = cloudinaryService;
         this.postJpa = postJpa;
+        this.searchHistoryService = searchHistoryService;
     }
 
     public String updateImgAccUserFromBase64(String base64Data, User user) {
@@ -109,7 +112,7 @@ public class AccountServiceImpl implements IAccountService {
                 "desc".equalsIgnoreCase(sort) ? org.springframework.data.domain.Sort.by("id").descending()
                         : org.springframework.data.domain.Sort.by("id").ascending());
         Page<User> userPage = userJpa.findUsersByKeyword(searchTerm, pageable);
-
+        searchHistoryService.addSearch(userLogin, searchTerm);
         List<RPAccountSearchDTO> dtoList = userPage.getContent().stream().map(user -> {
             RPAccountSearchDTO dto = new RPAccountSearchDTO();
             dto.setUserCode(user.getCode().toString());

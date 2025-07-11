@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axiosInstance from "@/services/axios/axios-instance";
+import axiosInstance from "@/services/axios/AxiosInstance";
 import { ResponseAPI } from "./type";
 
 interface UseGetApiProps<T> {

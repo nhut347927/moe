@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import axiosInstance from "@/services/axios/axios-instance";
+import axiosInstance from "@/services/axios/AxiosInstance";
 import { useToast } from "@/common/hooks/use-toast";
 import {
   Form,
@@ -36,7 +36,7 @@ export default function ForgotPassword() {
   async function onSubmit(values: any) {
     try {
       const response = await axiosInstance.post(
-        "auth/request-password-reset",
+        "auth/password-reset-request",
         {
           email: values.email,
         }

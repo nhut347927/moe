@@ -24,6 +24,7 @@ import com.moe.socialnetwork.api.dtos.RQPostCreateDTO.FFmpegMergeParams;
 import com.moe.socialnetwork.api.dtos.ZRPPageDTO;
 import com.moe.socialnetwork.api.services.IFFmpegService;
 import com.moe.socialnetwork.api.services.IPostService;
+import com.moe.socialnetwork.api.services.ISearchHistoryService;
 import com.moe.socialnetwork.jpa.AudioJPA;
 import com.moe.socialnetwork.jpa.ImageJPA;
 import com.moe.socialnetwork.jpa.LikeJPA;
@@ -58,9 +59,11 @@ public class PostServiceImpl implements IPostService {
 	private final LikeJPA likeJpa;
 	private final CloudinaryServiceImpl cloudinaryService;
 	private final ViewJPA viewJPA;
+	private final ISearchHistoryService searchHistoryService;
 
 	public PostServiceImpl(PostTagJPA postTagJPA, PostJPA postJPA, TagJPA tagJPA, AudioJPA audioJPA, ImageJPA imageJPA,
-			CloudinaryServiceImpl cloudinaryService, IFFmpegService ffmpegService, LikeJPA likeJpa, ViewJPA viewJPA) {
+			CloudinaryServiceImpl cloudinaryService, IFFmpegService ffmpegService, LikeJPA likeJpa, ViewJPA viewJPA,
+			ISearchHistoryService searchHistoryService) {
 		this.postTagJPA = postTagJPA;
 		this.postJPA = postJPA;
 		this.tagJPA = tagJPA;
@@ -70,13 +73,17 @@ public class PostServiceImpl implements IPostService {
 		this.ffmpegService = ffmpegService;
 		this.likeJpa = likeJpa;
 		this.viewJPA = viewJPA;
+		this.searchHistoryService = searchHistoryService;
 	}
 
-	public ZRPPageDTO<RPPostSearchDTO> searchPosts(String keyword, int page, int size, String sort) { // sort trả về
-																										// desc hoặc asc
+	public ZRPPageDTO<RPPostSearchDTO> searchPosts(String keyword, int page, int size, String sort, User user) { // sort
+																													// trả
+																													// về
+		// desc hoặc asc
 		Sort.Direction direction = "asc".equalsIgnoreCase(sort) ? Sort.Direction.ASC : Sort.Direction.DESC;
 		Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "id"));
 		Page<Post> postPage = postJPA.searchPostsByKeyword(keyword, pageable);
+		searchHistoryService.addSearch(user, keyword);
 
 		List<RPPostSearchDTO> responseList = postPage.getContent().stream().map(post -> {
 			RPPostSearchDTO dto = new RPPostSearchDTO();
@@ -394,6 +401,15 @@ public class PostServiceImpl implements IPostService {
 		boolean isLiked = post.getLikes().stream()
 				.anyMatch(like -> like.getUser().getId().equals(user.getId()));
 		dto.setIsLiked(isLiked);
+
+		if (post.getAudio() != null && post.getAudio().getOwnerPost() != null) {
+			dto.setAudioUrl(post.getAudio().getAudioName());
+		} else {
+			// if post does not have audio, it means it uses default audio
+			Audio defaultAudio = audioJPA.findAudioByOwnerPostId(post.getId());
+			dto.setAudioUrl(defaultAudio.getAudioName());
+		}
+
 		dto.setComments(null);
 		return dto;
 	}

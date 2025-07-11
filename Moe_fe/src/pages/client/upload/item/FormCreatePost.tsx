@@ -4,8 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { PostCreateForm } from "../type";
 import { ChangeEvent } from "react";
+import { PostCreateForm } from "../../types";
 
 interface FormCreatePostProp {
   postCreateForm: PostCreateForm | null;

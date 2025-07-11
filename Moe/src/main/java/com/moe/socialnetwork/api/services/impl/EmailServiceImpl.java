@@ -34,7 +34,7 @@ public class EmailServiceImpl implements IEmailService {
 
 	public EmailServiceImpl(JavaMailSender mailSender) {
 		this.mailSender = mailSender;
-	}
+	} 
 
 	public void sendPasswordResetEmail(String email, String resetToken) {
 		validateInputs(email, resetToken);

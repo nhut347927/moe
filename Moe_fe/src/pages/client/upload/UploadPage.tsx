@@ -3,15 +3,14 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/common/hooks/use-toast";
-import HashtagSearch from "@/pages/client/upload/item/hashtag-search";
-import MediaUpload from "./item/media-upload";
-import FormCreatePost from "./item/form-create-post";
+import HashtagSearch from "@/pages/client/upload/item/HashtagSearch";
+import MediaUpload from "./item/MediaUpload";
+import FormCreatePost from "./item/FormCreatePost";
 import { useState } from "react";
-import { PostCreateForm } from "./type";
-import Slide from "@/components/slide/slide";
-import VideoThumbnailSelector from "./item/video-thumbnail-selector-dialog";
-import { SoundSelector } from "./item/sound-selector";
-import axiosInstance from "@/services/axios/axios-instance";
+import Slide from "@/components/slide/Slide";
+import { SoundSelector } from "./item/SoundSelector";
+import axiosInstance from "@/services/axios/AxiosInstance";
+import { PostCreateForm } from "../types";
 
 export default function UploadPage() {
   const { toast } = useToast();
@@ -137,7 +136,7 @@ export default function UploadPage() {
             />
           </div>
 
-          {postCreateForm.videoPublicId && (
+          {/* {postCreateForm.videoPublicId && (
             <div className="mb-6">
               <label className="text-sm font-medium text-gray-700 dark:text-gray-200">
                 Thumbnail
@@ -147,7 +146,7 @@ export default function UploadPage() {
                 setPostCreateForm={setPostCreateForm}
               />
             </div>
-          )}
+          )} */}
 
           {postCreateForm.imgPublicIdList && (
             <div className="mb-6">

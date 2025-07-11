@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { useForm } from "react-hook-form";
+import axiosInstance from "@/services/axios/AxiosInstance";
 import { Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/common/hooks/use-toast";
 import {
@@ -20,24 +21,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import axiosInstance from "@/services/axios/axios-instance";
-export default function ResetPassword() {
+
+export default function ChangePassword() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessages, setErrorMessages] = useState<any>({});
-  const [tokenReset, setTokenReset] = useState<any>();
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   const toggleConfirmPasswordVisibility = () =>
     setShowConfirmPassword(!showConfirmPassword);
-  useEffect(() => {
-    const queryParams = new URLSearchParams(window.location.search);
-    const token = queryParams.get("token");
-    setTokenReset(token);
-  }, [toast]);
-
   const form = useForm({
     defaultValues: {
       newPassword: "",
@@ -46,12 +40,15 @@ export default function ResetPassword() {
   });
   async function onSubmit(values: any) {
     try {
-      // Gửi yêu cầu đăng nhập
-      const response = await axiosInstance.post("auth/reset-password", {
-        token: tokenReset,
-        newPassword: values.newPassword,
-        confirmNewPassword: values.confirmNewPassword,
-      });
+
+      const response = await axiosInstance.put(
+        "auth/change-password",
+        {
+          newPassword: values.newPassword,
+          confirmNewPassword: values.confirmNewPassword,
+        }
+      );
+      
 
       toast({
         variant: "default",
@@ -74,12 +71,12 @@ export default function ResetPassword() {
     }
   }
   return (
-    <div className="flex min-h-[40vh] h-full w-full items-center justify-center px-4">
+    <div className="flex min-h-[50vh] h-full w-full items-center justify-center px-4">
       <Card className="mx-auto max-w-sm">
         <CardHeader>
-          <CardTitle className="text-2xl">Reset Password</CardTitle>
+          <CardTitle className="text-2xl">Change Password</CardTitle>
           <CardDescription>
-            Enter a new password for your account!
+            Enter your new password to change your password.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -134,7 +131,7 @@ export default function ResetPassword() {
                       <FormControl>
                         <div className="relative">
                           <Input
-                            id="confirmPassword"
+                            id="confirmNewPassword"
                             type={showConfirmPassword ? "text" : "password"}
                             placeholder="******"
                             autoComplete="confirm-new-password"
@@ -162,8 +159,9 @@ export default function ResetPassword() {
                     </FormItem>
                   )}
                 />
+
                 <Button type="submit" className="w-full">
-                  Send Reset Link
+                  Change Password
                 </Button>
               </div>
             </form>

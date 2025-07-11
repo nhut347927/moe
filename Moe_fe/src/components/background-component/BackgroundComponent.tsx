@@ -1,5 +1,5 @@
 import React, { useContext, CSSProperties } from 'react';
-import { FilterContext, FilterType } from '../../common/context/filter-context'; // Import FilterType
+import { FilterContext, FilterType } from '../../common/context/FilterContext'; // Import FilterType
 
 interface BackgroundComponentProps {
   videoSrc?: string;

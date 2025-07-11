@@ -28,5 +28,7 @@ public class RPPostDTO {
 
     private Boolean isLiked;
 
+    private String audioUrl;
+
     private List<RPCommentDTO> comments;
 }

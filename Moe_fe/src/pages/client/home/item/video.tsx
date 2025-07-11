@@ -15,7 +15,7 @@ export interface PostVideoProps {
 }
 
 const PostVideo = forwardRef<HTMLDivElement, PostVideoProps>(
-  ({ videoSrc, initialPlaying = false, thumbnail }, ref) => {
+  ({ videoSrc, initialPlaying = false }, ref) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const progressBarRef = useRef<HTMLDivElement>(null);
     const [isPlaying, setIsPlaying] = useState(initialPlaying);

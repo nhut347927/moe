@@ -1,14 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/common/hooks/use-toast";
 import { Post } from "../types";
-import PostContent from "./item/media";
-import PostComments from "./item/comments";
+import PostContent from "./item/Media";
+import PostComments from "./item/Comments";
 import { Heart, MessageSquareHeart, Proportions } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
 import { cn, getTimeAgo } from "@/common/utils/utils";
 import { useGetApi } from "@/common/hooks/useGetApi";
-import Spinner from "@/components/common/spiner";
+import Spinner from "@/components/common/Spiner";
 import { usePostApi } from "@/common/hooks/usePostApi";
 
 // Define the Home component
@@ -128,6 +128,15 @@ const HomePage = () => {
       setPostData(previousPosts);
     }
   };
+  const updateImageSelect = (newImageSelect: number) => {
+    setPostData((prev) =>
+      prev.map((post) =>
+        post.postCode === postData[currentIndex.current]?.postCode
+          ? { ...post, imageSelect: newImageSelect }
+          : post
+      )
+    );
+  };
 
   // ---------------------- Render Logic ----------------------------
   return (
@@ -140,13 +149,25 @@ const HomePage = () => {
       </div>
 
       <div className="z-10 absolute inset-0 flex justify-center items-center">
-        <img
-          src={`https://res.cloudinary.com/dwv76nhoy/video/upload/so_${
-            postData[currentIndex.current]?.thumbnail ?? "0"
-          }/${postData[currentIndex.current]?.videoUrl}.jpg`}
-          className="z-10 max-w-full max-h-full object-contain blur-3xl scale-125 opacity-90 brightness-75 transition-all"
-          alt="Blur background"
-        />
+        {postData[currentIndex.current]?.postType === "VID" ? (
+          <img
+            src={`https://res.cloudinary.com/dwv76nhoy/video/upload/so_${
+              postData[currentIndex.current]?.thumbnail ?? "0"
+            }/${postData[currentIndex.current]?.videoUrl}.jpg`}
+            className="z-10 max-w-full max-h-full object-contain blur-3xl scale-125 opacity-90 brightness-75 transition-all"
+            alt="Blur background"
+          />
+        ) : (
+          <img
+            src={`https://res.cloudinary.com/dwv76nhoy/image/upload/${
+              postData[currentIndex.current]?.imageUrls[
+                postData[currentIndex.current]?.imageSelect ?? 0
+              ]
+            }.jpg`}
+            className="z-10 max-w-full max-h-full object-contain blur-3xl scale-125 opacity-90 brightness-75 transition-all"
+            alt="Blur background"
+          />
+        )}
       </div>
 
       <div
@@ -155,19 +176,19 @@ const HomePage = () => {
       >
         {postData?.length === 0 && !loading && (
           <div className="h-full w-full flex justify-center items-center space-x-2">
-            <Spinner className="mr-2" /> Loading
+            <Spinner className="mr-2" /> Loading...
           </div>
         )}
 
         {postData?.map((post, index) => (
-          <div>
+          <div key={index}>
             <div
-              key={index}
               ref={(el) => (mediaRefs.current[index] = el)}
               className="h-screen snap-center flex flex-col"
             >
               <PostContent
                 post={post}
+                updateImageSelect={updateImageSelect}
                 index={index}
                 mediaRefs={mediaRefs}
                 isPlaying={post.isPlaying}

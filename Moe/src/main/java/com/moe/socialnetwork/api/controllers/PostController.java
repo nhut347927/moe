@@ -84,13 +84,14 @@ public class PostController {
 
     @GetMapping("/search")
     public ResponseEntity<ResponseAPI<ZRPPageDTO<RPPostSearchDTO>>> searchPosts(
-            @ModelAttribute ZRQFilterPageDTO request) {
+            @ModelAttribute ZRQFilterPageDTO request, @AuthenticationPrincipal User user) {
 
         ZRPPageDTO<RPPostSearchDTO> posts = postService.searchPosts(
                 request.getKeyWord(),
                 request.getPage(),
                 request.getSize(),
-                request.getSort());
+                request.getSort(),user);
+                
 
         ResponseAPI<ZRPPageDTO<RPPostSearchDTO>> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());

@@ -1,13 +1,13 @@
-
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { Music, Search, Play, Pause } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import axiosInstance from "@/services/axios/axios-instance";
-import { PostCreateForm, PostSearch } from "../type";
 import { useToast } from "@/common/hooks/use-toast";
+import { PostCreateForm, PostSearch } from "../../types";
+import { useGetApi } from "@/common/hooks/useGetApi";
+import { Page } from "@/common/hooks/type";
 
 interface PostSearchSelectorProps {
   postCreateForm: PostCreateForm | null;
@@ -19,55 +19,51 @@ export function SoundSelector({
   setPostCreateForm,
 }: PostSearchSelectorProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [sounds, setPostSearchs] = useState<PostSearch[]>([]);
   const [selectedPostSearch, setSelectedPostSearch] = useState<PostSearch | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
+  const [sounds, setSounds] = useState<PostSearch[]>([]);
   const audioRef = useRef<HTMLAudioElement>(null);
   const { toast } = useToast();
 
-  const fetchSounds = useCallback(async () => {
-    if (!searchQuery.trim()) {
-      setPostSearchs([]);
-      setHasMore(true);
-      setPage(0);
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const response = await axiosInstance.post("/post/search", {
-        keyWord: searchQuery,
-        page,
-        size: 10,
-      });
-
-      const newPostSearchs: PostSearch[] = (response.data.data || []).map((item: PostSearch) => ({
-        ...item,
-      }));
-
-      setPostSearchs((prev) => (page === 0 ? newPostSearchs : [...prev, ...newPostSearchs]));
-      setHasMore(newPostSearchs.length === 10);
-    } catch (error: any) {
-      console.error("Error fetching sounds:", error);
+  // Use the useGetApi hook
+  const { data, loading } = useGetApi<Page<PostSearch>>({
+    endpoint: "/posts/search",
+    params: searchQuery.trim()
+      ? { keyWord: searchQuery, page, size: 10, sort: "desc" }
+      : undefined,
+    enabled: !!searchQuery.trim(),
+    onSuccess: (responseData) => {
+      if (responseData) {
+        setSounds((prev) =>
+          page === 0 ? responseData.contents : [...prev, ...responseData.contents]
+        );
+      }
+    },
+    onError: (err) => {
       toast({
         variant: "destructive",
-        description: error.response?.data?.message || "Failed to fetch sounds",
+        description: err.message || "Failed to fetch sounds",
       });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [searchQuery, page]);
+    },
+  });
 
+  // Update sounds when data or page changes
   useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      fetchSounds();
-    }, 500);
-    return () => clearTimeout(delayDebounce);
-  }, [fetchSounds]);
+    if (data) {
+      setSounds((prev) =>
+        page === 0 ? data.contents : [...prev, ...data.contents]
+      );
+    }
+  }, [data, page]);
 
+  // Reset page and sounds when searchQuery changes
+  useEffect(() => {
+    setPage(0);
+    setSounds([]);
+  }, [searchQuery]);
+
+  // Handle audio playback when selected sound changes
   useEffect(() => {
     if (selectedPostSearch && audioRef.current) {
       setIsPlaying(false);
@@ -107,10 +103,10 @@ export function SoundSelector({
   );
 
   const loadMore = useCallback(() => {
-    if (hasMore && !isLoading) {
+    if (data?.hasNext && !loading) {
       setPage((prev) => prev + 1);
     }
-  }, [hasMore, isLoading]);
+  }, [data?.hasNext, loading]);
 
   return (
     <div>
@@ -175,13 +171,10 @@ export function SoundSelector({
         <Input
           placeholder="Tìm kiếm nhạc..."
           value={searchQuery}
-          onChange={(e) => {
-            setSearchQuery(e.target.value);
-            setPage(0);
-            setPostSearchs([]);
-          }}
-          className="pl-10 bg-white dark:bg-zinc-800 border-gray-300 dark:border-zinc-600 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10 bg-white dark:bg-zinc-800 border-gray-300 dark:border-zinc-600 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-zinc-500 dark:focus:ring-zinc-400"
           aria-label="Search music"
+          type="search"
         />
       </div>
 
@@ -229,15 +222,15 @@ export function SoundSelector({
       </div>
 
       {/* Load more */}
-      {hasMore && sounds.length > 0 && (
+      {data?.hasNext && sounds.length > 0 && (
         <div className="mt-4 text-center">
           <Button
             variant="outline"
             onClick={loadMore}
-            disabled={isLoading}
+            disabled={loading}
             className="bg-white dark:bg-zinc-800 border-gray-300 dark:border-zinc-600 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-zinc-700"
           >
-            {isLoading ? "Đang tải..." : "Xem thêm"}
+            {loading ? "Đang tải..." : "Xem thêm"}
           </Button>
         </div>
       )}

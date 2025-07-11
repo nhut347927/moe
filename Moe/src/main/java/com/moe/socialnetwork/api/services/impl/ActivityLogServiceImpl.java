@@ -37,12 +37,16 @@ public class ActivityLogServiceImpl {
             log.setUser(user);
             log.setMessage(message);
             log.setError(error);
-            if (!(code==null||code.isEmpty())) {
+            if (!(code == null || code.isEmpty())) {
                 log.setResponseCode(code);
             }
-            if (!(data==null||data.isEmpty())) {
+            if (data != null && !data.isEmpty()) {
+                if (data.length() > 1024) {
+                    data = data.substring(0, 1024); // Cắt bớt nếu quá dài
+                }
                 log.setData(data);
             }
+
             // Note: createdAt and code are set by @PrePersist in ActivityLog
 
             // Get HTTP request context

@@ -6,36 +6,39 @@ import {
   forwardRef,
 } from "react";
 import { motion } from "framer-motion";
-import { Play } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 
 interface PostMultiImgProps {
   images: string[];
   audioSrc?: string;
+  updateImageSelect: (imageSelect: number) => void;
   //initialMuted?: boolean;
   initialPlaying?: boolean;
 }
 
 const PostMultiImg = forwardRef<HTMLDivElement, PostMultiImgProps>(
   (
-    { images, audioSrc = "",  initialPlaying = false },
+    { images, audioSrc = "", initialPlaying = false, updateImageSelect },
     ref
   ) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isPlaying, setIsPlaying] = useState(initialPlaying);
-   // const [isMuted, setIsMuted] = useState(initialMuted);
+    // const [isMuted, setIsMuted] = useState(initialMuted);
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
     useImperativeHandle(ref, () => containerRef.current as HTMLDivElement);
 
     const nextImage = () => {
-      setCurrentImageIndex((prev) => (prev + 1) % images.length);
+      const newIndex = (currentImageIndex + 1) % images.length;
+      setCurrentImageIndex(newIndex);
+      updateImageSelect(newIndex);
     };
 
     const prevImage = () => {
-      setCurrentImageIndex(
-        (prev) => (prev - 1 + images.length) % images.length
-      );
+      const newIndex = (currentImageIndex - 1 + images.length) % images.length;
+      setCurrentImageIndex(newIndex);
+      updateImageSelect(newIndex);
     };
 
     const toggleAudio = () => {
@@ -68,7 +71,7 @@ const PostMultiImg = forwardRef<HTMLDivElement, PostMultiImgProps>(
 
     useEffect(() => {
       if (audioRef.current) {
-       // audioRef.current.muted = initialMuted;
+        // audioRef.current.muted = initialMuted;
         //setIsMuted(initialMuted);
         if (initialPlaying) {
           audioRef.current.play().catch(console.error);
@@ -81,7 +84,7 @@ const PostMultiImg = forwardRef<HTMLDivElement, PostMultiImgProps>(
 
     return (
       <div ref={containerRef} className="mx-auto h-full flex items-center">
-        <div className="w-full relative">
+        <div className="h-full w-full relative flex justify-center items-center">
           <motion.div
             // onHoverStart={() => setIsHovered(true)}
             // onHoverEnd={() => setIsHovered(false)}
@@ -91,7 +94,7 @@ const PostMultiImg = forwardRef<HTMLDivElement, PostMultiImgProps>(
             <motion.img
               key={currentImageIndex}
               src={`https://res.cloudinary.com/dwv76nhoy/image/upload/${images[currentImageIndex]}`}
-              className="h-full moe-style object-contain rounded-[50px]"
+              className="z-20 max-h-full w-full object-contain cursor-pointer moe-style rounded-[50px]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -101,22 +104,22 @@ const PostMultiImg = forwardRef<HTMLDivElement, PostMultiImgProps>(
             {images.length > 1 && (
               <>
                 <div
-                  className="absolute top-0 left-0 transform w-2/6 h-full flex items-center justify-start"
+                  className="z-30 absolute top-0 left-0 transform w-2/6 h-full flex items-center justify-start"
                   onClick={(e) => {
                     e.stopPropagation();
                     prevImage();
                   }}
                 >
-                  {/* <ChevronLeft className="ms-4 h-4 w-4 font-bold text-zinc-800" /> */}
+                  <ChevronLeft className="ms-4 h-4 w-4 font-bold text-zinc-800" />
                 </div>
                 <div
-                  className="absolute top-0 right-0 transform w-2/6  h-full flex items-center justify-end"
+                  className="z-30 absolute top-0 right-0 transform w-2/6  h-full flex items-center justify-end"
                   onClick={(e) => {
                     e.stopPropagation();
                     nextImage();
                   }}
                 >
-                  {/* <ChevronRight className="me-2 h-4 w-4 font-bold text-zinc-800" /> */}
+                  <ChevronRight className="me-2 h-4 w-4 font-bold text-zinc-800" />
                 </div>
               </>
             )}
@@ -124,12 +127,11 @@ const PostMultiImg = forwardRef<HTMLDivElement, PostMultiImgProps>(
             {isPlaying ? (
               ""
             ) : (
-              <div className="absolute top-0 left-0 right-0 p-3 text-white space-x-3">
+              <div className="z-40 absolute flex items-center justify-center text-white space-x-3">
                 <button
                   onClick={toggleAudio}
-                  className="p-2 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-75"
                 >
-                  <Play size={20} />
+               <Play size={48} className="text-white" />
                 </button>
               </div>
             )}

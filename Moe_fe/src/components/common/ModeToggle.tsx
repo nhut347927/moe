@@ -1,5 +1,5 @@
 import { Moon, Sun } from "lucide-react";
-import { useTheme } from "./theme-provider-props";
+import { useTheme } from "./ThemeProviderProps";
 import { Switch } from "../ui/switch";
 
 export function ModeToggle() {
@@ -13,7 +13,7 @@ export function ModeToggle() {
 
   return (
     <div className="flex items-center justify-between w-full px-3 py-2 cursor-pointer">
-      <div className="flex items-center gap-2 text-sm">
+      <div className="flex items-center gap-2 text-sm bg">
         {theme === "dark" ? (
           <Moon className="w-4 h-4" />
         ) : (

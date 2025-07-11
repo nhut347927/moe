@@ -1,26 +1,27 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import React, { Suspense } from "react";
 
-import LoadingSpinner from "../components/common/loading-spinner-with-icon";
-import NotFound from "@/components/common/not-found";
-import ManageSongs from "@/pages/admin/manage-songs";
-import ManageUsers from "@/pages/admin/manage-users";
-import Dashboard from "@/pages/admin/dashboard";
-import Login from "@/pages/auth/login";
-import Register from "@/pages/auth/register";
-import ChangePassword from "@/pages/auth/change-password";
-import ForgotPassword from "@/pages/auth/forgot-password";
-import ResetPassword from "@/pages/auth/reset-password";
+import LoadingSpinner from "../components/common/LoadingSpinnerWithIcon";
+import NotFound from "@/components/common/NotFound";
+import ManageSongs from "@/pages/admin/ManageSongs";
+import ManageUsers from "@/pages/admin/ManageUsers";
+import ChangePassword from "@/pages/auth/ChangePassword";
+import ForgotPassword from "@/pages/auth/ForgotPassword";
+import ResetPassword from "@/pages/auth/ResetPassword";
 import Home from "@/pages/client/home/home-page";
-import { SearchPage } from "@/pages/client/search/search-page";
+import { SearchPage } from "@/pages/client/search/SearchPage";
 
-import { ProfilePage } from "@/pages/client/profile/profile-page";
+import { ProfilePage } from "@/pages/client/profile/ProfilePage";
 import KeepAlive from "react-activation";
-import UploadPage from "@/pages/client/upload/upload-page";
+import UploadPage from "@/pages/client/upload/UploadPage";
+import AboutPage from "@/pages/client/about/AboutPage";
+import Dashboard from "@/pages/admin/Dashboard";
+import Login from "@/pages/auth/Login";
+import Register from "@/pages/auth/Register";
 // Lazy load layouts
-const ClientLayout = React.lazy(() => import("./client-layout"));
-const AuthLayout = React.lazy(() => import("./auth-layout"));
-const AdminLayout = React.lazy(() => import("./admin-layout"));
+const ClientLayout = React.lazy(() => import("./ClientLayout"));
+const AuthLayout = React.lazy(() => import("./AuthLayout"));
+const AdminLayout = React.lazy(() => import("./AdminLayout"));
 
 const AppRoutes = () => {
   return (
@@ -53,6 +54,7 @@ const AppRoutes = () => {
               </KeepAlive>
             }
           />
+  <Route path="about" element={<AboutPage />} />
           <Route path="upload" element={<UploadPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>

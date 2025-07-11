@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import { FilterContext } from "../../common/context/filter-context";
+import { FilterContext } from "../../common/context/FilterContext";
 
 // Định nghĩa kiểu dữ liệu cho bộ lọc
 type FilterType = {

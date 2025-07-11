@@ -62,7 +62,7 @@ public class FileUploadController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/delete-file")
+    @PostMapping("/delete")
     public ResponseEntity<ResponseAPI<String>> deleteFile(
         @RequestBody ZRQCodeAndContentDTO request
     ) throws IOException {

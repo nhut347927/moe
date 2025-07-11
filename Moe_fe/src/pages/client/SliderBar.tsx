@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/popover";
 
 import { cn } from "@/common/utils/utils";
-import AddPlaylistModal from "@/components/dialog/add-playlist-dialog";
+import AddPlaylistModal from "@/components/dialog/AddPlaylistDialog";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
