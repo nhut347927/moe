@@ -44,4 +44,6 @@ public interface UserJPA extends JpaRepository<User, Long> {
 	boolean existsDisplayNameExcludingId(@Param("displayName") String displayName,
 			@Param("excludedId") Long excludedId);
 
+
+			
 }

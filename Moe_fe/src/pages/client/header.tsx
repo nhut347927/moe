@@ -92,7 +92,7 @@ export default function Header() {
   return (
     <>
       {/* Nút mở menu (mobile) */}
-      <div className="fixed top-4 left-4 w-16 z-50">
+      <div className="fixed top-4 left-4 w-16 z-50 text-zinc-500">
         <span onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? <X /> : <Menu />}
         </span>

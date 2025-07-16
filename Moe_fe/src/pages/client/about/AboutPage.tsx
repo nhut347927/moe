@@ -7,12 +7,11 @@ export default function AboutPage() {
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-center">
           🌟 Giới thiệu về Moe
         </h1>
-        <p className="text-sm sm:text-base md:text-lg text-center mt-2 sm:mt-4 max-w-md mx-auto">
+        <p className="text-sm sm:text-base md:text-lg text-center mt-2 sm:mt-4 mx-auto">
           Moe là một nền tảng mạng xã hội hiện đại, kết hợp trải nghiệm{" "}
           <b>xem video</b>,
           {/* <b>nghe nhạc</b> và <b>tương tác cộng đồng</b>. */}
-          Ứng dụng được phát triển tách biệt Frontend - Backend nhằm đảm bảo tốc
-          độ, bảo mật và dễ mở rộng.
+          Ứng dụng được phát triển tách biệt Frontend - Backend
         </p>
 
         <section>
@@ -41,7 +40,7 @@ export default function AboutPage() {
                 <li>🛢️ MySQL + Hibernate</li>
                 <li>🔒 JWT + Google OAuth2</li>
                 <li>☁️ Cloudinary (upload ảnh/video)</li>
-                <li>✉️ Gmail SMTP (email thông báo)</li>
+                <li>✉️ Gmail SMTP</li>
               </ul>
             </div>
           </div>
@@ -135,7 +134,7 @@ SPRING_MAIL_USERNAME=
             👨‍💻 Tác giả
           </h2>
           <p className="text-xs sm:text-sm md:text-base">
-            Phát triển bởi: <b>nhutnm379</b>
+            Phát triển: <b>nhutnm379</b>
           </p>
         </section>
 

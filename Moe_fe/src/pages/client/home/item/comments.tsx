@@ -38,7 +38,6 @@ interface CommentsProps {
 }
 
 const Comments = ({ postCode }: CommentsProps) => {
-  const [expanded, setExpanded] = useState(false);
   const [isLoadingComments, setIsLoadingComments] = useState(false);
   const [isLoadingPost, setIsLoadingPost] = useState(false);
   const [activePostCode, setActivePostCode] = useState<string | null>(null);
@@ -58,6 +57,18 @@ const Comments = ({ postCode }: CommentsProps) => {
     displayName: string;
   } | null>(null);
 
+  const [visibleParagraphs, setVisibleParagraphs] = useState(2); // Show first 2 paragraphs initially
+  const paragraphs =
+    postData?.description?.split("\n").filter((p) => p.trim()) || [];
+  const totalParagraphs = paragraphs.length;
+  const paragraphsToShowPerClick = 2; // Show 2 more paragraphs per "Read More" click
+  const showReadMore = totalParagraphs > 2; // Show button if more than 2 paragraphs
+
+  const handleReadMore = () => {
+    setVisibleParagraphs((prev) =>
+      Math.min(prev + paragraphsToShowPerClick, totalParagraphs)
+    );
+  };
   // ------------------- API Functions -------------------
   const fetchPostByCode = async (postCode: string): Promise<Post> => {
     const response = await axiosInstance.get<{ data: Post }>("/posts/get", {
@@ -453,7 +464,7 @@ const Comments = ({ postCode }: CommentsProps) => {
 
   // ------------------- Render Logic -------------------
   return (
-    <ScrollArea className="relative max-h-screen flex-1 h-full scroll-but-hidden rounded-t-[50px] bg-white dark:bg-zinc-900">
+    <ScrollArea className="relative max-h-screen flex-1 h-full scroll-but-hidden rounded-t-3xl bg-white dark:bg-zinc-900">
       {isLoadingPost && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm text-muted-foreground">
           <Spinner className="h-8 w-8 mb-3" />
@@ -467,7 +478,7 @@ const Comments = ({ postCode }: CommentsProps) => {
           <p className="text-sm font-medium">Post not found.</p>
         </div>
       )}
-      <div className="p-6 w-full space-y-4">
+      <div className="p-5 w-full space-y-4">
         <div className="w-full flex flex-wrap items-center gap-3">
           {/* Avatar */}
           <Avatar className="w-9 h-9 shrink-0">
@@ -511,12 +522,11 @@ const Comments = ({ postCode }: CommentsProps) => {
 
           {/* Actions */}
           <div className="flex items-center gap-2 ms-auto">
-            <Button
-              variant="outline"
-              className="text-xs px-2 h-7 hidden sm:flex"
-            >
-              Theo dõi
-            </Button>
+            <Link to={`/client/profile?code=${postData?.userCode}`}>
+              <Button variant="outline" className="text-xs px-5 h-8 rounded-xl">
+                Follow
+              </Button>
+            </Link>
             <ActionMenuDialog
               trigger={
                 <Button
@@ -564,40 +574,24 @@ const Comments = ({ postCode }: CommentsProps) => {
           {postData?.title ?? "[Title]"}
         </h2>
         <div className="mt-4">
-          <p
-            className={`w-full text-muted-foreground text-sm leading-relaxed whitespace-pre-wrap transition-all duration-300 overflow-hidden ${
-              !expanded
-                ? (postData?.title?.length ?? 0) * 2 +
-                    (postData?.description?.length ?? 0) >
-                    400 && (postData?.title?.length ?? 0) * 2 > 60
-                  ? "line-clamp-8"
-                  : (postData?.title?.length ?? 0) * 2 +
-                      (postData?.description?.length ?? 0) >
-                    500
-                  ? "line-clamp-10"
-                  : ""
-                : ""
-            }`}
-          >
-            {postData?.description ?? "[Description]"}
-          </p>
+          <div className="w-full text-muted-foreground text-sm leading-relaxed whitespace-pre-wrap transition-all duration-300">
+            {paragraphs.slice(0, visibleParagraphs).map((paragraph, index) => (
+              <p key={index} className="mb-4 animate-fade-in">
+                {paragraph}
+              </p>
+            ))}
+          </div>
 
-          {(((postData?.title?.length ?? 0) * 2 +
-            (postData?.description?.length ?? 0) >
-            400 &&
-            (postData?.title?.length ?? 0) * 2 > 60) ||
-            (postData?.title?.length ?? 0) * 2 +
-              (postData?.description?.length ?? 0) >
-              500) && (
+          {showReadMore && visibleParagraphs < totalParagraphs && (
             <button
-              onClick={() => setExpanded(!expanded)}
-              className="text-sm text-zinc-500 dark:text-zinc-300 hover:text-zinc-700 dark:hover:text-zinc-400 mt-2 transition-colors duration-300"
+              onClick={handleReadMore}
+              className="text-sm text-zinc-500 dark:text-zinc-300 hover:text-zinc-700 dark:hover:text-zinc-400 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-500 rounded px-2 py-1"
+              aria-label="Xem thêm nội dung"
             >
-              {expanded ? "Thu gọn" : "Xem thêm"}
+              ... Read More
             </button>
           )}
         </div>
-
         <div className="flex flex-wrap gap-2 mt-4">
           {postData?.tags?.map((tag, index) => (
             <span
@@ -987,7 +981,7 @@ const Comments = ({ postCode }: CommentsProps) => {
                 <Button
                   variant="outline"
                   size="sm"
-                   className="px-4 py-1.5 mt-4 text-sm rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                  className="px-4 py-1.5 mt-4 text-sm rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
                   onClick={handleLoadComments}
                   disabled={isLoadingComments}
                 >
@@ -1047,7 +1041,7 @@ const Comments = ({ postCode }: CommentsProps) => {
                 value={activePostCode === postData?.postCode ? newComment : ""}
                 onChange={(e) => setNewComment(e.target.value)}
                 onFocus={() => setActivePostCode(postData?.postCode ?? "0")}
-                className="flex-1 rounded-full"
+                className="flex-1 rounded-xl"
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey && newComment.trim()) {
                     e.preventDefault();

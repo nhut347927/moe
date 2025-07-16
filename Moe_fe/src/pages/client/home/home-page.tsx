@@ -64,49 +64,72 @@ const HomePage = () => {
   });
   // ------------------- Scroll Navigation Logic -------------------
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const index = mediaRefs.current.findIndex(
-              (ref) => ref === entry.target
-            );
-
-            if (index !== -1 && index !== currentIndex.current) {
-              currentIndex.current = index;
-              setPostData((prev) =>
-                prev.map((post, idx) => ({
-                  ...post,
-                  isPlaying: idx === index,
-                }))
+    if (!loading) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const index = mediaRefs.current.findIndex(
+                (ref) => ref === entry.target
               );
-              handleView(postData[index]?.postCode);
 
-              if (Number(index - 1) === 0) {
-                handleView(postData[0].postCode);
-              }
+              if (index !== -1 && index !== currentIndex.current) {
+                currentIndex.current = index;
+                setPostData((prev) =>
+                  prev.map((post, idx) => ({
+                    ...post,
+                    isPlaying: idx === index,
+                  }))
+                );
+                handleView(postData[index]?.postCode);
 
-              if (!loading && index >= postData.length - 3) {
-                refetch();
+                if (Number(index - 1) === 0) {
+                  //set false vị trí 0
+                  // setPostData((prev) => {
+                  //   const updated = [...prev];
+                  //   updated[0] = { ...updated[0], isPlaying: false };
+                  //   return updated;
+                  // });
+                  handleView(postData[0].postCode);
+                }
+
+                if (!loading && index >= postData.length - 3) {
+                  refetch();
+                }
               }
             }
-          }
-        });
-      },
-      { root: null, threshold: 0.6 }
-    );
+          });
+        },
+        { root: null, threshold: 0.6 }
+      );
 
-    // 👉 Gắn observer cho tất cả phần tử có ref
-    mediaRefs.current.forEach((ref) => {
-      if (ref) observer.observe(ref);
-    });
-
-    // 🧹 Cleanup
-    return () => {
+      // 👉 Gắn observer cho tất cả phần tử có ref
       mediaRefs.current.forEach((ref) => {
-        if (ref) observer.unobserve(ref);
+        if (ref) observer.observe(ref);
       });
-    };
+
+      // 🧹 Cleanup
+      return () => {
+        mediaRefs.current.forEach((ref) => {
+          if (ref) observer.unobserve(ref);
+        });
+      };
+    }
+  }, [postData]);
+
+  useEffect(() => {
+    if (
+      postData.length > 0 &&
+      currentIndex.current === 0 &&
+      !postData[0].isPlaying
+    ) {
+      setPostData((prev) =>
+        prev.map((post, idx) => ({
+          ...post,
+          isPlaying: idx === 0,
+        }))
+      );
+    }
   }, [postData]);
 
   //------------------------ HANDLE API ---------------------------
@@ -141,7 +164,7 @@ const HomePage = () => {
   // ---------------------- Render Logic ----------------------------
   return (
     <div className="max-h-screen h-screen w-full relative">
-      <div className="absolute z-30 right-3 top-3 px-2 h-[30px] bg-zinc-100/70 dark:bg-zinc-800/60 backdrop-blur-sm flex items-center rounded-xl shadow-sm">
+      <div className="absolute z-30 right-3 top-3 px-2 h-[30px] bg-zinc-100/70 dark:bg-zinc-800/60 backdrop-blur-sm flex items-center rounded-lg shadow-sm">
         <Proportions className="h-3.5 w-3.5 mr-1 text-zinc-500 dark:text-zinc-500" />
         <span className="text-xs text-zinc-500 dark:text-zinc-500">
           {currentIndex.current + 1}/{postData.length}
@@ -204,7 +227,7 @@ const HomePage = () => {
       </div>
       <div className="z-30 absolute  bottom-2 left-0 right-0 px-4 flex items-end justify-between">
         {/* Left: User info + caption */}
-        <div className="opacity-80 mb-2 max-w-full flex items-center space-x-3">
+        <div className="mb-2 max-w-full flex items-center space-x-3">
           <Link
             to={`/client/profile?code=${
               postData[currentIndex.current]?.userCode
@@ -226,7 +249,7 @@ const HomePage = () => {
               handleLike?.(postData[currentIndex.current]?.postCode)
             }
             className={cn(
-              "w-[42px] h-[42px] p-2 rounded-full flex items-center justify-center transition-all",
+              "opacity-80 w-[42px] h-[42px] p-2 rounded-full flex items-center justify-center transition-all",
               postData[currentIndex.current]?.isLiked
                 ? "bg-red-100 hover:bg-red-200"
                 : "bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700"
@@ -243,7 +266,7 @@ const HomePage = () => {
           </span>
 
           <span
-            className="w-[42px] h-[42px] p-2 rounded-full flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+            className="opacity-80 w-[42px] h-[42px] p-2 rounded-full flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700"
             onClick={() => setOpenComment(true)}
           >
             <MessageSquareHeart className="w-5 h-5 mt-0.5 text-zinc-500 dark:text-zinc-500" />

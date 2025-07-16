@@ -597,7 +597,7 @@ export function ProfilePage() {
               accountDetail?.posts.map((post) => (
                 <div
                   key={post.postCode}
-                  className="aspect-square bg-zinc-200 dark:bg-zinc-800 overflow-hidden rounded-3xl relative"
+                  className="aspect-square bg-zinc-200 dark:bg-zinc-800 overflow-hidden rounded-xl relative"
                 >
                   {post.postType === "VID" ? (
                     <img

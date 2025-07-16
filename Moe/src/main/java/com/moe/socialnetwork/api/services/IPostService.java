@@ -8,6 +8,7 @@ import com.moe.socialnetwork.api.dtos.ZRPPageDTO;
 import com.moe.socialnetwork.api.dtos.RPPostDTO;
 import com.moe.socialnetwork.api.dtos.RPPostDetailDTO;
 import com.moe.socialnetwork.api.dtos.RPPostSearchDTO;
+import com.moe.socialnetwork.models.Post;
 import com.moe.socialnetwork.models.User;
 
 /**
@@ -27,4 +28,6 @@ public interface IPostService {
 	List<RPPostDTO> getPostList(User user);
 
 	void deletePost(UUID postCode, User user);
+
+	RPPostDTO toPostResponse(Post post, User user);
 }

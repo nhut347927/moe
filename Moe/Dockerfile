@@ -1,14 +1,13 @@
 FROM openjdk:17-jdk-slim
 
-# Cài đặt ffmpeg
-RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
-
-# Tạo thư mục app và copy file JAR
+# Tạo thư mục làm việc
 WORKDIR /app
-COPY target/social-network.jar app.jar
 
-# Port ứng dụng
+# Copy WAR file vào image
+COPY target/Moe-0.0.1-SNAPSHOT.war app.war
+
+# Expose port (nếu Spring Boot dùng 8080)
 EXPOSE 8080
 
-# Chạy ứng dụng
-ENTRYPOINT ["java", "-jar", "moe.jar"]
+# Chạy ứng dụng với WAR file
+ENTRYPOINT ["java", "-jar", "app.war"]

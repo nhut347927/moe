@@ -383,7 +383,7 @@ public class PostServiceImpl implements IPostService {
 		return result.stream().limit(9).map(post -> this.toPostResponse(post, user)).collect(Collectors.toList());
 	}
 
-	private RPPostDTO toPostResponse(Post post, User user) {
+	public RPPostDTO toPostResponse(Post post, User user) {
 		RPPostDTO dto = new RPPostDTO();
 		dto.setUserCode(String.valueOf(post.getUser().getCode()));
 		dto.setPostCode(String.valueOf(post.getCode()));

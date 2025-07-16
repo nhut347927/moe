@@ -10,9 +10,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ISearchHistoryService {
-
-    Page<RPKeywordSearchTimeDTO> getSearchHistoryByUser(User user, int page, int size, String sort);
-
     List<RPKeywordCountDTO> getTopKeywords();
 
     void deleteByCode(UUID code);

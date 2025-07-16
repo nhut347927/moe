@@ -199,7 +199,7 @@ export function SearchPage() {
               type="search"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="w-full pl-10 pr-4 rounded-xl text-sm"
+              className="w-full h-10 pl-10 pr-4 rounded-xl text-sm"
             />
           </div>
         </div>

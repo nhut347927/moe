@@ -127,7 +127,7 @@ const PostVideo = forwardRef<HTMLDivElement, PostVideoProps>(
           <video
             ref={videoRef}
             src={`https://res.cloudinary.com/dwv76nhoy/video/upload/${videoSrc}`}
-            className="z-20 max-h-full object-contain cursor-pointer moe-style rounded-[50px]"
+            className="z-20 max-h-full object-contain cursor-pointer moe-style rounded-3xl"
             autoPlay={isPlaying}
             loop
             playsInline

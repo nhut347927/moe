@@ -26,15 +26,6 @@ public class SearchHistoryServiceImpl implements ISearchHistoryService {
     }
 
     @Override
-    public Page<RPKeywordSearchTimeDTO> getSearchHistoryByUser(User user, int page, int size, String sort) {
-        Sort.Direction direction = "asc".equalsIgnoreCase(sort) ? Sort.Direction.ASC : Sort.Direction.DESC;
-        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "id"));
-        ;
-        Page<SearchHistory> searchPage = searchHistoryRepository.getByUser(user, pageable);
-        return searchPage.map(s -> new RPKeywordSearchTimeDTO(s.getKeyword(), s.getCreatedAt().toString()));
-    }
-
-    @Override
     public List<RPKeywordCountDTO> getTopKeywords() {
         Pageable pageable = PageRequest.of(0, 10);
         return searchHistoryRepository.findTopKeywords(pageable);

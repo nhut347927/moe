@@ -1,0 +1,1 @@
+import{j as s,O as a}from"./index-BUxin4Fp.js";import{H as t}from"./Header-CIpENYPV.js";const i=()=>s.jsxs("div",{className:"admin-layout",children:[s.jsx(t,{}),s.jsx("div",{className:"admin-content",children:s.jsx(a,{})})]});export{i as default};

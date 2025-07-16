@@ -6,6 +6,7 @@ import App from "./App";
 import { store } from "./store/Store";
 import { FilterProvider } from "./common/context/FilterContext";
 import { AliveScope } from "react-activation";
+import { ThemeProvider } from "./components/common/ThemeProvider";
 
 const root = ReactDOM.createRoot(document.getElementById("root")!);
 
@@ -13,9 +14,11 @@ root.render(
   <StrictMode>
     <Provider store={store}>
       <FilterProvider>
-        <AliveScope>
-          <App />
-        </AliveScope>
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+          <AliveScope>
+            <App />
+          </AliveScope>
+        </ThemeProvider>
       </FilterProvider>
     </Provider>
   </StrictMode>

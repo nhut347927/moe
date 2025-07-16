@@ -94,7 +94,7 @@ const PostMultiImg = forwardRef<HTMLDivElement, PostMultiImgProps>(
             <motion.img
               key={currentImageIndex}
               src={`https://res.cloudinary.com/dwv76nhoy/image/upload/${images[currentImageIndex]}`}
-              className="z-20 max-h-full w-full object-contain cursor-pointer moe-style rounded-[50px]"
+              className="z-20 max-h-full w-full object-contain cursor-pointer moe-style rounded-3xl"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -137,7 +137,7 @@ const PostMultiImg = forwardRef<HTMLDivElement, PostMultiImgProps>(
             )}
 
             {images.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
+              <div className="z-30 absolute bottom-28 left-1/2 transform -translate-x-1/2 flex space-x-2">
                 {images.map((_, index) => (
                   <button
                     key={index}

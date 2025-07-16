@@ -27,21 +27,6 @@ public class SearchHistoryController {
         this.searchHistoryService = searchHistoryService;
     }
 
-    @GetMapping
-    public ResponseEntity<ResponseAPI<Page<RPKeywordSearchTimeDTO>>> getSearchHistory(
-            @ModelAttribute ZRQFilterPageDTO request,
-            @AuthenticationPrincipal User user) {
-        Page<RPKeywordSearchTimeDTO> result = searchHistoryService.getSearchHistoryByUser(user, request.getPage(),
-                request.getSize(), request.getSort());
-
-        ResponseAPI<Page<RPKeywordSearchTimeDTO>> response = new ResponseAPI<>();
-        response.setCode(HttpStatus.OK.value());
-        response.setMessage("Lấy lịch sử tìm kiếm thành công");
-        response.setData(result);
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
     @GetMapping("/top")
     public ResponseEntity<ResponseAPI<List<RPKeywordCountDTO>>> getTopKeywords() {
         List<RPKeywordCountDTO> result = searchHistoryService.getTopKeywords();
