@@ -86,6 +86,7 @@ export type Post = {
   audioUrl: string;
   audioOwnerAvatar: string;
   audioOwnerDisplayName: string;
+  audioPostCode:string;
   audioCode: string;
 
   comments: Comment[];

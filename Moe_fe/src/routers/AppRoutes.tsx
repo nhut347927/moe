@@ -18,6 +18,7 @@ import AboutPage from "@/pages/client/about/AboutPage";
 import Dashboard from "@/pages/admin/Dashboard";
 import Login from "@/pages/auth/Login";
 import Register from "@/pages/auth/Register";
+import AudioPage from "@/pages/client/other/AudioPage";
 // Lazy load layouts
 const ClientLayout = React.lazy(() => import("./ClientLayout"));
 const AuthLayout = React.lazy(() => import("./AuthLayout"));
@@ -46,15 +47,9 @@ const AppRoutes = () => {
               </KeepAlive>
             }
           />
-          <Route
-            path="profile"
-            element={
-              <KeepAlive id="profile">
-                <ProfilePage />
-              </KeepAlive>
-            }
-          />
-  <Route path="about" element={<AboutPage />} />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="about" element={<AboutPage />} />
+          <Route path="audio" element={<AudioPage />} />
           <Route path="upload" element={<UploadPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>

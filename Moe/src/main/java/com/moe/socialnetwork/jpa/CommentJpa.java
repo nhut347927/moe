@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.moe.socialnetwork.models.Comment;
-import com.moe.socialnetwork.models.Like;
 
 /**
  * Author: nhutnm379

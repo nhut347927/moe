@@ -459,6 +459,7 @@ public class PostServiceImpl implements IPostService {
 			dto.setAudioUrl(post.getAudio().getAudioName());
 			dto.setAudioOwnerAvatar(post.getAudio().getOwnerPost().getUser().getAvatar());
 			dto.setAudioOwnerDisplayName(post.getAudio().getOwnerPost().getUser().getDisplayName());
+			dto.setAudioPostCode(post.getAudio().getOwnerPost().getCode().toString());
 			dto.setAudioCode(String.valueOf(post.getAudio().getId()));
 		} else {
 			// if post does not have audio, it means it uses default audio
@@ -467,6 +468,7 @@ public class PostServiceImpl implements IPostService {
 			dto.setAudioUrl(defaultAudio.getAudioName());
 			dto.setAudioOwnerAvatar(user.getAvatar());
 			dto.setAudioOwnerDisplayName(user.getDisplayName());
+			dto.setAudioPostCode(post.getCode().toString());
 			dto.setAudioCode(defaultAudio.getCode().toString());
 		}
 

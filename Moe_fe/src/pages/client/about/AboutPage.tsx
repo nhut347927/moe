@@ -89,7 +89,7 @@ export default function AboutPage() {
 ├── models/           # Entity
 ├── config/           # Cấu hình bảo mật & hệ thống
 ├── util/             # Helper class
-└── MoeApplication.java`}
+└── Application.java`}
           </pre>
         </section>
 

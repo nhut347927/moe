@@ -34,6 +34,7 @@ public class RPPostDetailDTO {
     private String audioUrl;
     private String audioOwnerAvatar;
     private String audioOwnerDisplayName;
+    private String audioPostCode;
     private String audioCode;
 
     private String userCurrentCode;

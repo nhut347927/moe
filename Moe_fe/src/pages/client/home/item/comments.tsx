@@ -7,6 +7,7 @@ import {
   FileX,
   Flag,
   Heart,
+  Music,
   Send,
   Smile,
   Trash2,
@@ -24,7 +25,7 @@ import { getTimeAgo } from "@/common/utils/utils";
 import { ActionMenuItem } from "@/components/dialog/ActionMenuItem";
 import ActionMenuDialog from "@/components/dialog/ActionMenuDialog";
 import DeleteConfirmationDialog from "@/components/dialog/DeleteConfirmationDialog";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ReportDialog from "@/components/dialog/ReportDialog";
@@ -149,6 +150,37 @@ const Comments = ({ postCode }: CommentsProps) => {
       data: { code: postCode },
     });
   };
+  //------------------------------------------------------------
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    const checkIfAnyVideoIsPlaying = () => {
+      const videos = document.querySelectorAll("video");
+      let isAnyPlaying = false;
+
+      videos.forEach((video) => {
+        if (!video.paused && !video.ended && video.readyState > 2) {
+          isAnyPlaying = true;
+        }
+      });
+
+      setIsPlaying(isAnyPlaying);
+    };
+
+    const events = ["play", "pause", "ended"];
+    events.forEach((event) =>
+      document.addEventListener(event, checkIfAnyVideoIsPlaying, true)
+    );
+
+    // Initial check
+    checkIfAnyVideoIsPlaying();
+
+    return () => {
+      events.forEach((event) =>
+        document.removeEventListener(event, checkIfAnyVideoIsPlaying, true)
+      );
+    };
+  }, []);
 
   // ------------------- Data Fetching Logic -------------------
   useEffect(() => {
@@ -607,6 +639,38 @@ const Comments = ({ postCode }: CommentsProps) => {
               #{tag}
             </span>
           ))}
+        </div>
+        <div className="w-full flex items-center gap-2">
+          {/* Music Icon */}
+          <Music className="text-zinc-500 dark:text-zinc-400 w-5 h-5 shrink-0" />
+
+          {/* Title Text (phải có min-w-0 để truncate hoạt động) */}
+
+          <p className="min-w-0 flex-1 text-sm text-zinc-500 dark:text-zinc-400">
+            Original sound by{" "}
+            <Link
+              to={`/client/audio?code=${postData?.audioPostCode}`}
+              className="text-zinc-600 dark:text-zinc-300 font-medium hover:underline"
+            >
+              {postData?.audioOwnerDisplayName ?? "MOE"}
+            </Link>
+          </p>
+
+          {/* Avatar Link (không co lại) */}
+          <Link to={`/client/audio?code=${postData?.audioPostCode}`}>
+            <Avatar
+              className={`w-9 h-9 shrink-0 border border-zinc-300 dark:border-zinc-600 rounded-full ${
+                isPlaying ? "animate-spin-slow" : ""
+              }`}
+            >
+              <AvatarImage
+                src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_80,h_80/${postData?.audioOwnerAvatar}`}
+              />
+              <AvatarFallback className="text-xs">
+                {postData?.userDisplayName?.charAt(0) ?? "MOE"}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
         </div>
       </div>
 

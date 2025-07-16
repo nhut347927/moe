@@ -426,7 +426,7 @@ export function ProfilePage() {
             {/* Avatar */}
             <div className="w-24 sm:w-36 aspect-square overflow-hidden">
               <div className="relative group">
-                <Avatar className="w-full h-full z-10 border-4 border-zinc-300 dark:border-zinc-700 rounded-full">
+                <Avatar className="w-24 h-24 sm:w-36 sm:h-36 z-10 border-4 border-zinc-300 dark:border-zinc-700 rounded-full">
                   <AvatarImage
                     src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_200,h_200,c_thumb,f_auto,q_auto/${accountDetail?.avatarUrl}`}
                   />

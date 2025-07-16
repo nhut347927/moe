@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.moe.socialnetwork.models.Audio;
 import com.moe.socialnetwork.models.Post;
+
 /**
  * Author: nhutnm379
  */
@@ -19,9 +20,9 @@ public interface AudioJPA extends JpaRepository<Audio, Long> {
     Audio findAudioByOwnerPostId(Long postId);
 
     @Query("SELECT a FROM Audio a WHERE a.code = :audioCode")
-    Optional<Audio> findAudioByCode(UUID audioCode);  
-    
-   @Query("SELECT p FROM Post p WHERE p.isDeleted = false AND p.visibility = 'PUBLIC' AND p.audio.code = :code")
-Page<Post> findPostByAudioCode(@Param("code") UUID code, Pageable pageable);
+    Optional<Audio> findAudioByCode(UUID audioCode);
+
+    @Query("SELECT p FROM Post p WHERE p.isDeleted = false AND p.visibility = 'PUBLIC' AND p.audio.code = :code")
+    Page<Post> findPostByAudioCode(@Param("code") UUID code, Pageable pageable);
 
 }
