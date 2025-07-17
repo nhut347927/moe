@@ -33,7 +33,7 @@ const PostContent = ({
           />
         ) : (
           <PostMultiImg
-          updateImageSelect={updateImageSelect}
+            updateImageSelect={updateImageSelect}
             images={post.imageUrls}
             audioSrc={post.audioUrl}
             initialPlaying={isPlaying}

@@ -1,7 +1,5 @@
 package com.moe.socialnetwork.api.services;
 
-import org.springframework.stereotype.Service;
-
 import com.moe.socialnetwork.api.dtos.RPKeywordSearchTimeDTO;
 import com.moe.socialnetwork.api.dtos.RPPostDTO;
 import com.moe.socialnetwork.api.dtos.RPUserCommentDTO;

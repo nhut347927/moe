@@ -1,14 +1,14 @@
 package com.moe.socialnetwork.api.controllers;
 
 import com.moe.socialnetwork.api.dtos.RPKeywordCountDTO;
-import com.moe.socialnetwork.api.dtos.RPKeywordSearchTimeDTO;
 import com.moe.socialnetwork.api.dtos.ZRQCodeAndContentDTO;
 import com.moe.socialnetwork.api.dtos.ZRQFilterPageDTO;
-import com.moe.socialnetwork.api.services.ISearchHistoryService;
+import com.moe.socialnetwork.api.services.ISearchService;
 import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.response.ResponseAPI;
 
-import org.springframework.data.domain.Page;
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,13 +18,30 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/search-history")
-public class SearchHistoryController {
+@RequestMapping("/api/search")
+public class SearchController {
 
-    private final ISearchHistoryService searchHistoryService;
+    private final ISearchService searchHistoryService;
 
-    public SearchHistoryController(ISearchHistoryService searchHistoryService) {
+    public SearchController(ISearchService searchHistoryService) {
         this.searchHistoryService = searchHistoryService;
+    }
+
+    @GetMapping("/suggestions")
+    public ResponseEntity<ResponseAPI<List<String>>> getKeywordSuggestions(
+            @Valid @ModelAttribute ZRQFilterPageDTO request,
+            @AuthenticationPrincipal User user) {
+
+        List<String> data = searchHistoryService.getSuggestionsByPrefix(
+                request.getKeyWord(),
+                request.getSize());
+
+        ResponseAPI<List<String>> response = new ResponseAPI<>();
+        response.setCode(200);
+        response.setMessage("Keyword suggestions fetched successfully");
+        response.setData(data);
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/top")

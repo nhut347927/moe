@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RPUserCommentDTO {
-    private String Code;
+    private String code;
     private String postCode;
     private String content;
     private String createAt;

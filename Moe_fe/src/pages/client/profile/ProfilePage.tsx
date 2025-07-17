@@ -20,6 +20,8 @@ import {
   UserCog,
   Clipboard,
   Clock,
+  MessageCircle,
+  Search,
 } from "lucide-react";
 import { AccountDetail, PostAccount } from "../types";
 import { Page } from "@/common/hooks/type";
@@ -31,6 +33,7 @@ import Cookies from "js-cookie";
 import { convertFileToBase64 } from "@/common/utils/utils";
 import { ModeToggle } from "@/components/common/ModeToggle";
 import Spinner from "@/components/common/Spiner";
+import { Separator } from "@/components/ui/separator";
 
 export function ProfilePage() {
   const { toast } = useToast();
@@ -46,6 +49,9 @@ export function ProfilePage() {
   const [userCode, setUserCode] = useState<string>(
     new URLSearchParams(location.search).get("code") || ""
   );
+
+  const [errorProfile, setErrorProfile] = useState<any | null>(null);
+
   useEffect(() => {
     const code = new URLSearchParams(location.search).get("code") || "";
     setUserCode(code);
@@ -66,24 +72,17 @@ export function ProfilePage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
   const handleSubmit = async () => {
-    if (!form.displayName.trim() || !form.userName.trim() || !form.bio.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please fill in all fields.",
-      });
-      return;
-    }
-
     try {
       setIsSubmitting(true);
       await axiosInstance.post("accounts/update-profile", form);
       setAccountDetail((prev) => (prev ? { ...prev, ...form } : prev));
+      setErrorProfile(null);
       toast({
         title: "Success",
         description: "Profile updated successfully.",
       });
     } catch (error: any) {
+      setErrorProfile(error.response?.data?.errors);
       toast({
         variant: "destructive",
         title: "Update failed",
@@ -151,7 +150,7 @@ export function ProfilePage() {
         code ? `accounts/detail` : `accounts/me`,
         code ? { params: { code } } : undefined
       );
-     // console.log("fetchAccountProfile response:", response.data); // Debug log
+      // console.log("fetchAccountProfile response:", response.data); // Debug log
       if (!code) {
         setUserCode(response.data.data.userCode);
       }
@@ -178,10 +177,10 @@ export function ProfilePage() {
           params: { code, page, size: "12", sort: "desc" },
         }
       );
-    //  console.log("fetchAccountPost response:", response.data); // Debug log
+      //  console.log("fetchAccountPost response:", response.data); // Debug log
       return response.data.data;
     } catch (error: any) {
-    //  console.error("fetchAccountPost error:", error.response?.data || error); // Debug log
+      //  console.error("fetchAccountPost error:", error.response?.data || error); // Debug log
       throw new Error(error.response?.data?.message || "Failed to fetch posts");
     }
   };
@@ -311,7 +310,7 @@ export function ProfilePage() {
       }
     } catch (err) {
       toast({ variant: "destructive", description: "Failed to copy URL" });
-     // console.error("Fallback copy error:", err);
+      // console.error("Fallback copy error:", err);
     }
     document.body.removeChild(textArea);
   };
@@ -323,10 +322,10 @@ export function ProfilePage() {
         navigator.clipboard.writeText(url).then(
           () => {
             toast({ description: "Profile URL copied to clipboard!" });
-          //  console.log("Copied URL:", url);
+            //  console.log("Copied URL:", url);
           },
           () => {
-           // console.error("Copy error:", err);
+            // console.error("Copy error:", err);
             fallbackCopyTextToClipboard(url);
           }
         );
@@ -366,9 +365,14 @@ export function ProfilePage() {
             className="!rounded-3xl p-0 overflow-hidden"
           >
             <div className="p-4 space-y-4">
-              <div className="w-full my-4 flex items-center justify-between">
+              {/* 1. Toggle Theme */}
+              <div className="w-full flex items-center justify-between">
                 <ModeToggle />
               </div>
+
+              <Separator />
+
+              {/* 2. Quick actions */}
               <Button
                 variant="ghost"
                 className="w-full justify-start gap-2 text-sm px-3 py-2"
@@ -378,24 +382,59 @@ export function ProfilePage() {
                 <Clipboard className="w-4 h-4" />
                 Copy URL
               </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-start gap-2 text-sm px-3 py-2"
-                // onClick={handleViewHistory}
-                aria-label="View history"
-              >
-                <Clock className="w-4 h-4" />
-                View history(Coming soon)
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-start gap-2 text-sm px-3 py-2"
-                // onClick={handleViewFavorites}
-                aria-label="View favorite posts"
-              >
-                <Heart className="w-4 h-4" />
-                Favorite posts(Coming soon)
-              </Button>
+
+              <Separator />
+
+              {/* 3. View-related links */}
+              <div className="space-y-1">
+                <Link to="/client/history">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start gap-2 text-sm px-3 py-2"
+                    aria-label="View history"
+                  >
+                    <Clock className="w-4 h-4" />
+                    View history
+                  </Button>
+                </Link>
+
+                <Link to="/client/favorites">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start gap-2 text-sm px-3 py-2"
+                    aria-label="View favorite posts"
+                  >
+                    <Heart className="w-4 h-4" />
+                    Favorite posts
+                  </Button>
+                </Link>
+
+                <Link to="/client/comments">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start gap-2 text-sm px-3 py-2"
+                    aria-label="View comments"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    View comments
+                  </Button>
+                </Link>
+
+                <Link to="/client/keywords">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start gap-2 text-sm px-3 py-2"
+                    aria-label="View searched keywords"
+                  >
+                    <Search className="w-4 h-4" />
+                    Searched keywords
+                  </Button>
+                </Link>
+              </div>
+
+              <Separator />
+
+              {/* 4. Logout */}
               <Button
                 variant="ghost"
                 className="w-full justify-start gap-2 text-sm text-red-600 px-3 py-2"
@@ -520,6 +559,11 @@ export function ProfilePage() {
                           placeholder="Your display name"
                           className="text-sm rounded-xl"
                         />
+                        {errorProfile?.displayName && (
+                          <p className="text-xs mt-2 text-red-500">
+                            {errorProfile.displayName}
+                          </p>
+                        )}
                       </div>
 
                       {/* Username */}
@@ -534,6 +578,11 @@ export function ProfilePage() {
                           placeholder="Your username"
                           className="text-sm rounded-xl"
                         />
+                        {errorProfile?.userName && (
+                          <p className="text-xs mt-2 text-red-500">
+                            {errorProfile.userName}
+                          </p>
+                        )}
                       </div>
 
                       {/* Bio */}
@@ -548,6 +597,11 @@ export function ProfilePage() {
                           placeholder="Tell us something about yourself..."
                           className="text-sm min-h-[100px] resize-none rounded-xl"
                         />
+                        {errorProfile?.bio && (
+                          <p className="text-xs mt-2 text-red-500">
+                            {errorProfile.bio}
+                          </p>
+                        )}
                       </div>
 
                       {/* Actions */}

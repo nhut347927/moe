@@ -24,7 +24,7 @@ import com.moe.socialnetwork.api.dtos.RQPostCreateDTO.FFmpegMergeParams;
 import com.moe.socialnetwork.api.dtos.ZRPPageDTO;
 import com.moe.socialnetwork.api.services.IFFmpegService;
 import com.moe.socialnetwork.api.services.IPostService;
-import com.moe.socialnetwork.api.services.ISearchHistoryService;
+import com.moe.socialnetwork.api.services.ISearchService;
 import com.moe.socialnetwork.jpa.AudioJPA;
 import com.moe.socialnetwork.jpa.ImageJPA;
 import com.moe.socialnetwork.jpa.LikeJPA;
@@ -59,11 +59,11 @@ public class PostServiceImpl implements IPostService {
 	private final LikeJPA likeJpa;
 	private final CloudinaryServiceImpl cloudinaryService;
 	private final ViewJPA viewJPA;
-	private final ISearchHistoryService searchHistoryService;
+	private final ISearchService searchHistoryService;
 
 	public PostServiceImpl(PostTagJPA postTagJPA, PostJPA postJPA, TagJPA tagJPA, AudioJPA audioJPA, ImageJPA imageJPA,
 			CloudinaryServiceImpl cloudinaryService, IFFmpegService ffmpegService, LikeJPA likeJpa, ViewJPA viewJPA,
-			ISearchHistoryService searchHistoryService) {
+			ISearchService searchHistoryService) {
 		this.postTagJPA = postTagJPA;
 		this.postJPA = postJPA;
 		this.tagJPA = tagJPA;

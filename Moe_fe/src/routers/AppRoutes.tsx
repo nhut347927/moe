@@ -19,6 +19,10 @@ import Dashboard from "@/pages/admin/Dashboard";
 import Login from "@/pages/auth/Login";
 import Register from "@/pages/auth/Register";
 import AudioPage from "@/pages/client/other/AudioPage";
+import ViewHistoryPage from "@/pages/client/other/ViewHistory";
+import FavoritePage from "@/pages/client/other/FavoritePage";
+import CommentPage from "@/pages/client/other/CommentPage";
+import KeywordPage from "@/pages/client/other/KeywordPage";
 // Lazy load layouts
 const ClientLayout = React.lazy(() => import("./ClientLayout"));
 const AuthLayout = React.lazy(() => import("./AuthLayout"));
@@ -50,6 +54,12 @@ const AppRoutes = () => {
           <Route path="profile" element={<ProfilePage />} />
           <Route path="about" element={<AboutPage />} />
           <Route path="audio" element={<AudioPage />} />
+
+          <Route path="history" element={<ViewHistoryPage />} />
+          <Route path="favorites" element={<FavoritePage />} />
+          <Route path="comments" element={<CommentPage />} />
+          <Route path="keywords" element={<KeywordPage />} />
+
           <Route path="upload" element={<UploadPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>

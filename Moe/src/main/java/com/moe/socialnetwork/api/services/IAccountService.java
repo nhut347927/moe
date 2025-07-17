@@ -1,6 +1,5 @@
 package com.moe.socialnetwork.api.services;
 
-import java.util.List;
 import java.util.UUID;
 
 import com.moe.socialnetwork.api.dtos.RPAccountDetailDTO;

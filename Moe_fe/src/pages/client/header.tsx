@@ -183,7 +183,7 @@ export default function Header() {
 
             {/* Avatar người dùng */}
             <div className="mt-0">
-              <Link to="/client/profile" title="Tài khoản">
+              <Link to="/client/profile" title="Account">
                 <Avatar className="w-10 h-10 bg-zinc-400 text-white text-sm">
                   <AvatarImage
                     src={

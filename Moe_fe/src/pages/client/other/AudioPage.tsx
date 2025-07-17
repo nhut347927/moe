@@ -5,7 +5,7 @@ import axiosInstance from "@/services/axios/AxiosInstance";
 import { Post } from "../types";
 import { Page } from "@/common/hooks/type";
 import { useGetApi } from "@/common/hooks/useGetApi";
-import { Play, Pause, Heart, MessageSquareHeart } from "lucide-react";
+import { Play, Pause, Heart, MessageSquareHeart, Eye } from "lucide-react";
 import PostCompo from "@/components/post/PostCompo";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -102,25 +102,25 @@ export default function AudioPage() {
     <div className="relative flex-1 flex justify-center">
       <ScrollArea className="flex-1 max-h-full h-screen max-w-3xl w-full p-3 overflow-y-auto overflow-x-hidden relative">
         {/* Audio header with gradient background and spinning avatar */}
-        <div className="w-full relative h-auto rounded-3xl overflow-hidden">
-          {/* Background + gradient */}
+        <div className="w-full relative h-auto rounded-3xl overflow-hidden bg-zinc-900">
+          {/* Background + Gradient */}
           <div
             className="absolute inset-0 bg-cover bg-center opacity-30"
             style={{
               backgroundImage: post?.avatarUrl
                 ? `url(https://res.cloudinary.com/dwv76nhoy/image/upload/w_600,h_300,c_fill,f_auto,q_auto/${post.avatarUrl})`
                 : "none",
-              backgroundColor: !post?.avatarUrl ? "#cbd5e1" : "transparent",
+              backgroundColor: !post?.avatarUrl ? "#1e293b" : "transparent",
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10" />
 
           {/* Content */}
-          <div className="relative z-20 px-3 pt-4 pb-3 sm:px-4 sm:pt-6 sm:pb-4 md:px-6 md:pt-8 md:pb-6 flex flex-col md:flex-row items-start md:items-end justify-between gap-4">
+          <div className="relative z-20 px-4 py-5 md:px-6 md:py-8 flex flex-col md:flex-row items-start md:items-end justify-between gap-4">
             {/* Avatar + Info */}
-            <div className="flex items-center gap-3 md:gap-5">
+            <div className="flex items-center gap-4 md:gap-6">
               <Avatar
-                className={`w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 border-4 border-white dark:border-zinc-700 rounded-full ${
+                className={`w-24 h-24 md:w-28 md:h-28 border-4 border-white dark:border-zinc-700 rounded-full shadow-md ${
                   isPlaying ? "animate-spin-slow" : ""
                 }`}
               >
@@ -128,8 +128,8 @@ export default function AudioPage() {
                   src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_200,h_200,c_thumb,f_auto,q_auto/${post?.avatarUrl}`}
                   alt="Audio avatar"
                 />
-                <AvatarFallback className="text-base sm:text-lg">
-                  {post?.audioOwnerDisplayName?.charAt(0) ?? "MOE"}
+                <AvatarFallback className="text-base md:text-xl">
+                  {post?.audioOwnerDisplayName?.charAt(0) ?? "M"}
                 </AvatarFallback>
               </Avatar>
 
@@ -137,13 +137,13 @@ export default function AudioPage() {
                 <h1 className="text-white text-lg sm:text-xl md:text-2xl font-bold leading-snug">
                   {post?.title || "Untitled Audio"}
                 </h1>
-                <p className="text-zinc-200 text-sm sm:text-base">
+                <p className="text-zinc-300 text-sm sm:text-base">
                   Original sound by{" "}
                   <span className="underline font-medium">
                     {post?.audioOwnerDisplayName ?? "MOE"}
                   </span>
                 </p>
-                <p className="text-xs text-zinc-300 mt-1">
+                <p className="text-xs text-zinc-400 mt-1">
                   {post?.createdAt
                     ? new Date(post.createdAt).toLocaleDateString()
                     : ""}
@@ -151,24 +151,24 @@ export default function AudioPage() {
               </div>
             </div>
 
-            {/* Play/Pause + Stats */}
+            {/* Controls + Stats */}
             <div className="flex items-center gap-4 flex-wrap sm:flex-nowrap">
               {post?.audioUrl && (
                 <button
                   onClick={togglePlay}
-                  className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 flex items-center justify-center bg-white text-black rounded-full hover:bg-zinc-200 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700 transition-colors duration-200 shadow-md"
+                  className="w-14 h-14 md:w-16 md:h-16 flex items-center justify-center bg-white text-black dark:bg-zinc-800 dark:text-white rounded-full hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-colors duration-200 shadow-lg"
                   aria-label={isPlaying ? "Pause audio" : "Play audio"}
                 >
                   {isPlaying ? (
-                    <Pause className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
+                    <Pause className="w-6 h-6 md:w-7 md:h-7" />
                   ) : (
-                    <Play className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
+                    <Play className="w-6 h-6 md:w-7 md:h-7" />
                   )}
                 </button>
               )}
 
               {/* Like & Comment */}
-              <div className="flex gap-4 text-sm text-zinc-400 dark:text-zinc-300">
+              <div className="flex gap-4 text-sm text-zinc-300 dark:text-zinc-100">
                 <div className="flex items-center gap-1.5">
                   <Heart className="w-4 h-4" />
                   <span>{post?.likeCount ?? 0}</span>
@@ -183,7 +183,7 @@ export default function AudioPage() {
 
           {/* Description */}
           {post?.description && (
-            <div className="relative z-20 px-3 sm:px-4 md:px-6 pb-4 text-white">
+            <div className="relative z-20 px-4 md:px-6 pb-4 text-white">
               <p className="text-sm text-zinc-300 line-clamp-3">
                 {post.description}
               </p>
@@ -226,6 +226,14 @@ export default function AudioPage() {
                   onClick={() => setSelectedPost(post.postCode)}
                 />
               )}
+              <div
+                className="absolute bottom-2 left-2 flex items-center gap-1 
+  rounded-lg px-2 py-0.5 text-xs font-medium
+  bg-zinc-900/60 text-white 
+  dark:bg-zinc-100/70 dark:text-black"
+              >
+                Original
+              </div>
             </div>
           )}
 

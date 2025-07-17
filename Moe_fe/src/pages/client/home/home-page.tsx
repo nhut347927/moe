@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useToast } from "@/common/hooks/use-toast";
 import { Post } from "../types";
 import PostContent from "./item/Media";
@@ -8,14 +9,57 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
 import { cn, getTimeAgo } from "@/common/utils/utils";
 import { useGetApi } from "@/common/hooks/useGetApi";
-import Spinner from "@/components/common/Spiner";
 import { usePostApi } from "@/common/hooks/usePostApi";
+import Spinner from "@/components/common/Spiner";
+import axiosInstance from "@/services/axios/AxiosInstance";
 
-// Define the Home component
-const HomePage = () => {
+// Define fetchPostByCode function
+const fetchPostByCode = async (postCode: string): Promise<Post> => {
+  const response = await axiosInstance.get<{ data: Post }>("/posts/get", {
+    params: { code: postCode },
+  });
+  return response.data.data;
+};
+
+export default function HomePage() {
   const { toast } = useToast();
-  // ------------------- State Management -------------------
+  const [searchParams] = useSearchParams();
   const [postData, setPostData] = useState<Post[]>([]);
+  const [isInitialPostFetched, setIsInitialPostFetched] = useState(false); // Track if initial post is fetched
+  const mediaRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const currentIndex = useRef<number>(0);
+  const [openComment, setOpenComment] = useState<boolean>(false);
+
+  // Extract code from URL
+  const postCodeFromUrl = searchParams.get("code");
+
+  // Fetch initial post if code is present in URL
+  useEffect(() => {
+    if (postCodeFromUrl && !isInitialPostFetched) {
+      const fetchInitialPost = async () => {
+        try {
+          const post = await fetchPostByCode(postCodeFromUrl);
+          setPostData((prev) => {
+            const existing = new Set(prev.map((p) => p.postCode));
+            if (!existing.has(post.postCode)) {
+              return [{ ...post, comments: post.comments ?? [], isPlaying: true }, ...prev];
+            }
+            return prev;
+          });
+          setIsInitialPostFetched(true);
+        } catch (error) {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to fetch post from URL",
+          });
+        }
+      };
+      fetchInitialPost();
+    }
+  }, [postCodeFromUrl, isInitialPostFetched, toast]);
+
+  // Fetch posts from /posts endpoint
   const { refetch, loading } = useGetApi<Post[]>({
     endpoint: "/posts",
     enabled: true,
@@ -39,30 +83,8 @@ const HomePage = () => {
       });
     },
   });
-  const mediaRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const currentIndex = useRef<number>(0);
-  const [openComment, setOpenComment] = useState<boolean>(false);
-  const { callApi: callViewApi } = usePostApi<Post>({
-    endpoint: "/posts/view",
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-    },
-  });
-  const { callApi: callLikeApi } = usePostApi<Post>({
-    endpoint: "/posts/like",
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-    },
-  });
-  // ------------------- Scroll Navigation Logic -------------------
+
+  // Scroll Navigation Logic
   useEffect(() => {
     if (!loading) {
       const observer = new IntersectionObserver(
@@ -83,16 +105,6 @@ const HomePage = () => {
                 );
                 handleView(postData[index]?.postCode);
 
-                if (Number(index - 1) === 0) {
-                  //set false vị trí 0
-                  // setPostData((prev) => {
-                  //   const updated = [...prev];
-                  //   updated[0] = { ...updated[0], isPlaying: false };
-                  //   return updated;
-                  // });
-                  handleView(postData[0].postCode);
-                }
-
                 if (!loading && index >= postData.length - 3) {
                   refetch();
                 }
@@ -103,19 +115,17 @@ const HomePage = () => {
         { root: null, threshold: 0.6 }
       );
 
-      // 👉 Gắn observer cho tất cả phần tử có ref
       mediaRefs.current.forEach((ref) => {
         if (ref) observer.observe(ref);
       });
 
-      // 🧹 Cleanup
       return () => {
         mediaRefs.current.forEach((ref) => {
           if (ref) observer.unobserve(ref);
         });
       };
     }
-  }, [postData]);
+  }, [postData, loading, refetch]);
 
   useEffect(() => {
     if (
@@ -132,10 +142,35 @@ const HomePage = () => {
     }
   }, [postData]);
 
-  //------------------------ HANDLE API ---------------------------
+  // Handle API Calls
+  const { callApi: callViewApi } = usePostApi<Post>({
+    endpoint: "/posts/view",
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    },
+  });
+
+  const { callApi: callLikeApi } = usePostApi<Post>({
+    endpoint: "/posts/like",
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    },
+  });
+
   const handleView = async (code: string) => {
-    await callViewApi({ code });
+    if (code) {
+      await callViewApi({ code });
+    }
   };
+
   const handleLike = async (code: string) => {
     const previousPosts = [...postData];
 
@@ -151,6 +186,7 @@ const HomePage = () => {
       setPostData(previousPosts);
     }
   };
+
   const updateImageSelect = (newImageSelect: number) => {
     setPostData((prev) =>
       prev.map((post) =>
@@ -161,7 +197,7 @@ const HomePage = () => {
     );
   };
 
-  // ---------------------- Render Logic ----------------------------
+  // Render Logic
   return (
     <div className="max-h-screen h-screen w-full relative">
       <div className="absolute z-30 right-3 top-3 px-2 h-[30px] bg-zinc-100/70 dark:bg-zinc-800/60 backdrop-blur-sm flex items-center rounded-lg shadow-sm">
@@ -225,8 +261,8 @@ const HomePage = () => {
           </div>
         ))}
       </div>
-      <div className="z-30 absolute  bottom-2 left-0 right-0 px-4 flex items-end justify-between">
-        {/* Left: User info + caption */}
+
+      <div className="z-30 absolute bottom-2 left-0 right-0 px-4 flex items-end justify-between">
         <div className="mb-2 max-w-full flex items-center space-x-3">
           <Link
             to={`/client/profile?code=${
@@ -282,6 +318,7 @@ const HomePage = () => {
           </div>
         </div>
       </div>
+
       {openComment && (
         <>
           <div
@@ -291,15 +328,15 @@ const HomePage = () => {
           <div className="fixed inset-0 z-50 flex justify-center items-center pointer-events-none">
             <div
               className={`
-          max-w-2xl w-full  mt-auto
-          transform transition-all duration-300 ease-in-out
-          ${
-            openComment
-              ? "opacity-100 translate-y-0 scale-100"
-              : "opacity-0 translate-y-10 scale-95"
-          }
-          pointer-events-auto
-        `}
+                max-w-2xl w-full mt-auto
+                transform transition-all duration-300 ease-in-out
+                ${
+                  openComment
+                    ? "opacity-100 translate-y-0 scale-100"
+                    : "opacity-0 translate-y-10 scale-95"
+                }
+                pointer-events-auto
+              `}
             >
               <div className="max-h-[80vh]" data-scroll-ignore>
                 <PostComments
@@ -312,6 +349,4 @@ const HomePage = () => {
       )}
     </div>
   );
-};
-
-export default HomePage;
+}

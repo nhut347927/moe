@@ -602,8 +602,8 @@ const Comments = ({ postCode }: CommentsProps) => {
           </div>
         </div>
 
-        <h2 className="text-3xl font-bold tracking-tight">
-          {postData?.title ?? "[Title]"}
+        <h2 className="text-3xl tracking-tight">
+          <strong>{postData?.title ?? "[Title]"}</strong>
         </h2>
         <div className="mt-4">
           <div className="w-full text-muted-foreground text-sm leading-relaxed whitespace-pre-wrap transition-all duration-300">

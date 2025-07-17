@@ -29,4 +29,11 @@ public interface SearchHistoryJPA extends JpaRepository<SearchHistory, Long> {
             "ORDER BY COUNT(s.keyword) DESC")
     List<RPKeywordCountDTO> findTopKeywords(Pageable pageable);
 
+    @Query("""
+                SELECT DISTINCT s.keyword
+                FROM SearchHistory s
+                WHERE LOWER(s.keyword) LIKE LOWER(CONCAT(:prefix, '%'))
+            """)
+    List<String> findTopKeywordsByPrefix(@Param("prefix") String prefix, Pageable pageable);
+
 }

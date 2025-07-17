@@ -18,7 +18,7 @@ import com.moe.socialnetwork.api.dtos.RPAccountSearchDTO;
 import com.moe.socialnetwork.api.dtos.ZRPPageDTO;
 import com.moe.socialnetwork.api.services.IAccountService;
 import com.moe.socialnetwork.api.services.ICloudinaryService;
-import com.moe.socialnetwork.api.services.ISearchHistoryService;
+import com.moe.socialnetwork.api.services.ISearchService;
 import com.moe.socialnetwork.jpa.FollowerJPA;
 import com.moe.socialnetwork.jpa.PostJPA;
 import com.moe.socialnetwork.jpa.UserJPA;
@@ -39,10 +39,10 @@ public class AccountServiceImpl implements IAccountService {
     private final FollowerJPA followerJpa;
     private final ICloudinaryService cloudinaryService;
     private final PostJPA postJpa;
-    private final ISearchHistoryService searchHistoryService;
+    private final ISearchService searchHistoryService;
 
     public AccountServiceImpl(UserJPA userJpa, FollowerJPA followerJpa, ICloudinaryService cloudinaryService,
-            PostJPA postJpa, ISearchHistoryService searchHistoryService) {
+            PostJPA postJpa, ISearchService searchHistoryService) {
         this.userJpa = userJpa;
         this.followerJpa = followerJpa;
         this.cloudinaryService = cloudinaryService;

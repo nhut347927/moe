@@ -1,28 +1,34 @@
 package com.moe.socialnetwork.api.services.impl;
 
-import com.moe.socialnetwork.api.dtos.RPKeywordSearchTimeDTO;
 import com.moe.socialnetwork.api.dtos.RPKeywordCountDTO;
-import com.moe.socialnetwork.api.services.ISearchHistoryService;
+import com.moe.socialnetwork.api.services.ISearchService;
 import com.moe.socialnetwork.jpa.SearchHistoryJPA;
 import com.moe.socialnetwork.models.SearchHistory;
 import com.moe.socialnetwork.models.User;
 
-import org.springframework.data.domain.Page;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
-public class SearchHistoryServiceImpl implements ISearchHistoryService {
+public class SearchServiceImpl implements ISearchService {
 
     private final SearchHistoryJPA searchHistoryRepository;
 
-    public SearchHistoryServiceImpl(SearchHistoryJPA searchHistoryRepository) {
+    public SearchServiceImpl(SearchHistoryJPA searchHistoryRepository) {
         this.searchHistoryRepository = searchHistoryRepository;
+    }
+
+    @Override
+    public List<String> getSuggestionsByPrefix(String prefix, int síze) {
+        if (prefix == null || prefix.trim().isEmpty()) {
+            return List.of(); // hoặc Collections.emptyList()
+        }
+        return searchHistoryRepository.findTopKeywordsByPrefix(prefix.trim(), PageRequest.of(0, síze));
     }
 
     @Override

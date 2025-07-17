@@ -73,7 +73,7 @@ export type Post = {
   videoUrl: string;
   thumbnail: string;
   imageUrls: string[];
-  imageSelect:number;
+  imageSelect: number;
   title: string;
   description: string;
   tags: string[];
@@ -86,7 +86,7 @@ export type Post = {
   audioUrl: string;
   audioOwnerAvatar: string;
   audioOwnerDisplayName: string;
-  audioPostCode:string;
+  audioPostCode: string;
   audioCode: string;
 
   comments: Comment[];
@@ -184,4 +184,15 @@ export interface PostCreateForm {
 export interface TopSearch {
   keyword: string;
   count: string;
+}
+
+export interface UserComment {
+  code: string;
+  postCode: string;
+  content: string;
+  createAt: string;
+}
+export interface KeywordSearch {
+  keyWord: string;
+  createdAt: string;
 }
