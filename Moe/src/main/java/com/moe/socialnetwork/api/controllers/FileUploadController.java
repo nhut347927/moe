@@ -33,7 +33,7 @@ public class FileUploadController {
         String publicId = cloudinaryService.uploadImage(request.getFile());
         ResponseAPI<String> response = new ResponseAPI<>();
         response.setCode(200);
-        response.setMessage("Image uploaded successfully.");
+        response.setMessage("Success");
         response.setData(publicId);
         return ResponseEntity.ok(response);
     }
@@ -45,7 +45,7 @@ public class FileUploadController {
         String publicId = cloudinaryService.uploadVideo(request.getFile());
         ResponseAPI<String> response = new ResponseAPI<>();
         response.setCode(200);
-        response.setMessage("Video uploaded successfully.");
+        response.setMessage("Success");
         response.setData(publicId);
         return ResponseEntity.ok(response);
     }
@@ -57,7 +57,7 @@ public class FileUploadController {
         String publicId = cloudinaryService.uploadAudio(request.getFile());
         ResponseAPI<String> response = new ResponseAPI<>();
         response.setCode(200);
-        response.setMessage("Audio uploaded successfully.");
+        response.setMessage("Success");
         response.setData(publicId);
         return ResponseEntity.ok(response);
     }
@@ -70,10 +70,10 @@ public class FileUploadController {
         ResponseAPI<String> response = new ResponseAPI<>();
         if (deleted) {
             response.setCode(200);
-            response.setMessage("File deleted successfully.");
+            response.setMessage("Success");
         } else {
             response.setCode(400);
-            response.setMessage("File deletion failed.");
+            response.setMessage("Success");
         }
         return ResponseEntity.ok(response);
     }

@@ -45,7 +45,7 @@ public class AccountController {
         accountService.updateProfileAccUser(dto.getDisplayName(), dto.getUserName(), dto.getBio(), userLogin);
         ResponseAPI<Void> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Profile updated successfully.");
+        response.setMessage("Success");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -58,7 +58,7 @@ public class AccountController {
 
         ResponseAPI<String> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Avatar updated successfully.");
+        response.setMessage("Success");
         response.setData(img);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -73,7 +73,7 @@ public class AccountController {
 
         ResponseAPI<ZRPPageDTO<RPAccountSearchDTO>> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("User search completed successfully.");
+        response.setMessage("Success");
         response.setData(result);
 
         return ResponseEntity.ok(response);
@@ -87,7 +87,7 @@ public class AccountController {
         accountService.followUser(UUID.fromString(code.getCode()), userLogin);
         ResponseAPI<Void> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Follow/unfollow action completed successfully.");
+        response.setMessage("Success");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -98,7 +98,7 @@ public class AccountController {
         RPAccountDetailDTO accountDetail = accountService.getAccountSummary(userLogin.getCode(), userLogin);
         ResponseAPI<RPAccountDetailDTO> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Logged-in user account detail retrieved successfully.");
+        response.setMessage("Success");
         response.setData(accountDetail);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -111,7 +111,7 @@ public class AccountController {
         RPAccountDetailDTO accountDetail = accountService.getAccountSummary(UUID.fromString(code.getCode()), userLogin);
         ResponseAPI<RPAccountDetailDTO> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Account detail retrieved successfully.");
+        response.setMessage("Success");
         response.setData(accountDetail);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -126,7 +126,7 @@ public class AccountController {
 
         ResponseAPI<ZRPPageDTO<RPAccountDetailDTO.RPAccountPostDTO>> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("User's post list retrieved successfully.");
+        response.setMessage("Success");
         response.setData(postPage);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

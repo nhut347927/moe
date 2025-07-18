@@ -40,7 +40,7 @@ public class AudioController {
 
         ResponseAPI<ZRPPageDTO<RPPostDTO>> response = new ResponseAPI<>();
         response.setCode(200);
-        response.setMessage("Posts by audio fetched successfully");
+        response.setMessage("Success");
         response.setData(data);
 
         return ResponseEntity.ok(response);

@@ -274,10 +274,10 @@ export function ProfilePage() {
     try {
       const res = await axiosInstance.post("auth/logout");
       const message = res.data?.message;
-      document.cookie =
-        "refreshToken_fe=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      document.cookie =
-        "accessToken_fe=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      // document.cookie =
+      //   "refreshToken_fe=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      // document.cookie =
+      //   "accessToken_fe=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       document.cookie =
         "avatar=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       toast({
@@ -294,49 +294,24 @@ export function ProfilePage() {
       });
     }
   };
-  const fallbackCopyTextToClipboard = (text: string) => {
-    const textArea = document.createElement("textarea");
-    textArea.value = text;
-    textArea.style.position = "fixed"; // tránh trang bị cuộn
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-    try {
-      const successful = document.execCommand("copy");
-      if (successful) {
-        toast({ description: "Profile URL copied to clipboard!" });
-      } else {
-        toast({ variant: "destructive", description: "Failed to copy URL" });
-      }
-    } catch (err) {
-      toast({ variant: "destructive", description: "Failed to copy URL" });
-      // console.error("Fallback copy error:", err);
-    }
-    document.body.removeChild(textArea);
-  };
 
-  const handleCopyUrl = () => {
-    if (accountDetail?.userCode) {
-      const url = `${window.location.origin}/client/profile?code=${accountDetail.userCode}`;
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(url).then(
-          () => {
-            toast({ description: "Profile URL copied to clipboard!" });
-            //  console.log("Copied URL:", url);
-          },
-          () => {
-            // console.error("Copy error:", err);
-            fallbackCopyTextToClipboard(url);
-          }
-        );
-      } else {
-        // Clipboard API không tồn tại, fallback
-        fallbackCopyTextToClipboard(url);
-      }
-    } else {
+  const copyURLToClipboard = async () => {
+    const url = `${
+      window.location.origin
+    }/client/profile?code=${encodeURIComponent(
+      accountDetail?.userCode ?? "MOE"
+    )}`;
+
+    try {
+      await navigator.clipboard.writeText(url);
+      toast({
+        description: "Link copied to clipboard!",
+      });
+    } catch (error) {
       toast({
         variant: "destructive",
-        description: "Profile code is undefined",
+        title: "Failed",
+        description: "Failed to copy link to clipboard",
       });
     }
   };
@@ -376,7 +351,7 @@ export function ProfilePage() {
               <Button
                 variant="ghost"
                 className="w-full justify-start gap-2 text-sm px-3 py-2"
-                onClick={handleCopyUrl}
+                onClick={copyURLToClipboard}
                 aria-label="Copy username to clipboard"
               >
                 <Clipboard className="w-4 h-4" />
@@ -447,13 +422,32 @@ export function ProfilePage() {
             </div>
           </ActionMenuDialog>
         ) : (
-          <Button
-            variant="outline"
-            size="icon"
-            className="bg-zinc-100/60 text-zinc-800 hover:bg-zinc-200 border border-zinc-300 dark:bg-white/5 dark:text-white dark:border-white/10 dark:hover:bg-white/10 transition-colors rounded-full"
+          <ActionMenuDialog
+            trigger={
+              <Button
+                variant="outline"
+                className="flex justify-center items-center p-2.5 rounded-full"
+                aria-label="Open settings menu"
+              >
+                <EllipsisVertical className="h-4 w-4" />
+              </Button>
+            }
+            size="sm"
+            className="!rounded-3xl p-0 overflow-hidden"
           >
-            <EllipsisVertical className="w-5 h-5" />
-          </Button>
+            <div className="p-4 space-y-4">
+              {/* 2. Quick actions */}
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-2 text-sm px-3 py-2"
+                onClick={copyURLToClipboard}
+                aria-label="Copy username to clipboard"
+              >
+                <Clipboard className="w-4 h-4" />
+                Copy URL
+              </Button>
+            </div>
+          </ActionMenuDialog>
         )}
       </div>
       <ScrollArea

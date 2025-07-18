@@ -1,6 +1,7 @@
 import {
   ChevronDown,
   ChevronUp,
+  Clipboard,
   Copy,
   Ellipsis,
   EllipsisVertical,
@@ -25,7 +26,7 @@ import { getTimeAgo } from "@/common/utils/utils";
 import { ActionMenuItem } from "@/components/dialog/ActionMenuItem";
 import ActionMenuDialog from "@/components/dialog/ActionMenuDialog";
 import DeleteConfirmationDialog from "@/components/dialog/DeleteConfirmationDialog";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ReportDialog from "@/components/dialog/ReportDialog";
@@ -494,6 +495,41 @@ const Comments = ({ postCode }: CommentsProps) => {
     }
   };
 
+  //-----------------------------------------------------
+
+  const copyURLToClipboard = async (postCode: string) => {
+    const url = `${
+      window.location.origin
+    }/client/home?code=${encodeURIComponent(postCode)}`;
+
+    try {
+      await navigator.clipboard.writeText(url);
+      toast({
+        description: "Link copied to clipboard!",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Failed",
+        description: "Failed to copy link to clipboard",
+      });
+    }
+  };
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({
+        description: "Copied to clipboard!",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Failed",
+        description: "Failed to copy to clipboard",
+      });
+    }
+  };
   // ------------------- Render Logic -------------------
   return (
     <ScrollArea className="relative max-h-screen flex-1 h-full scroll-but-hidden rounded-t-3xl bg-white dark:bg-zinc-900">
@@ -572,6 +608,15 @@ const Comments = ({ postCode }: CommentsProps) => {
               size="sm"
               className="!rounded-3xl p-2 overflow-hidden"
             >
+              <ActionMenuItem
+                icon={<Clipboard className="h-4 w-4" />}
+                className="font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                onClick={() => {
+                  copyURLToClipboard(postData?.postCode ?? "MOE");
+                }}
+              >
+                Copy URL
+              </ActionMenuItem>
               <ReportDialog
                 postCode={postData?.postCode ?? "0"}
                 trigger={
@@ -741,54 +786,10 @@ const Comments = ({ postCode }: CommentsProps) => {
                           >
                             <ActionMenuItem
                               icon={
-                                <Copy className="h-4 w-4 text-muted-foreground" />
+                                <Clipboard className="h-4 w-4 text-muted-foreground" />
                               }
                               className="justify-start text-sm px-4 py-2 hover:bg-accent rounded-lg transition-colors"
-                              onClick={() => {
-                                const textToCopy = comment?.content ?? "";
-                                if (!textToCopy) {
-                                  toast({
-                                    variant: "destructive",
-                                    title: "Error",
-                                    description: "No content to copy.",
-                                  });
-                                  return;
-                                }
-
-                                if (
-                                  navigator.clipboard &&
-                                  typeof navigator.clipboard.writeText ===
-                                    "function"
-                                ) {
-                                  navigator.clipboard
-                                    .writeText(textToCopy)
-                                    .then(() => {
-                                      toast({
-                                        title: "Success",
-                                        description:
-                                          "Content copied to clipboard!",
-                                      });
-                                    })
-                                    .catch((err) => {
-                                      console.error(
-                                        "Clipboard copy failed:",
-                                        err
-                                      );
-                                      toast({
-                                        variant: "destructive",
-                                        title: "Error",
-                                        description: "Failed to copy content.",
-                                      });
-                                    });
-                                } else {
-                                  toast({
-                                    variant: "destructive",
-                                    title: "Clipboard API not supported",
-                                    description:
-                                      "Your browser does not support clipboard copying.",
-                                  });
-                                }
-                              }}
+                              onClick={() => copyToClipboard(comment.content)}
                             >
                               Copy
                             </ActionMenuItem>
@@ -893,53 +894,7 @@ const Comments = ({ postCode }: CommentsProps) => {
                                           }
                                           className="justify-start text-sm px-4 py-2 hover:bg-accent rounded-lg transition-colors"
                                           onClick={() => {
-                                            const textToCopy =
-                                              reply?.content ?? "";
-                                            if (!textToCopy) {
-                                              toast({
-                                                variant: "destructive",
-                                                title: "Error",
-                                                description:
-                                                  "No content to copy.",
-                                              });
-                                              return;
-                                            }
-
-                                            if (
-                                              navigator.clipboard &&
-                                              typeof navigator.clipboard
-                                                .writeText === "function"
-                                            ) {
-                                              navigator.clipboard
-                                                .writeText(textToCopy)
-                                                .then(() => {
-                                                  toast({
-                                                    title: "Success",
-                                                    description:
-                                                      "Content copied to clipboard!",
-                                                  });
-                                                })
-                                                .catch((err) => {
-                                                  console.error(
-                                                    "Clipboard copy failed:",
-                                                    err
-                                                  );
-                                                  toast({
-                                                    variant: "destructive",
-                                                    title: "Error",
-                                                    description:
-                                                      "Failed to copy content.",
-                                                  });
-                                                });
-                                            } else {
-                                              toast({
-                                                variant: "destructive",
-                                                title:
-                                                  "Clipboard API not supported",
-                                                description:
-                                                  "Your browser does not support clipboard copying.",
-                                              });
-                                            }
+                                            copyToClipboard(reply?.content);
                                           }}
                                         >
                                           Copy

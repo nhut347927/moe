@@ -158,8 +158,8 @@ const PostCompo = ({ postCode }: PostProps) => {
             </div>
           </div>
           {/* Post info and actions */}
-          <div className="z-30 absolute bottom-2 left-0 right-0 px-4 flex items-end justify-between">
-            <div className=" opacity-80 mb-2 max-w-3xl w-full mx-auto  flex items-center space-x-3">
+          <div className="z-30 pointer-events-none absolute bottom-2 left-0 right-0 px-4 flex items-end justify-between">
+            <div className="pointer-events-auto opacity-80 mb-2 max-w-3xl w-full mx-auto  flex items-center space-x-3">
               <Link to={`/client/profile?code=${postData?.userCode}`}>
                 <Avatar className="w-10 h-10 transition-all">
                   <AvatarImage

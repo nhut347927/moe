@@ -19,14 +19,16 @@ import com.moe.socialnetwork.auth.dtos.RPLoginDTO;
 import com.moe.socialnetwork.auth.dtos.RQLoginWithGoogleDTO;
 import com.moe.socialnetwork.auth.dtos.RQRegisterDTO;
 import com.moe.socialnetwork.auth.dtos.RQPasswordResetRequestDTO;
-import com.moe.socialnetwork.auth.dtos.RQRefreshAccessTokenDTO;
 import com.moe.socialnetwork.auth.dtos.RQPasswordResetDTO;
 import com.moe.socialnetwork.auth.dtos.RPUserRegisterDTO;
 import com.moe.socialnetwork.auth.services.IAuthService;
 import com.moe.socialnetwork.auth.services.ITokenService;
 import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.response.ResponseAPI;
+
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+
 /**
  * Author: nhutnm379
  */
@@ -54,7 +56,7 @@ public class AuthController {
     public ResponseEntity<ResponseAPI<RPUserRegisterDTO>> register(
             @RequestBody @Valid RQRegisterDTO request) {
         RPUserRegisterDTO registeredUser = authService.register(request);
-        return ResponseEntity.ok(ResponseAPI.of(HttpStatus.OK.value(), "Registration successful", registeredUser));
+        return ResponseEntity.ok(ResponseAPI.of(HttpStatus.OK.value(), "Success", registeredUser));
     }
 
     @PostMapping("/login")
@@ -108,23 +110,41 @@ public class AuthController {
         authService.validateNewPassword(request.getNewPassword(), request.getConfirmNewPassword());
         authService.updatePassword(user, request.getNewPassword());
 
-        return ResponseEntity.ok(ResponseAPI.of(HttpStatus.OK.value(), "Password reset successfully", "Success"));
+        return ResponseEntity.ok(ResponseAPI.of(HttpStatus.OK.value(), "Success", null));
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<ResponseAPI<String>> refreshAccessToken(@RequestBody RQRefreshAccessTokenDTO request) {
+    public ResponseEntity<ResponseAPI<String>> refreshAccessToken(HttpServletRequest httpRequest) {
+        int maxAgeAccessToken = (int) (jwtExpirationMs / 1000);
 
-        if (request.getRefreshToken() == null || !tokenService.validateJwtToken(request.getRefreshToken())) {
+        // B1: Lấy refresh token từ cookie
+        String reToken = tokenService.extractRefreshTokenFromCookie(httpRequest);
+
+        // B2: Kiểm tra token
+        if (reToken == null || !tokenService.validateJwtToken(reToken)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(ResponseAPI.error(HttpStatus.UNAUTHORIZED.value(), "Invalid or expired refresh token", null));
         }
 
-        String email = tokenService.getEmailFromJwtToken(request.getRefreshToken());
+        // B3: Lấy user
+        String email = tokenService.getEmailFromJwtToken(reToken);
         User user = authService.findByEmail(email);
-        String newAccessToken = tokenService.generateJwtToken(user);
 
+        // B4: Tạo access token mới
+        String newAccessToken = tokenService.generateJwtToken(user);
+        ResponseCookie accessCookie = ResponseCookie.from("access_token", newAccessToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(maxAgeAccessToken)
+                .sameSite("Strict") // hoặc "Lax" nếu redirect từ bên ngoài
+                .build();
+
+        // B5: Trả về cookie và access token mới
         return ResponseEntity
-                .ok(ResponseAPI.of(HttpStatus.OK.value(), "Access token refreshed successfully", newAccessToken));
+                .ok()
+                .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
+                .body(ResponseAPI.of(HttpStatus.OK.value(), "Success", newAccessToken));
     }
 
     @PostMapping("/logout")
@@ -144,7 +164,7 @@ public class AuthController {
                 .maxAge(0)
                 .build();
 
-                  ResponseCookie deleteRefreshCookie = ResponseCookie.from("refresh_token", "")
+        ResponseCookie deleteRefreshCookie = ResponseCookie.from("refresh_token", "")
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
@@ -154,31 +174,31 @@ public class AuthController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, deleteAccessCookie.toString(), deleteRefreshCookie.toString())
-                .body(ResponseAPI.of(HttpStatus.OK.value(), "Logged out successfully", "Success"));
+                .body(ResponseAPI.of(HttpStatus.OK.value(), "Success", null));
     }
 
     private ResponseEntity<ResponseAPI<RPLoginDTO>> buildLoginResponse(RPLoginDTO login) {
         int maxAgeAccessToken = (int) (jwtExpirationMs / 1000);
-        //int maxAgeRefreshToken = (int) (jwtExpirationMs2 / 1000);
+        int maxAgeRefreshToken = (int) (jwtExpirationMs2 / 1000);
 
-        // ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", login.getRefreshToken())
-        //         .httpOnly(true)
-        //         .secure(true)
-        //         .path("/")
-        //         .maxAge(maxAgeRefreshToken)
-        //         .sameSite("Lax")
-        //         .build();
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", login.getRefreshToken())
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(maxAgeRefreshToken)
+                .sameSite("Strict")
+                .build();
 
         ResponseCookie accessCookie = ResponseCookie.from("access_token", login.getAccessToken())
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
                 .maxAge(maxAgeAccessToken)
-                .sameSite("Lax")
+                .sameSite("Strict")
                 .build();
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
-                .body(ResponseAPI.of(HttpStatus.OK.value(), "Login successful", login));
+                .header(HttpHeaders.SET_COOKIE, accessCookie.toString(), refreshCookie.toString())
+                .body(ResponseAPI.of(HttpStatus.OK.value(), "Success", login));
     }
 }

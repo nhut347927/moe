@@ -34,7 +34,7 @@ public class UserActivityController {
 
         ResponseAPI<ZRPPageDTO<RPKeywordSearchTimeDTO>> response = new ResponseAPI<>();
         response.setCode(200);
-        response.setMessage("Search history fetched");
+        response.setMessage("Success");
         response.setData(data);
 
         return ResponseEntity.ok(response);
@@ -54,7 +54,7 @@ public class UserActivityController {
 
         ResponseAPI<ZRPPageDTO<RPPostDTO>> response = new ResponseAPI<>();
         response.setCode(200);
-        response.setMessage("Viewed posts fetched");
+        response.setMessage("Success");
         response.setData(data);
 
         return ResponseEntity.ok(response);
@@ -74,7 +74,7 @@ public class UserActivityController {
 
         ResponseAPI<ZRPPageDTO<RPPostDTO>> response = new ResponseAPI<>();
         response.setCode(200);
-        response.setMessage("Liked posts fetched");
+        response.setMessage("Success");
         response.setData(data);
 
         return ResponseEntity.ok(response);
@@ -94,7 +94,7 @@ public class UserActivityController {
 
         ResponseAPI<ZRPPageDTO<RPUserCommentDTO>> response = new ResponseAPI<>();
         response.setCode(200);
-        response.setMessage("User comments fetched");
+        response.setMessage("Success");
         response.setData(data);
 
         return ResponseEntity.ok(response);

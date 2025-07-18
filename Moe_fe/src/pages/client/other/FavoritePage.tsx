@@ -95,7 +95,6 @@ export default function FavoritePage() {
     setSelectedPost(postCode);
   }, []);
 
-
   const handleLoadMore = () => {
     if (
       !loading &&
@@ -112,25 +111,36 @@ export default function FavoritePage() {
       <ScrollArea className="flex-1 max-h-full h-screen max-w-3xl w-full p-3 overflow-y-auto overflow-x-hidden relative">
         <div ref={scrollAreaRef} className="h-full overflow-y-auto">
           {/* Header with sort */}
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
-              Favorites
-            </h2>
-            <div className="flex gap-2">
-              <Button
-                variant={sort === "desc" ? "default" : "outline"}
-                onClick={() => handleSortChange("desc")}
-                aria-pressed={sort === "desc"}
-              >
-                Newest First
-              </Button>
-              <Button
-                variant={sort === "asc" ? "default" : "outline"}
-                onClick={() => handleSortChange("asc")}
-                aria-pressed={sort === "asc"}
-              >
-                Oldest First
-              </Button>
+          <div className="bg-zinc-100 dark:bg-zinc-800 rounded-3xl px-6 py-8 mb-6 transform transition-transform duration-300  border border-transparent hover:border-zinc-400 dark:hover:border-zinc-500">
+            <div className="flex flex-col space-y-4">
+              <div>
+                <h2 className="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                  Favourite Posts{" "}
+                  <span className="text-red-500 animate-pulse">❤️</span>
+                </h2>
+                <p className="text-sm text-zinc-600 dark:text-zinc-300 mt-1">
+                  A collection of posts you’ve liked and saved for later.
+                </p>
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant={sort === "desc" ? "default" : "outline"}
+                  onClick={() => handleSortChange("desc")}
+                  aria-pressed={sort === "desc"}
+                  className="rounded-lg px-4 py-2 text-sm"
+                >
+                  Newest First
+                </Button>
+                <Button
+                  variant={sort === "asc" ? "default" : "outline"}
+                  onClick={() => handleSortChange("asc")}
+                  aria-pressed={sort === "asc"}
+                  className="rounded-lg px-4 py-2 text-sm"
+                >
+                  Oldest First
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -205,16 +215,17 @@ export default function FavoritePage() {
           )}
 
           {/* Manual Load More Button for Testing */}
-          {!loading && data?.page != null && data?.totalPages != null && Number(data.page) < Number(data.totalPages) - 1 && (
-            <div className="text-center py-4">
-              <Button onClick={handleLoadMore}>Load More</Button>
-            </div>
-          )}
-
-        
+          {!loading &&
+            data?.page != null &&
+            data?.totalPages != null &&
+            Number(data.page) < Number(data.totalPages) - 1 && (
+              <div className="text-center py-4">
+                <Button onClick={handleLoadMore}>Load More</Button>
+              </div>
+            )}
         </div>
       </ScrollArea>
-        {/* Post modal */}
+      {/* Post modal */}
       {selectedPost && (
         <div className="fixed inset-0 z-50 max-h-screen bg-black/60 backdrop-blur-sm flex items-center justify-center">
           <div className="relative w-full max-h-screen">

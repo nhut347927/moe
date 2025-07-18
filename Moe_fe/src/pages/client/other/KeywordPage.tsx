@@ -93,10 +93,6 @@ export default function KeywordPage() {
     }
   }, [handleScroll]);
 
-  const handlePostClick = useCallback((postCode: string) => {
-    setSelectedPost(postCode);
-  }, []);
-
   const handleLoadMore = () => {
     if (
       !loading &&
@@ -113,25 +109,37 @@ export default function KeywordPage() {
       <ScrollArea className="flex-1 max-h-full h-screen max-w-3xl w-full p-3 overflow-y-auto overflow-x-hidden relative">
         <div ref={scrollAreaRef} className="h-full overflow-y-auto">
           {/* Header with sort */}
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
-              Recent Searches
-            </h2>
-            <div className="flex gap-2">
-              <Button
-                variant={sort === "desc" ? "default" : "outline"}
-                onClick={() => handleSortChange("desc")}
-                aria-pressed={sort === "desc"}
-              >
-                Newest First
-              </Button>
-              <Button
-                variant={sort === "asc" ? "default" : "outline"}
-                onClick={() => handleSortChange("asc")}
-                aria-pressed={sort === "asc"}
-              >
-                Oldest First
-              </Button>
+          <div className="bg-zinc-100 dark:bg-zinc-800 rounded-3xl px-6 py-8 mb-6 transform transition-transform duration-300  border border-transparent hover:border-zinc-400 dark:hover:border-zinc-500">
+            <div className="flex flex-col space-y-4">
+              <div>
+                <h2 className="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                  Search History
+                  <span className="text-blue-500 animate-pulse">🔍</span>
+                </h2>
+                <p className="text-sm text-zinc-600 dark:text-zinc-300 mt-1">
+                  A record of your recent searches to help you revisit what
+                  you’ve explored.
+                </p>
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant={sort === "desc" ? "default" : "outline"}
+                  onClick={() => handleSortChange("desc")}
+                  aria-pressed={sort === "desc"}
+                  className="rounded-lg px-4 py-2 text-sm"
+                >
+                  Newest First
+                </Button>
+                <Button
+                  variant={sort === "asc" ? "default" : "outline"}
+                  onClick={() => handleSortChange("asc")}
+                  aria-pressed={sort === "asc"}
+                  className="rounded-lg px-4 py-2 text-sm"
+                >
+                  Oldest First
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -163,7 +171,9 @@ export default function KeywordPage() {
           <div className="flex flex-col gap-3 mt-4">
             {posts.map((item, index) => (
               <a
-                href={`${window.location.origin}/client/search?q=${encodeURIComponent(item.keyWord)}`}
+                href={`${
+                  window.location.origin
+                }/client/search?q=${encodeURIComponent(item.keyWord)}`}
                 key={index}
                 className="w-full p-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all duration-200 flex flex-col gap-1"
                 target="_blank"

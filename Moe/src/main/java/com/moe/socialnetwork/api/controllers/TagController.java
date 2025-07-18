@@ -35,7 +35,7 @@ public class TagController {
 
         ResponseAPI<List<RPTagDTO>> response = new ResponseAPI<>();
         response.setCode(200);
-        response.setMessage("Tags fetched successfully");
+        response.setMessage("Success");
         response.setData(tagList);
 
         return ResponseEntity.ok(response);
@@ -54,7 +54,7 @@ public class TagController {
 
         ResponseAPI<List<RPTagDTO>> response = new ResponseAPI<>();
         response.setCode(200);
-        response.setMessage("Tags search successful");
+        response.setMessage("Success");
         response.setData(tagList);
 
         return ResponseEntity.ok(response);
@@ -69,7 +69,7 @@ public class TagController {
 
         ResponseAPI<RPTagDTO> response = new ResponseAPI<>();
         response.setCode(200);
-        response.setMessage("Tag created successfully");
+        response.setMessage("Success");
         response.setData(tag);
 
         return ResponseEntity.ok(response);

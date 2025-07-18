@@ -61,7 +61,7 @@ public class PostController {
 
         ResponseAPI<List<RPPostDTO>> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Posts retrieved successfully.");
+        response.setMessage("Success");
         response.setData(posts);
 
         return ResponseEntity.ok(response);
@@ -76,7 +76,7 @@ public class PostController {
 
         ResponseAPI<RPPostDetailDTO> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Post retrieved successfully.");
+        response.setMessage("Success");
         response.setData(post);
 
         return ResponseEntity.ok(response);
@@ -95,7 +95,7 @@ public class PostController {
 
         ResponseAPI<ZRPPageDTO<RPPostSearchDTO>> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Search completed successfully.");
+        response.setMessage("Success");
         response.setData(posts);
 
         return ResponseEntity.ok(response);
@@ -110,7 +110,7 @@ public class PostController {
 
         ResponseAPI<Void> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Post viewed successfully.");
+        response.setMessage("Success");
 
         return ResponseEntity.ok(response);
     }
@@ -124,7 +124,7 @@ public class PostController {
 
         ResponseAPI<Void> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Post liked successfully.");
+        response.setMessage("Success");
 
         return ResponseEntity.ok(response);
     }
@@ -138,7 +138,7 @@ public class PostController {
 
         ResponseAPI<Void> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Post deleted successfully.");
+        response.setMessage("Success");
 
         return ResponseEntity.ok(response);
     }

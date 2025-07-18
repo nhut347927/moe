@@ -39,7 +39,7 @@ public class CommentController {
 
         ResponseAPI<RPCommentDTO> response = new ResponseAPI<>();
         response.setCode(HttpStatus.CREATED.value());
-        response.setMessage("Comment created successfully");
+        response.setMessage("Success");
         response.setData(comment);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -54,7 +54,7 @@ public class CommentController {
 
         ResponseAPI<RPReplyDTO> response = new ResponseAPI<>();
         response.setCode(HttpStatus.CREATED.value());
-        response.setMessage("Reply created successfully");
+        response.setMessage("Success");
         response.setData(reply);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -69,7 +69,7 @@ public class CommentController {
 
         ResponseAPI<Void> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Comment liked successfully");
+        response.setMessage("Success");
         response.setData(null);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -84,7 +84,7 @@ public class CommentController {
 
         ResponseAPI<Void> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Comment deleted successfully");
+        response.setMessage("Success");
         response.setData(null);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -99,7 +99,7 @@ public class CommentController {
 
         ResponseAPI<ZRPPageDTO<RPCommentDTO>> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Comments fetched successfully");
+        response.setMessage("Success");
         response.setData(comments);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -114,7 +114,7 @@ public class CommentController {
 
         ResponseAPI<ZRPPageDTO<RPReplyDTO>> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Replies fetched successfully");
+        response.setMessage("Success");
         response.setData(replies);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);

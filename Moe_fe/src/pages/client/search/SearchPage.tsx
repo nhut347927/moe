@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -10,16 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useToast } from "@/common/hooks/use-toast";
 import axiosInstance from "@/services/axios/AxiosInstance";
-import { getTimeAgo } from "@/common/utils/utils";
 import { AccountSearch, PostSearch, TopSearch } from "../types";
 import { useGetApi } from "@/common/hooks/useGetApi";
-import {
-  ArrowUpLeft,
-  ChevronRight,
-  ImageIcon,
-  Search,
-  Users,
-} from "lucide-react";
+import { ArrowUpLeft, ImageIcon, Search, Users } from "lucide-react";
 import Spinner from "@/components/common/Spiner";
 import PostCompo from "@/components/post/PostCompo";
 import { Page } from "@/common/hooks/type";
@@ -38,6 +31,11 @@ export function SearchPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<"posts" | "accounts">("posts");
   const [selectedPost, setSelectedPost] = useState<string | null>(null);
+  const [searchSugges, setSearchSugges] = useState<string>(""); // giá trị nhập trong input
+  const [debouncedKeyword, setDebouncedKeyword] = useState<string>(""); // keyword đã debounce
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   // Read query parameter 'q' from URL
   useEffect(() => {
@@ -45,6 +43,7 @@ export function SearchPage() {
     if (query && query.trim() !== searchInput) {
       setSearchInput(query.trim());
       setSearchTerm(query.trim());
+      setSearchSugges(query.trim());
       setPostPage(0);
       setAccountPage(0);
       setPosts([]);
@@ -73,7 +72,7 @@ export function SearchPage() {
     Page<PostSearch>
   >({
     endpoint: "posts/search",
-    params: { keyWord: searchTerm, page: postPage, size: 10, sort: "desc" },
+    params: { keyWord: searchTerm, page: postPage, size: 12, sort: "desc" },
     enabled: !!searchTerm && activeTab === "posts",
     onSuccess: (data) => {
       setPosts((prev) =>
@@ -96,7 +95,7 @@ export function SearchPage() {
     Page<AccountSearch>
   >({
     endpoint: "accounts/search",
-    params: { keyWord: searchTerm, page: accountPage, size: 10, sort: "desc" },
+    params: { keyWord: searchTerm, page: accountPage, size: 12, sort: "desc" },
     enabled: !!searchTerm && activeTab === "accounts",
     onSuccess: (data) => {
       setAccounts((prev) =>
@@ -199,12 +198,32 @@ export function SearchPage() {
     }
   }, [postError, accountError]);
 
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [searchSugges, setSearchSugges] = useState<string>("");
-  const {} = useGetApi<string[]>({
+  // Hàm gọi khi người dùng gõ input
+  const searchChange = (q: string) => {
+    setSearchSugges(q);
+  };
+
+  // Debounce input trong 300ms
+  useEffect(() => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
+    debounceRef.current = setTimeout(() => {
+      const trimmed = searchSugges.trim();
+      setDebouncedKeyword(trimmed);
+
+      setSearchInput("");
+      setPosts([]);
+      setAccounts([]);
+    }, 300);
+  }, [searchSugges]);
+
+  // Gọi API suggestions với keyword đã debounce
+  useGetApi<string[]>({
     endpoint: "search/suggestions",
-    params: { keyWord: searchSugges, size: 10 },
-    enabled: true,
+    params: { keyWord: debouncedKeyword, size: 10 },
+    enabled: !!debouncedKeyword, // chỉ gọi khi có từ khóa
     onSuccess: (data) => {
       setSuggestions(data ?? []);
     },
@@ -216,15 +235,9 @@ export function SearchPage() {
     },
   });
 
-  const searchChange = (q: string) => {
-    setSearchSugges(q);
-    if (!searchSugges) {
-      setSearchInput("");
-    }
-  };
   return (
     <div className="relative flex-1 flex justify-center">
-      <ScrollArea className="flex-1 max-h-full h-screen max-w-3xl w-full p-3 overflow-y-auto overflow-x-hidden relative">
+      <ScrollArea className="flex-1 max-h-full h-screen max-w-3xl w-full p-2 overflow-y-auto overflow-x-hidden relative">
         <div className="flex items-center gap-2 p-1 mb-4 mt-12">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
@@ -233,49 +246,49 @@ export function SearchPage() {
               type="search"
               value={searchSugges}
               onChange={(e) => searchChange(e.target.value)}
-              className="w-full h-10 pl-10 pr-4 rounded-xl text-sm"
+              className="w-full h-11 pl-10 pr-4 rounded-2xl text-sm shadow-sm focus:ring-2 focus:ring-primary"
             />
 
-            {(suggestions.length > 0 || searchSugges) && !searchInput && (
-              <ul className="absolute top-full left-0 z-50 mt-1 w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-lg rounded-xl overflow-hidden text-zinc-800 dark:text-zinc-200">
-                <li
-                  onMouseDown={() => {
-                    setSearchInput(searchSugges);
-                    setSuggestions([]);
-                  }}
-                  className="px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-sm cursor-pointer flex items-center justify-between transition-colors"
-                >
-                  {/* Icon Search phía trước + từ khóa */}
-                  <div className="flex items-center gap-2">
-                    <Search className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
-                    <span>{searchSugges}</span>
-                  </div>
-
-                  {/* Icon mũi tên phía sau */}
-                  <ArrowUpLeft className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
-                </li>
-                {suggestions.map((keyword, index) => (
+            {(suggestions.length > 0 || searchSugges.trim()) &&
+              !searchInput &&
+              posts.length === 0 &&
+              accounts.length === 0 && (
+                <ul className="absolute top-full left-0 z-50 mt-2 w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-md rounded-2xl overflow-hidden text-zinc-800 dark:text-zinc-200 animate-fade-in">
+                  {/* Gợi ý từ khoá người dùng đang gõ */}
                   <li
-                    key={index}
-                    onClick={() => {
-                      setSearchInput(keyword);
+                    onMouseDown={() => {
+                      setSearchInput(searchSugges);
                       setSuggestions([]);
-                      setSearchSugges(keyword);
                     }}
                     className="px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-sm cursor-pointer flex items-center justify-between transition-colors"
                   >
-                    {/* Icon Search phía trước + từ khóa */}
-                    <div className="flex items-center gap-2">
-                      <Search className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
-                      <span>{keyword}</span>
+                    <div className="flex items-center gap-2 font-semibold">
+                      <Search className="w-4 h-4 text-primary" />
+                      <span className="text-primary">{searchSugges}</span>
                     </div>
-
-                    {/* Icon mũi tên phía sau */}
                     <ArrowUpLeft className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
                   </li>
-                ))}
-              </ul>
-            )}
+
+                  {/* Gợi ý từ API */}
+                  {suggestions.map((keyword, index) => (
+                    <li
+                      key={index}
+                      onClick={() => {
+                        setSearchInput(keyword);
+                        setSuggestions([]);
+                        setSearchSugges(keyword);
+                      }}
+                      className="px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-sm cursor-pointer flex items-center justify-between transition-colors"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Search className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
+                        <span>{keyword}</span>
+                      </div>
+                      <ArrowUpLeft className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
+                    </li>
+                  ))}
+                </ul>
+              )}
           </div>
         </div>
 
@@ -316,7 +329,12 @@ export function SearchPage() {
                       {topSearch.map((item, index) => (
                         <div
                           key={index}
-                          className="flex items-center justify px-2 py-1"
+                          className="flex items-center justify-between px-2 py-1 cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded"
+                          onClick={() => {
+                            setSearchInput(item.keyword);
+                            setSuggestions([]);
+                            setSearchSugges(item.keyword);
+                          }}
                         >
                           <div className="flex items-center gap-3">
                             <span className="text-xs text-zinc-500 dark:text-zinc-400">
@@ -335,40 +353,40 @@ export function SearchPage() {
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                   {posts.map((post) => (
                     <div
                       key={post.postCode}
-                      className="rounded-2xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+                      className="rounded-xl overflow-hidden cursor-pointer relative group"
                       onClick={() => setSelectedPost(post.postCode)}
                     >
-                      {/* Padding phần ảnh trên */}
-                      <div className="p-4 rounded-t-2xl overflow-hidden">
-                        <div className="relative aspect-square rounded-lg overflow-hidden">
-                          {post.postType === "VID" ? (
-                            <img
-                              src={`https://res.cloudinary.com/dwv76nhoy/video/upload/w_300,so_${
-                                post.videoThumbnail ?? "0"
-                              }/${post.mediaUrl}.jpg`}
-                              alt="post thumbnail"
-                              className="w-full h-full object-cover transform transition-transform duration-300 hover:scale-105"
-                            />
-                          ) : (
-                            <img
-                              src={`https://res.cloudinary.com/dwv76nhoy/image/upload/${post.mediaUrl}`}
-                              alt="post thumbnail"
-                              className="w-full h-full object-cover transform transition-transform duration-300 hover:scale-105"
-                            />
-                          )}
+                      {/* Ảnh với overlay view ở góc dưới trái */}
+                      <div className="relative aspect-square rounded-xl overflow-hidden">
+                        {post.postType === "VID" ? (
+                          <img
+                            src={`https://res.cloudinary.com/dwv76nhoy/video/upload/w_300,so_${
+                              post.videoThumbnail ?? "0"
+                            }/${post.mediaUrl}.jpg`}
+                            alt="post thumbnail"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          <img
+                            src={`https://res.cloudinary.com/dwv76nhoy/image/upload/${post.mediaUrl}`}
+                            alt="post thumbnail"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        )}
 
-                          <div className="absolute bottom-2 left-2 bg-black bg-opacity-60 text-white text-xs px-2 py-0.5 rounded-md select-none shadow-md">
-                            {getTimeAgo(post.createAt)}
-                          </div>
+                        {/* View count góc dưới trái ảnh */}
+                        <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-0.5 rounded select-none">
+                          {post.viewCount} view
+                          {Number(post.viewCount) !== 1 ? "s" : ""}
                         </div>
                       </div>
 
-                      {/* Padding phần nội dung dưới */}
-                      <div className="px-4 py-3 space-y-1">
+                      {/* Nội dung bên dưới ảnh */}
+                      <div className="mt-2 px-1 overflow-hidden">
                         <p
                           className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate"
                           title={post.title}
@@ -376,8 +394,8 @@ export function SearchPage() {
                           {post.title || "Untitled"}
                         </p>
 
-                        <div className="flex items-center gap-3">
-                          <Avatar className="w-7 h-7 shrink-0 border-2 border-zinc-300 dark:border-zinc-700">
+                        <div className="flex items-center gap-2 mt-1 text-xs text-zinc-700 dark:text-zinc-300 truncate">
+                          <Avatar className="w-6 h-6 border border-zinc-300 dark:border-zinc-700">
                             <AvatarImage
                               src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_40,h_40,c_thumb,f_auto,q_auto/${post.avatarUrl}`}
                               alt={post.displayName}
@@ -387,18 +405,15 @@ export function SearchPage() {
                             </AvatarFallback>
                           </Avatar>
 
-                          <div className="flex flex-col flex-grow overflow-hidden">
-                            <span
-                              className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate"
-                              title={post.displayName}
-                            >
-                              {post.displayName}
-                            </span>
-                          </div>
+                          <span
+                            className="font-medium truncate max-w-[100px]"
+                            title={post.displayName}
+                          >
+                            {post.displayName}
+                          </span>
 
-                          <span className="text-xs text-zinc-500 dark:text-zinc-400 whitespace-nowrap">
-                            {post.viewCount} view
-                            {Number(post.viewCount) !== 1 ? "s" : ""}
+                          <span className="whitespace-nowrap ms-auto">
+                            {new Date(post.createAt).toLocaleDateString()}
                           </span>
                         </div>
                       </div>
@@ -406,20 +421,20 @@ export function SearchPage() {
                   ))}
 
                   {hasMorePosts && (
-                    <div className="col-span-2 text-center mt-4">
+                    <div className="col-span-3 text-center mt-4">
                       <Button
                         variant="outline"
                         onClick={handleLoadMorePosts}
                         disabled={isLoading}
                         className="px-4 py-1.5 my-6 text-sm rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
                       >
-                        Load more
+                        {isLoading?"Loading":"Load more"}
                       </Button>
                     </div>
                   )}
                 </div>
               )}
-              {isLoading && (
+              {isLoading&&!posts && (
                 <div className="w-full min-h-[300px] flex flex-col items-center justify-center text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <Spinner className="h-5 w-5 animate-spin" />
@@ -445,7 +460,12 @@ export function SearchPage() {
                       {topSearch.map((item, index) => (
                         <div
                           key={index}
-                          className="flex items-center justify px-2 py-1"
+                          className="flex items-center justify-between px-2 py-1 cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded"
+                          onClick={() => {
+                            setSearchInput(item.keyword);
+                            setSuggestions([]);
+                            setSearchSugges(item.keyword);
+                          }}
                         >
                           <div className="flex items-center gap-3">
                             <span className="text-xs text-zinc-500 dark:text-zinc-400">
@@ -520,13 +540,13 @@ export function SearchPage() {
                         disabled={isLoading}
                         className="px-4 py-1.5 my-6 text-sm rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
                       >
-                        Load more
+                         {isLoading?"Loading":"Load more"}
                       </Button>
                     </div>
                   )}
                 </div>
               )}
-              {isLoading && (
+              {isLoading&&!accounts && (
                 <div className="w-full min-h-[300px] flex flex-col items-center justify-center text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <Spinner className="h-5 w-5 animate-spin" />
@@ -537,22 +557,22 @@ export function SearchPage() {
             </div>
           </TabsContent>
         </Tabs>
-
-        {selectedPost && (
-          <div className="fixed inset-0 z-50 max-h-screen bg-black/60 backdrop-blur-sm flex items-center justify-center">
-            <div className="relative w-full max-h-screen max-w-lg">
-              <button
-                className="absolute top-4 right-4 z-50 w-8 h-8 flex items-center justify-center bg-zinc-200 text-zinc-600 rounded-full hover:bg-zinc-300 hover:text-zinc-900 dark:bg-slate-700 dark:text-zinc-300 dark:hover:bg-slate-600 dark:hover:text-white transition-colors duration-200"
-                onClick={() => setSelectedPost(null)}
-                aria-label="Close post"
-              >
-                ✕
-              </button>
-              <PostCompo postCode={selectedPost} />
-            </div>
-          </div>
-        )}
       </ScrollArea>
+      {/* Post Modal */}
+      {selectedPost && (
+        <div className="fixed inset-0 z-50 max-h-screen bg-black/60 backdrop-blur-sm flex items-center justify-center">
+          <div className="relative w-full max-h-screen">
+            <button
+              className="absolute top-4 right-4 z-50 w-8 h-8 flex items-center justify-center bg-zinc-200 text-zinc-600 rounded-full hover:bg-zinc-300 hover:text-zinc-900 dark:bg-slate-700 dark:text-zinc-300 dark:hover:bg-slate-600 dark:hover:text-white transition-colors duration-200"
+              onClick={() => setSelectedPost(null)}
+              aria-label="Close post"
+            >
+              ✕
+            </button>
+            <PostCompo postCode={selectedPost} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

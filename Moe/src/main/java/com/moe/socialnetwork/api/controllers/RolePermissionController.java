@@ -33,7 +33,7 @@ public class RolePermissionController {
 
         ResponseAPI<List<RPRolePermissionDTO>> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Permissions retrieved successfully.");
+        response.setMessage("Success");
         response.setData(permissions);
 
         return ResponseEntity.ok(response);
@@ -47,7 +47,7 @@ public class RolePermissionController {
 
         ResponseAPI<String> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Permissions updated successfully.");
+        response.setMessage("Success");
         response.setData("OK");
 
         return ResponseEntity.ok(response);
@@ -61,7 +61,7 @@ public class RolePermissionController {
 
         ResponseAPI<String> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Permission deleted successfully.");
+        response.setMessage("Success");
         response.setData("OK");
 
         return ResponseEntity.ok(response);

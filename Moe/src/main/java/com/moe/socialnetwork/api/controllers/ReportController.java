@@ -38,7 +38,7 @@ public class ReportController {
 
         ResponseAPI<Void> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Report created successfully");
+        response.setMessage("Success");
         response.setData(null);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);

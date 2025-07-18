@@ -97,7 +97,7 @@ const PostVideo = forwardRef<HTMLDivElement, PostVideoProps>(
       const progressBar = progressBarRef.current;
       const video = videoRef.current;
       if (!progressBar || !video || !video.duration) {
-      //  console.error("Missing progressBar, video, or duration");
+        //  console.error("Missing progressBar, video, or duration");
         return;
       }
 
@@ -178,11 +178,11 @@ const PostVideo = forwardRef<HTMLDivElement, PostVideoProps>(
             >
               {showDetailedProgress && (
                 <div className="w-full flex items-center justify-center gap-2 mb-2">
-                  <strong className="text-sm text-zinc-800 dark:text-white">
+                  <strong className="text-sm text-white">
                     {formatTime(videoRef.current?.currentTime || 0)}
                   </strong>
                   /
-                  <strong className="text-sm text-zinc-800 dark:text-white">
+                  <strong className="text-sm text-white">
                     {formatTime(videoRef.current?.duration || 0)}
                   </strong>
                 </div>
@@ -192,16 +192,16 @@ const PostVideo = forwardRef<HTMLDivElement, PostVideoProps>(
                 className={`w-full ${
                   showDetailedProgress ? "h-3" : "h-0.5"
                 } rounded-full cursor-pointer transition-all duration-100
-      bg-zinc-300 dark:bg-white/30 hover:bg-zinc-400 dark:hover:bg-white/50`}
+  bg-zinc-300 dark:bg-white/10 hover:bg-zinc-400 dark:hover:bg-white/30`}
                 style={{ pointerEvents: "auto" }}
               >
                 <div
                   className={`h-full rounded-full transition-all duration-75 
-        ${
-          showDetailedProgress
-            ? "bg-zinc-800 dark:bg-white"
-            : "bg-zinc-500 dark:bg-white/30"
-        }`}
+    ${
+      showDetailedProgress
+        ? "bg-zinc-50 dark:bg-white"
+        : "bg-zinc-950/30 dark:bg-white/10"
+    }`}
                   style={{ width: `${progress}%` }}
                 />
               </div>

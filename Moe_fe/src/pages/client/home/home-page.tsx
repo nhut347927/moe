@@ -262,8 +262,8 @@ export default function HomePage() {
         ))}
       </div>
 
-      <div className="z-30 absolute bottom-2 left-0 right-0 px-4 flex items-end justify-between">
-        <div className="mb-2 max-w-full flex items-center space-x-3">
+      <div className="z-30 pointer-events-none absolute bottom-2 left-0 right-0 px-4 flex items-end justify-between">
+        <div className="pointer-events-auto mb-2 max-w-full flex items-center space-x-3">
           <Link
             to={`/client/profile?code=${
               postData[currentIndex.current]?.userCode

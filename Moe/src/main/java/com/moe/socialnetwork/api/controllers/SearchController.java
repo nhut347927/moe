@@ -38,7 +38,7 @@ public class SearchController {
 
         ResponseAPI<List<String>> response = new ResponseAPI<>();
         response.setCode(200);
-        response.setMessage("Keyword suggestions fetched successfully");
+        response.setMessage("Success");
         response.setData(data);
 
         return ResponseEntity.ok(response);
@@ -50,7 +50,7 @@ public class SearchController {
 
         ResponseAPI<List<RPKeywordCountDTO>> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Lấy top từ khoá thành công");
+        response.setMessage("Success");
         response.setData(result);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -65,7 +65,7 @@ public class SearchController {
 
     // ResponseAPI<Void> response = new ResponseAPI<>();
     // response.setCode(HttpStatus.OK.value());
-    // response.setMessage("Thêm từ khoá thành công");
+    // response.setMessage("Success");
     // response.setData(null);
 
     // return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -78,7 +78,7 @@ public class SearchController {
 
         ResponseAPI<Void> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
-        response.setMessage("Xoá từ khoá thành công");
+        response.setMessage("Success");
         response.setData(null);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);

@@ -3,14 +3,12 @@ import React, { Suspense } from "react";
 
 import LoadingSpinner from "../components/common/LoadingSpinnerWithIcon";
 import NotFound from "@/components/common/NotFound";
-import ManageSongs from "@/pages/admin/ManageSongs";
 import ManageUsers from "@/pages/admin/ManageUsers";
 import ChangePassword from "@/pages/auth/ChangePassword";
 import ForgotPassword from "@/pages/auth/ForgotPassword";
 import ResetPassword from "@/pages/auth/ResetPassword";
 import Home from "@/pages/client/home/home-page";
 import { SearchPage } from "@/pages/client/search/SearchPage";
-
 import { ProfilePage } from "@/pages/client/profile/ProfilePage";
 import KeepAlive from "react-activation";
 import UploadPage from "@/pages/client/upload/UploadPage";
@@ -69,7 +67,6 @@ const AppRoutes = () => {
           <Route index element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="users" element={<ManageUsers />} />
-          <Route path="songs" element={<ManageSongs />} />
           <Route path="*" element={<NotFound />} />
         </Route>
 

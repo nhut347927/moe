@@ -53,10 +53,10 @@ export default function Login() {
         email: values.email,
         password: values.password,
       });
-      Cookies.set("accessToken_fe", response.data.data.accessToken, { expires: 1 });
-      Cookies.set("refreshToken_fe", response.data.data.refreshToken, {
-        expires: 180,
-      });
+      // Cookies.set("accessToken_fe", response.data.data.accessToken, { expires: 1 });
+      // Cookies.set("refreshToken_fe", response.data.data.refreshToken, {
+      //   expires: 180,
+      // });
       Cookies.set("avatar", response.data.data.user.profilePictureUrl);
       toast({
         variant: "default",
