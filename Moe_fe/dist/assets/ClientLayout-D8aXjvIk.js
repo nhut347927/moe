@@ -1,1 +1,0 @@
-import{j as s,O as e}from"./index-BUxin4Fp.js";import{T as r}from"./toaster-S_3FkfTf.js";import{H as t}from"./Header-CIpENYPV.js";const l=()=>s.jsxs("div",{className:"w-full h-screen bg-white dark:bg-black overflow-hidden",children:[s.jsx(r,{}),s.jsx(t,{}),s.jsx(e,{})]});export{l as default};

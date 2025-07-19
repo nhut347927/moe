@@ -1,5 +1,5 @@
-import { Outlet } from "react-router-dom";
-import { useState } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Bell,
@@ -29,8 +29,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/common/utils/utils";
-import logo from"../assets/images/logo.png"
-
+import logo from "../assets/images/logo.png";
+import { Toaster } from "@/components/ui/toaster";
 
 // Sample data for sidebar navigation
 const sidebarItems = [
@@ -38,10 +38,13 @@ const sidebarItems = [
     title: "Home",
     icon: <Home />,
     isActive: true,
+    path: "/admin/home",
   },
   {
     title: "Activity Log",
     icon: <FileClock />,
+    isActive: false,
+    path: "/admin/activity-log",
   },
   {
     title: "App",
@@ -53,6 +56,8 @@ const sidebarItems = [
       { title: "Updates", url: "#", badge: "2" },
       { title: "Installed", url: "#" },
     ],
+    path: "/admin/app",
+    isActive: false,
   },
 ];
 
@@ -60,10 +65,40 @@ const AdminLayout = () => {
   const [notifications] = useState(5);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>(
     {}
   );
 
+  // Mảng sidebar items (bỏ isActive cứng)
+  const sidebarItems = [
+    {
+      title: "Home",
+      icon: <Home />,
+      path: "/admin/home",
+    },
+    {
+      title: "Activity Log",
+      icon: <FileClock />,
+      path: "/admin/activity-log",
+    },
+    {
+      title: "App",
+      icon: <Grid />,
+      badge: "2",
+      items: [
+        { title: "All Apps", url: "/admin/app/all" },
+        { title: "Recent", url: "/admin/app/recent" },
+        { title: "Updates", url: "/admin/app/updates", badge: "2" },
+        { title: "Installed", url: "/admin/app/installed" },
+      ],
+      path: "/admin/app",
+    },
+  ];
+
+  // Hàm toggle expanded menu
   const toggleExpanded = (title: string) => {
     setExpandedItems((prev) => ({
       ...prev,
@@ -71,6 +106,18 @@ const AdminLayout = () => {
     }));
   };
 
+  // Kiểm tra xem item có active không dựa trên location.pathname
+  const isActive = (item: (typeof sidebarItems)[number]) => {
+    // Nếu item có path thì so sánh trực tiếp
+    if (item.path && location.pathname.startsWith(item.path)) return true;
+
+    // Nếu có sub items thì kiểm tra xem có cái nào active ko
+    if (item.items) {
+      return item.items.some((sub) => location.pathname.startsWith(sub.url));
+    }
+
+    return false;
+  };
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
       {/* Animated gradient background */}
@@ -137,62 +184,80 @@ const AdminLayout = () => {
 
           <ScrollArea className="flex-1 px-3 py-2">
             <div className="space-y-1">
-              {sidebarItems.map((item) => (
-                <div key={item.title} className="mb-1">
-                  <button
-                    className={cn(
-                      "flex w-full items-center justify-between rounded-2xl px-3 py-2 text-sm font-medium",
-                      item.isActive
-                        ? "bg-primary/10 text-primary"
-                        : "hover:bg-muted"
-                    )}
-                    onClick={() => item.items && toggleExpanded(item.title)}
-                  >
-                    <div className="flex items-center gap-3">
-                      {item.icon}
-                      <span>{item.title}</span>
-                    </div>
-                    {item.badge && (
-                      <Badge
-                        variant="outline"
-                        className="ml-auto rounded-full px-2 py-0.5 text-xs"
-                      >
-                        {item.badge}
-                      </Badge>
-                    )}
-                    {item.items && (
-                      <ChevronDown
-                        className={cn(
-                          "ml-2 h-4 w-4 transition-transform",
-                          expandedItems[item.title] ? "rotate-180" : ""
-                        )}
-                      />
-                    )}
-                  </button>
+              {sidebarItems.map((item) => {
+                const active = isActive(item);
 
-                  {item.items && expandedItems[item.title] && (
-                    <div className="mt-1 ml-6 space-y-1 border-l pl-3">
-                      {item.items.map((subItem) => (
-                        <a
-                          key={subItem.title}
-                          href={subItem.url}
-                          className="flex items-center justify-between rounded-2xl px-3 py-2 text-sm hover:bg-muted"
+                return (
+                  <div key={item.title} className="mb-1">
+                    <button
+                      className={cn(
+                        "flex w-full items-center justify-between rounded-2xl px-3 py-2 text-sm font-medium",
+                        active ? "bg-primary/10 text-primary" : "hover:bg-muted"
+                      )}
+                      onClick={() => {
+                        if (item.items) {
+                          toggleExpanded(item.title);
+                        } else if (item.path) {
+                          navigate(item.path);
+                        }
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        {item.icon}
+                        <span>{item.title}</span>
+                      </div>
+                      {item.badge && (
+                        <Badge
+                          variant="outline"
+                          className="ml-auto rounded-full px-2 py-0.5 text-xs"
                         >
-                          {subItem.title}
-                          {subItem.badge && (
-                            <Badge
-                              variant="outline"
-                              className="ml-auto rounded-full px-2 py-0.5 text-xs"
-                            >
-                              {subItem.badge}
-                            </Badge>
+                          {item.badge}
+                        </Badge>
+                      )}
+                      {item.items && (
+                        <ChevronDown
+                          className={cn(
+                            "ml-2 h-4 w-4 transition-transform",
+                            expandedItems[item.title] ? "rotate-180" : ""
                           )}
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
+                        />
+                      )}
+                    </button>
+
+                    {item.items && expandedItems[item.title] && (
+                      <div className="mt-1 ml-6 space-y-1 border-l pl-3">
+                        {item.items.map((subItem) => {
+                          const subActive = location.pathname.startsWith(
+                            subItem.url
+                          );
+                          return (
+                            <a
+                              key={subItem.title}
+                              href={subItem.url}
+                              className={cn(
+                                "flex items-center justify-between rounded-2xl px-3 py-2 text-sm",
+                                subActive
+                                  ? "bg-primary/10 text-primary"
+                                  : "hover:bg-muted"
+                              )}
+                            >
+                              {subItem.title}
+                              {subItem.badge && (
+                                <Badge
+                                  variant="outline"
+                                  className="ml-auto rounded-full px-2 py-0.5 text-xs"
+                                >
+                                  {subItem.badge}
+                                </Badge>
+                              )}
+                            </a>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </ScrollArea>
 
@@ -232,7 +297,7 @@ const AdminLayout = () => {
         <div className="flex h-full flex-col">
           <div className="p-4">
             <div className="flex items-center gap-3">
-             <img className="w-9" src={logo} alt="" />
+              <img className="w-9" src={logo} alt="" />
               <div>
                 <h2 className="font-semibold">MOE</h2>
                 <p className="text-xs text-muted-foreground">Social network</p>
@@ -253,62 +318,80 @@ const AdminLayout = () => {
 
           <ScrollArea className="flex-1 px-3 py-2">
             <div className="space-y-1">
-              {sidebarItems.map((item) => (
-                <div key={item.title} className="mb-1">
-                  <button
-                    className={cn(
-                      "flex w-full items-center justify-between rounded-2xl px-3 py-2 text-sm font-medium",
-                      item.isActive
-                        ? "bg-primary/10 text-primary"
-                        : "hover:bg-muted"
-                    )}
-                    onClick={() => item.items && toggleExpanded(item.title)}
-                  >
-                    <div className="flex items-center gap-3">
-                      {item.icon}
-                      <span>{item.title}</span>
-                    </div>
-                    {item.badge && (
-                      <Badge
-                        variant="outline"
-                        className="ml-auto rounded-full px-2 py-0.5 text-xs"
-                      >
-                        {item.badge}
-                      </Badge>
-                    )}
-                    {item.items && (
-                      <ChevronDown
-                        className={cn(
-                          "ml-2 h-4 w-4 transition-transform",
-                          expandedItems[item.title] ? "rotate-180" : ""
-                        )}
-                      />
-                    )}
-                  </button>
+              {sidebarItems.map((item) => {
+                const active = isActive(item);
 
-                  {item.items && expandedItems[item.title] && (
-                    <div className="mt-1 ml-6 space-y-1 border-l pl-3">
-                      {item.items.map((subItem) => (
-                        <a
-                          key={subItem.title}
-                          href={subItem.url}
-                          className="flex items-center justify-between rounded-2xl px-3 py-2 text-sm hover:bg-muted"
+                return (
+                  <div key={item.title} className="mb-1">
+                    <button
+                      className={cn(
+                        "flex w-full items-center justify-between rounded-2xl px-3 py-2 text-sm font-medium",
+                        active ? "bg-primary/10 text-primary" : "hover:bg-muted"
+                      )}
+                      onClick={() => {
+                        if (item.items) {
+                          toggleExpanded(item.title);
+                        } else if (item.path) {
+                          navigate(item.path);
+                        }
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        {item.icon}
+                        <span>{item.title}</span>
+                      </div>
+                      {item.badge && (
+                        <Badge
+                          variant="outline"
+                          className="ml-auto rounded-full px-2 py-0.5 text-xs"
                         >
-                          {subItem.title}
-                          {subItem.badge && (
-                            <Badge
-                              variant="outline"
-                              className="ml-auto rounded-full px-2 py-0.5 text-xs"
-                            >
-                              {subItem.badge}
-                            </Badge>
+                          {item.badge}
+                        </Badge>
+                      )}
+                      {item.items && (
+                        <ChevronDown
+                          className={cn(
+                            "ml-2 h-4 w-4 transition-transform",
+                            expandedItems[item.title] ? "rotate-180" : ""
                           )}
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
+                        />
+                      )}
+                    </button>
+
+                    {item.items && expandedItems[item.title] && (
+                      <div className="mt-1 ml-6 space-y-1 border-l pl-3">
+                        {item.items.map((subItem) => {
+                          const subActive = location.pathname.startsWith(
+                            subItem.url
+                          );
+                          return (
+                            <a
+                              key={subItem.title}
+                              href={subItem.url}
+                              className={cn(
+                                "flex items-center justify-between rounded-2xl px-3 py-2 text-sm",
+                                subActive
+                                  ? "bg-primary/10 text-primary"
+                                  : "hover:bg-muted"
+                              )}
+                            >
+                              {subItem.title}
+                              {subItem.badge && (
+                                <Badge
+                                  variant="outline"
+                                  className="ml-auto rounded-full px-2 py-0.5 text-xs"
+                                >
+                                  {subItem.badge}
+                                </Badge>
+                              )}
+                            </a>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </ScrollArea>
 
@@ -426,6 +509,8 @@ const AdminLayout = () => {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
+              {" "}
+              <Toaster />
               <Outlet />
             </motion.div>
           </AnimatePresence>

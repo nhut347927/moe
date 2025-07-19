@@ -6,6 +6,7 @@ import {
   forwardRef,
 } from "react";
 import { Play } from "lucide-react";
+import SlideVideo from "@/components/slide/SlideVideo";
 
 export interface PostVideoProps {
   videoSrc: string;
@@ -24,7 +25,7 @@ const PostVideo = forwardRef<HTMLDivElement, PostVideoProps>(
     const [isDragging, setIsDragging] = useState(false);
     const [showDetailedProgress, setShowDetailedProgress] = useState(false);
     const lastClickTime = useRef<number>(0);
-
+  const [showSlider, setShowSlider] = useState<boolean>(false);
     useImperativeHandle(ref, () => containerRef.current as HTMLDivElement);
 
     useEffect(() => {
@@ -215,6 +216,13 @@ const PostVideo = forwardRef<HTMLDivElement, PostVideoProps>(
             </div>
           </div>
         </div>
+         {videoSrc && (
+            <SlideVideo
+              video={videoSrc}
+              showSlider={showSlider}
+              setShowSlider={setShowSlider}
+            />
+          )}
       </div>
     );
   }

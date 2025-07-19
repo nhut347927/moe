@@ -1,17 +1,25 @@
 package com.moe.socialnetwork.api.services.impl;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
+import com.moe.socialnetwork.api.dtos.RPActivityLogDTO;
+import com.moe.socialnetwork.api.dtos.ZRPPageDTO;
+import com.moe.socialnetwork.api.services.IActivityLogService;
 import com.moe.socialnetwork.jpa.ActivityLogJPA;
 import com.moe.socialnetwork.models.ActivityLog;
 import com.moe.socialnetwork.models.User;
+import com.moe.socialnetwork.util.PaginationUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -19,15 +27,29 @@ import jakarta.servlet.http.HttpServletRequest;
  * Author: nhutnm379
  */
 @Service
-public class ActivityLogServiceImpl {
+public class ActivityLogServiceImpl implements IActivityLogService {
     private static final Logger logger = LoggerFactory.getLogger(ActivityLogServiceImpl.class);
-    private static final int MAX_BODY_LENGTH = 1024; // Limit request body size
+    private static final int MAX_BODY_LENGTH = 3000; // Limit request body size
     private static final String DEFAULT_RESPONSE_CODE = "200"; // Default for successful requests
 
     private final ActivityLogJPA activityLogJPA;
 
     public ActivityLogServiceImpl(ActivityLogJPA activityLogJPA) {
         this.activityLogJPA = activityLogJPA;
+    }
+
+    public ZRPPageDTO<RPActivityLogDTO> getLog(String query, int page, int size, String sort) {
+        Pageable pageable = PaginationUtils.buildPageable(page, size, sort);
+        Page<ActivityLog> searchPage = activityLogJPA.searchLogs(query, pageable);
+
+        List<RPActivityLogDTO> contents = searchPage.stream()
+                .map(s -> new RPActivityLogDTO(s.getCode(), s.getType(), s.getIp(),
+                        s.getResponseCode(), s.getMessage(), s.getError(), s.getData(),
+                        s.getUser() != null ? s.getUser().getCode().toString() : null,
+                        s.getCreatedAt().toString()))
+                .collect(Collectors.toList());
+
+        return PaginationUtils.buildPageDTO(searchPage, contents);
     }
 
     public void logActivity(User user, String message, String error, String code, String data) {
@@ -55,15 +77,7 @@ public class ActivityLogServiceImpl {
             if (attributes != null) {
                 HttpServletRequest request = attributes.getRequest();
                 enrichLogWithRequestDetails(log, request);
-            } else {
-                logger.warn("No HTTP request context available for logging activity for user: {}",
-                        user != null ? user.getId() : "null");
-                log.setMessage("[NON-HTTP] " + message);
-                log.setType("NON-HTTP");
-                log.setIp("0.0.0.0");
-                log.setResponseCode(DEFAULT_RESPONSE_CODE);
             }
-
             // Sanitize sensitive data
             sanitizeLogData(log);
 

@@ -7,7 +7,7 @@ import HashtagSearch from "@/pages/client/upload/item/HashtagSearch";
 import MediaUpload from "./item/MediaUpload";
 import FormCreatePost from "./item/FormCreatePost";
 import { useState } from "react";
-import Slide from "@/components/slide/Slide";
+import Slide from "@/components/slide/SlideImage";
 import { SoundSelector } from "./item/SoundSelector";
 import axiosInstance from "@/services/axios/AxiosInstance";
 import { PostCreateForm } from "../types";

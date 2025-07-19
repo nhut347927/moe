@@ -7,6 +7,7 @@ import {
 } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
+import Slide from "@/components/slide/SlideImage";
 
 interface PostMultiImgProps {
   images: string[];
@@ -26,7 +27,7 @@ const PostMultiImg = forwardRef<HTMLDivElement, PostMultiImgProps>(
     // const [isMuted, setIsMuted] = useState(initialMuted);
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
-
+    const [showSlider, setShowSlider] = useState<boolean>(false);
     useImperativeHandle(ref, () => containerRef.current as HTMLDivElement);
 
     const nextImage = () => {
@@ -90,6 +91,7 @@ const PostMultiImg = forwardRef<HTMLDivElement, PostMultiImgProps>(
             // onHoverEnd={() => setIsHovered(false)}
             className="relative max-h-screen h-full flex justify-center items-center overflow-hidden cursor-pointer"
             onClick={toggleAudio}
+            onDoubleClick={() => setShowSlider(true)}
           >
             <motion.img
               key={currentImageIndex}
@@ -128,10 +130,8 @@ const PostMultiImg = forwardRef<HTMLDivElement, PostMultiImgProps>(
               ""
             ) : (
               <div className="z-40 absolute flex items-center justify-center text-white space-x-3">
-                <button
-                  onClick={toggleAudio}
-                >
-               <Play size={48} className="text-white" />
+                <button onClick={toggleAudio}>
+                  <Play size={48} className="text-white" />
                 </button>
               </div>
             )}
@@ -165,6 +165,13 @@ const PostMultiImg = forwardRef<HTMLDivElement, PostMultiImgProps>(
             }}
           />
         </div>
+        {images && (
+          <Slide
+            images={images}
+            showSlider={showSlider}
+            setShowSlider={setShowSlider}
+          />
+        )}
       </div>
     );
   }

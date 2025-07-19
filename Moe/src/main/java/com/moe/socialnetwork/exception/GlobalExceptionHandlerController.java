@@ -10,7 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import com.moe.socialnetwork.api.services.impl.ActivityLogServiceImpl;
+import com.moe.socialnetwork.api.services.IActivityLogService;
 import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.response.ResponseAPI;
 
@@ -19,9 +19,9 @@ import com.moe.socialnetwork.response.ResponseAPI;
  */
 @ControllerAdvice
 public class GlobalExceptionHandlerController {
-    private final ActivityLogServiceImpl activityLogService;
+    private final IActivityLogService activityLogService;
 
-    public GlobalExceptionHandlerController(ActivityLogServiceImpl activityLogService) {
+    public GlobalExceptionHandlerController(IActivityLogService activityLogService) {
         this.activityLogService = activityLogService;
     }
 

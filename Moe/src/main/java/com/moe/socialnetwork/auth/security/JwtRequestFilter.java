@@ -12,7 +12,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.moe.socialnetwork.api.services.IActivityLogService;
 import com.moe.socialnetwork.api.services.impl.ActivityLogServiceImpl;
+import com.moe.socialnetwork.auth.active.UserActivityContextService;
 import com.moe.socialnetwork.auth.services.impl.TokenServiceImpl;
 import com.moe.socialnetwork.models.User;
 import com.moe.socialnetwork.response.ResponseAPI;
@@ -34,13 +36,16 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final TokenServiceImpl tokenService;
 
-    private final ActivityLogServiceImpl activityLogService;
+    private final IActivityLogService activityLogService;
+
+    private final UserActivityContextService userActivityContextService;
 
     public JwtRequestFilter(CustomUserDetailsService userDetailsService, TokenServiceImpl tokenService,
-            ActivityLogServiceImpl activityLogService) {
+            IActivityLogService activityLogService, UserActivityContextService userActivityContextService) {
         this.userDetailsService = userDetailsService;
         this.tokenService = tokenService;
         this.activityLogService = activityLogService;
+        this.userActivityContextService = userActivityContextService;
     }
 
     @Override
@@ -186,12 +191,40 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     private void logFailure(User user, String message, String error, String statusCode, HttpServletRequest req) {
         String query = getQueryOrBody(req);
-        activityLogService.logActivity(user, message, error, statusCode, query);
+        String path = req.getRequestURI();
+        // Lấy địa chỉ IP
+        String ip = req.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty()) {
+            ip = req.getRemoteAddr();
+        }
+
+        if (!(path.startsWith("/api/logs") || path.startsWith("/api/logs/active-users"))) {
+            activityLogService.logActivity(user, message, error, statusCode, query);
+        }
+
+        // Gắn IP vào message để ghi lại
+        String fullMessage = String.format("[%s] %s", ip, message);
+
+        userActivityContextService.addUserActivity(user.getCode().toString(), user.getDisplayName(), fullMessage);
     }
 
     private void logSuccess(User user, String message, HttpServletRequest req) {
         String query = getQueryOrBody(req);
-        activityLogService.logActivity(user, message, null, "200", query);
+        String path = req.getRequestURI();
+        // Lấy địa chỉ IP
+        String ip = req.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty()) {
+            ip = req.getRemoteAddr();
+        }
+
+        if (!(path.startsWith("/api/logs") || path.startsWith("/api/logs/active-users"))) {
+            activityLogService.logActivity(user, message, null, "200", query);
+        }
+
+        // Gắn IP vào message để ghi lại
+        String fullMessage = String.format("[%s] %s", ip, message);
+
+        userActivityContextService.addUserActivity(user.getCode().toString(), user.getDisplayName(), fullMessage);
     }
 
     private String getQueryOrBody(HttpServletRequest request) {

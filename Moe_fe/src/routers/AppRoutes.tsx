@@ -3,7 +3,6 @@ import React, { Suspense } from "react";
 
 import LoadingSpinner from "../components/common/LoadingSpinnerWithIcon";
 import NotFound from "@/components/common/NotFound";
-import ManageUsers from "@/pages/admin/ManageUsers";
 import ChangePassword from "@/pages/auth/ChangePassword";
 import ForgotPassword from "@/pages/auth/ForgotPassword";
 import ResetPassword from "@/pages/auth/ResetPassword";
@@ -13,7 +12,7 @@ import { ProfilePage } from "@/pages/client/profile/ProfilePage";
 import KeepAlive from "react-activation";
 import UploadPage from "@/pages/client/upload/UploadPage";
 import AboutPage from "@/pages/client/about/AboutPage";
-import Dashboard from "@/pages/admin/Dashboard";
+import Dashboard from "@/pages/admin/home/DashboardPage";
 import Login from "@/pages/auth/Login";
 import Register from "@/pages/auth/Register";
 import AudioPage from "@/pages/client/other/AudioPage";
@@ -21,6 +20,7 @@ import ViewHistoryPage from "@/pages/client/other/ViewHistory";
 import FavoritePage from "@/pages/client/other/FavoritePage";
 import CommentPage from "@/pages/client/other/CommentPage";
 import KeywordPage from "@/pages/client/other/KeywordPage";
+import ActivityLogPage from "@/pages/admin/log/ActivityLogPage";
 // Lazy load layouts
 const ClientLayout = React.lazy(() => import("./ClientLayout"));
 const AuthLayout = React.lazy(() => import("./AuthLayout"));
@@ -65,8 +65,22 @@ const AppRoutes = () => {
         {/* ADMIN ROUTES */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="users" element={<ManageUsers />} />
+          <Route
+            path="home"
+            element={
+              <KeepAlive id="home">
+                <Dashboard />
+              </KeepAlive>
+            }
+          />
+          <Route
+            path="activity-log"
+            element={
+              <KeepAlive id="activity-log">
+                <ActivityLogPage />
+              </KeepAlive>
+            }
+          />
           <Route path="*" element={<NotFound />} />
         </Route>
 

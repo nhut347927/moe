@@ -1,1 +1,0 @@
-import{j as s,O as t}from"./index-BUxin4Fp.js";import{T as r}from"./toaster-S_3FkfTf.js";const o=()=>s.jsxs("div",{className:"w-full h-screen",children:[s.jsx(t,{})," ",s.jsx(r,{})]});export{o as default};
