@@ -188,7 +188,7 @@ export default function Header() {
                   <AvatarImage
                     src={
                       avatar
-                        ? `https://res.cloudinary.com/dwv76nhoy/image/upload/w_80,h_80/${avatar}`
+                        ? `https://res.cloudinary.com/dazttnakn/image/upload/w_80,h_80/${avatar}`
                         : undefined
                     }
                   />

@@ -364,7 +364,7 @@ export function SearchPage() {
                       <div className="relative aspect-square rounded-xl overflow-hidden">
                         {post.postType === "VID" ? (
                           <img
-                            src={`https://res.cloudinary.com/dwv76nhoy/video/upload/w_300,so_${
+                            src={`https://res.cloudinary.com/dazttnakn/video/upload/w_300,so_${
                               post.videoThumbnail ?? "0"
                             }/${post.mediaUrl}.jpg`}
                             alt="post thumbnail"
@@ -372,7 +372,7 @@ export function SearchPage() {
                           />
                         ) : (
                           <img
-                            src={`https://res.cloudinary.com/dwv76nhoy/image/upload/${post.mediaUrl}`}
+                            src={`https://res.cloudinary.com/dazttnakn/image/upload/${post.mediaUrl}`}
                             alt="post thumbnail"
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
@@ -397,7 +397,7 @@ export function SearchPage() {
                         <div className="flex items-center gap-2 mt-1 text-xs text-zinc-700 dark:text-zinc-300 truncate">
                           <Avatar className="w-6 h-6 border border-zinc-300 dark:border-zinc-700">
                             <AvatarImage
-                              src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_40,h_40,c_thumb,f_auto,q_auto/${post.avatarUrl}`}
+                              src={`https://res.cloudinary.com/dazttnakn/image/upload/w_40,h_40,c_thumb,f_auto,q_auto/${post.avatarUrl}`}
                               alt={post.displayName}
                             />
                             <AvatarFallback>
@@ -493,7 +493,7 @@ export function SearchPage() {
                       <div className="flex items-center gap-3">
                         <Avatar className="w-10 h-10">
                           <AvatarImage
-                            src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_40,h_40,c_thumb,f_auto,q_auto/${acc.avatarUrl}`}
+                            src={`https://res.cloudinary.com/dazttnakn/image/upload/w_40,h_40,c_thumb,f_auto,q_auto/${acc.avatarUrl}`}
                           />
                           <AvatarFallback>
                             {acc.displayName.charAt(0)}

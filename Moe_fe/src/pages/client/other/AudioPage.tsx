@@ -108,7 +108,7 @@ export default function AudioPage() {
             className="absolute inset-0 bg-cover bg-center opacity-30"
             style={{
               backgroundImage: post?.avatarUrl
-                ? `url(https://res.cloudinary.com/dwv76nhoy/image/upload/w_600,h_300,c_fill,f_auto,q_auto/${post.avatarUrl})`
+                ? `url(https://res.cloudinary.com/dazttnakn/image/upload/w_600,h_300,c_fill,f_auto,q_auto/${post.avatarUrl})`
                 : "none",
               backgroundColor: !post?.avatarUrl ? "#1e293b" : "transparent",
             }}
@@ -125,7 +125,7 @@ export default function AudioPage() {
                 }`}
               >
                 <AvatarImage
-                  src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_200,h_200,c_thumb,f_auto,q_auto/${post?.avatarUrl}`}
+                  src={`https://res.cloudinary.com/dazttnakn/image/upload/w_200,h_200,c_thumb,f_auto,q_auto/${post?.avatarUrl}`}
                   alt="Audio avatar"
                 />
                 <AvatarFallback className="text-base md:text-xl">
@@ -194,7 +194,7 @@ export default function AudioPage() {
           {post?.audioUrl && (
             <audio
               ref={audioRef}
-              src={`https://res.cloudinary.com/dwv76nhoy/video/upload/${post.audioUrl}.mp3`}
+              src={`https://res.cloudinary.com/dazttnakn/video/upload/${post.audioUrl}.mp3`}
               preload="auto"
               loop
             />
@@ -211,7 +211,7 @@ export default function AudioPage() {
             >
               {post.postType === "VID" ? (
                 <img
-                  src={`https://res.cloudinary.com/dwv76nhoy/video/upload/w_300,c_fill,q_auto,so_${
+                  src={`https://res.cloudinary.com/dazttnakn/video/upload/w_300,c_fill,q_auto,so_${
                     post.thumbnail ?? "0"
                   }/${post.videoUrl}.jpg`}
                   className="w-full h-full object-cover"
@@ -220,7 +220,7 @@ export default function AudioPage() {
                 />
               ) : (
                 <img
-                  src={`https://res.cloudinary.com/dwv76nhoy/image/upload/${post.imageUrls[0]}`}
+                  src={`https://res.cloudinary.com/dazttnakn/image/upload/${post.imageUrls[0]}`}
                   className="w-full h-full object-cover"
                   alt="Original post"
                   onClick={() => setSelectedPost(post.postCode)}
@@ -246,7 +246,7 @@ export default function AudioPage() {
                 >
                   {relatedPost.postType === "VID" ? (
                     <img
-                      src={`https://res.cloudinary.com/dwv76nhoy/video/upload/w_300,c_fill,q_auto,so_${
+                      src={`https://res.cloudinary.com/dazttnakn/video/upload/w_300,c_fill,q_auto,so_${
                         relatedPost.thumbnail ?? "0"
                       }/${relatedPost.videoUrl}.jpg`}
                       className="w-full h-full object-cover"
@@ -255,7 +255,7 @@ export default function AudioPage() {
                     />
                   ) : (
                     <img
-                      src={`https://res.cloudinary.com/dwv76nhoy/image/upload/${relatedPost.imageUrls[0]}`}
+                      src={`https://res.cloudinary.com/dazttnakn/image/upload/${relatedPost.imageUrls[0]}`}
                       className="w-full h-full object-cover"
                       alt="post"
                       onClick={() => setSelectedPost(relatedPost.postCode)}

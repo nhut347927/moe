@@ -72,7 +72,7 @@ export default function ChangePassword() {
   }
   return (
     <div className="flex min-h-[50vh] h-full w-full items-center justify-center px-4">
-      <Card className="mx-auto max-w-sm">
+      <Card className="mx-auto max-w-sm rounded-3xl">
         <CardHeader>
           <CardTitle className="text-2xl">Change Password</CardTitle>
           <CardDescription>

@@ -55,11 +55,11 @@ export default function SlideVideo({
       </button>
 
       {/* Video Player */}
-      <div className="relative w-full max-w-4xl">
+      <div className="relative w-full max-w-5xl">
         <video
           ref={videoRef}
-          src={`https://res.cloudinary.com/dwv76nhoy/video/upload/${video}`}
-          className="max-h-[80vh] w-full object-contain mx-auto rounded-lg"
+          src={`https://res.cloudinary.com/dazttnakn/video/upload/${video}`}
+          className="max-h-[90vh] w-full object-contain mx-auto rounded-lg"
           controls
           autoPlay={autoPlay}
           onError={() => {

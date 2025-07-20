@@ -80,7 +80,7 @@ export default function ActionMenuDialog({
       >
         {title ? (
           <>
-            <DialogTitle className="ms-7 mt-3 text-lg font-medium ">
+            <DialogTitle className="mt-3 text-lg font-medium ">
               {title}
             </DialogTitle>
             <DialogDescription className="sr-only">

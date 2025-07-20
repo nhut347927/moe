@@ -16,7 +16,7 @@ import java.util.List;
 public class RQPostCreateDTO {
 
     @NotBlank(message = "Title must not be empty")
-    @Size(max = 150, message = "Title must not exceed 150 characters")
+    @Size(max = 70, message = "Title must not exceed 70 characters")
     private String title;
 
     private String description;

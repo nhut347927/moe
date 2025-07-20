@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -64,7 +63,7 @@ export default function HashtagSearch({
     }
     try {
       const response = await axiosInstance.post("tags", {
-        tag: newTagName.trim(),
+        content: newTagName.trim(),
       });
       return response.data.data;
     } catch (error: any) {
@@ -174,7 +173,7 @@ export default function HashtagSearch({
               placeholder="Search hashtags..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pr-10 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-zinc-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+              className="rounded-xl bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 placeholder:text-gray-400 dark:placeholder:text-gray-500"
               aria-label="Search hashtags"
             />
             {searchTerm && (
@@ -195,13 +194,13 @@ export default function HashtagSearch({
             trigger={
               <Button
                 variant="outline"
-                className="bg-white dark:bg-zinc-800 border-gray-300 dark:border-zinc-600 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-zinc-700"
+                className="rounded-xl bg-white dark:bg-zinc-800 border-gray-300 dark:border-zinc-600 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-zinc-700"
                 aria-label="Create new tag"
               >
                 <Plus className="w-4 h-4" />
               </Button>
             }
-            className="rounded-xl bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700"
+            className="!rounded-3xl "
           >
             <p className="text-sm text-gray-500 dark:text-zinc-400 mb-4">
               Enter the name for the new hashtag.
@@ -211,17 +210,19 @@ export default function HashtagSearch({
               placeholder="New tag name"
               value={newTagName}
               onChange={(e) => setNewTagName(e.target.value)}
-              className="mb-4 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-zinc-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+              className="mb-4 rounded-xl bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-zinc-600 focus:ring-2 focus:ring-zinc-500 dark:focus:ring-zinc-400"
               aria-label="New tag name"
             />
             {errorMessage && (
-              <p className="text-red-500 dark:text-red-400 text-xs mb-4">{errorMessage}</p>
+              <p className="text-red-500 dark:text-red-400 text-xs mb-4">
+                {errorMessage}
+              </p>
             )}
             <div className="flex justify-end gap-2">
               <DialogClose asChild>
                 <Button
                   variant="outline"
-                  className="bg-white dark:bg-zinc-800 border-gray-300 dark:border-zinc-600 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-zinc-700"
+                  className="rounded-xl bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                 >
                   Cancel
                 </Button>
@@ -229,7 +230,11 @@ export default function HashtagSearch({
               <DialogClose asChild>
                 <Button
                   onClick={handleCreateTag}
-                  className="bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
+                  className="rounded-xl px-5 py-2 font-semibold 
+             bg-zinc-100 text-zinc-900 hover:bg-zinc-200 
+             dark:bg-zinc-200 dark:text-zinc-900 dark:hover:bg-zinc-300 
+             border border-zinc-300 dark:border-zinc-400 
+             shadow-sm hover:shadow-md transition-all"
                 >
                   Create
                 </Button>
@@ -239,9 +244,10 @@ export default function HashtagSearch({
         </div>
 
         {searchTerm && searchResults.length > 0 && (
-          <div className="absolute z-10 w-full mt-1 bg-white dark:bg-zinc-900 rounded-md shadow-lg border border-gray-200 dark:border-zinc-700 max-h-40 overflow-auto">
+          <div className="absolute z-10 w-full mt-1 bg-white dark:bg-zinc-900 rounded-3xl shadow-lg border border-gray-200 dark:border-zinc-700 max-h-62 overflow-y-auto scroll-but-hidden">
             {searchResults.map((hashtag) => {
-              const isSelected = postCreateForm?.tagCodeList?.includes(hashtag.code) || false;
+              const isSelected =
+                postCreateForm?.tagCodeList?.includes(hashtag.code) || false;
               return (
                 <div
                   key={hashtag.code}
@@ -250,7 +256,9 @@ export default function HashtagSearch({
                   }`}
                 >
                   <div className="flex flex-col text-sm">
-                    <span className="text-gray-900 dark:text-gray-100">#{hashtag.name}</span>
+                    <span className="text-gray-900 dark:text-gray-100">
+                      #{hashtag.name}
+                    </span>
                     <span className="text-xs text-gray-500 dark:text-zinc-400">
                       {hashtag.usageCount} uses • @{hashtag.username}
                     </span>
@@ -260,7 +268,7 @@ export default function HashtagSearch({
                       <AvatarImage
                         src={
                           hashtag.avatar
-                            ? `https://res.cloudinary.com/dwv76nhoy/image/upload/w_80,h_80,c_thumb,f_auto,q_auto/${hashtag.avatar}`
+                            ? `https://res.cloudinary.com/dazttnakn/image/upload/w_80,h_80,c_thumb,f_auto,q_auto/${hashtag.avatar}`
                             : undefined
                         }
                         alt={`${hashtag.username}'s avatar`}
@@ -278,7 +286,11 @@ export default function HashtagSearch({
                         size="sm"
                         onClick={() => selectHashtag(hashtag)}
                         disabled={isSelected}
-                        className="bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
+                        className="rounded-full px-5 py-2 font-semibold 
+             bg-zinc-100 text-zinc-900 hover:bg-zinc-200 
+             dark:bg-zinc-200 dark:text-zinc-900 dark:hover:bg-zinc-300 
+             border border-zinc-300 dark:border-zinc-400 
+             shadow-sm hover:shadow-md transition-all"
                       >
                         Add
                       </Button>
@@ -318,10 +330,14 @@ export default function HashtagSearch({
         ))}
       </div>
       {errorMessages?.title && (
-        <p className="text-red-500 dark:text-red-400 text-xs mt-2">{errorMessages.title}</p>
+        <p className="text-red-500 dark:text-red-400 text-xs mt-2">
+          {errorMessages.title}
+        </p>
       )}
       {errorMessages?.description && (
-        <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errorMessages.description}</p>
+        <p className="text-red-500 dark:text-red-400 text-xs mt-1">
+          {errorMessages.description}
+        </p>
       )}
     </div>
   );

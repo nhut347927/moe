@@ -33,8 +33,8 @@ export default function Slide({ images, showSlider, setShowSlider }: SlideProps)
           ‹
         </button>
         <img
-          src={`https://res.cloudinary.com/dwv76nhoy/image/upload/${images[currentSlide]}`}
-          className="max-h-[80vh] object-contain mx-auto"
+          src={`https://res.cloudinary.com/dazttnakn/image/upload/${images[currentSlide]}`}
+          className="max-h-[90vh] object-contain mx-auto"
         />
         <button
           type="button"

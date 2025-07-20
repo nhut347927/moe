@@ -8,6 +8,7 @@ import axiosInstance from "@/services/axios/AxiosInstance";
 import { useToast } from "@/common/hooks/use-toast";
 import { PostCreateForm } from "../../types";
 import Spinner from "@/components/common/Spiner";
+import axios from "axios";
 
 interface MediaUploadProp {
   postCreateForm: PostCreateForm | null;
@@ -40,7 +41,7 @@ export default function MediaUpload({
   const { toast } = useToast();
 
   // Upload media to the server
-  const uploadMedia = async (file: File, mediaType: "image" | "video") => {
+  const uploadMedia = async (file: File, mediaType: "image" | "video"): Promise<string> => {
     if (!file) {
       throw new Error("No file provided for upload");
     }
@@ -56,17 +57,23 @@ export default function MediaUpload({
 
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("upload_preset", "moe_uploadreset");
+    formData.append("resource_type", mediaType);
+    formData.append("folder", mediaType === "video" ? "videos" : "images");
+
     try {
-      const endpoint = mediaType === "image" ? "files/images" : "files/videos";
-      const response = await axiosInstance.post(endpoint, formData);
-      return response.data.publicId || response.data.data;
+      const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/dazttnakn/upload`,
+        formData
+      );
+      return response.data.public_id;
     } catch (error: any) {
       console.error("Upload error:", error);
       throw new Error(
-        error.response?.data?.message || `Failed to upload ${mediaType}`
+        error.response?.data?.error?.message || `Failed to upload ${mediaType}`
       );
     }
-  };
+};
 
   // Delete media from the server
   const deleteMedia = (publicId: string) => {
@@ -329,10 +336,10 @@ export default function MediaUpload({
             <Spinner className="h-8 w-8" />
           )}
         </div>
-        <div className="max-w-2xl mx-auto  space-y-6">
+        <div className=" mx-auto  space-y-6">
           <div className="space-y-4">
             {/* Visible video for user preview */}
-            <video ref={videoRef} controls className="w-full rounded border" />
+            <video ref={videoRef} controls className="w-full rounded-xl border" />
 
             {/* Hidden video for thumbnail generation */}
             <video
@@ -373,7 +380,7 @@ export default function MediaUpload({
                 <img
                   src={thumbnailUrl}
                   alt="Thumbnail"
-                  className="w-full border rounded shadow"
+                  className="w-full border rounded-xl shadow"
                 />
               </div>
             )}
@@ -410,10 +417,10 @@ export default function MediaUpload({
           {postCreateForm.imgPublicIdList.map((id, index) => (
             <div
               key={index}
-              className="relative group border rounded-xl overflow-hidden border-gray-300 dark:border-zinc-600"
+              className="relative group border rounded-3xl overflow-hidden border-gray-300 dark:border-zinc-600"
             >
               <img
-                src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_300,c_fill,q_auto/${id}`}
+                src={`https://res.cloudinary.com/dazttnakn/image/upload/w_300,c_fill,q_auto/${id}`}
                 alt={`Image ${index + 1}`}
                 className="w-full aspect-square object-cover"
                 onClick={() => setShowSlider(true)}

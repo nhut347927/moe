@@ -461,7 +461,7 @@ export function ProfilePage() {
               <div className="relative group">
                 <Avatar className="w-24 h-24 sm:w-36 sm:h-36 z-10 border-4 border-zinc-300 dark:border-zinc-700 rounded-full">
                   <AvatarImage
-                    src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_200,h_200,c_thumb,f_auto,q_auto/${accountDetail?.avatarUrl}`}
+                    src={`https://res.cloudinary.com/dazttnakn/image/upload/w_200,h_200,c_thumb,f_auto,q_auto/${accountDetail?.avatarUrl}`}
                   />
                   <AvatarFallback>
                     {accountDetail?.displayName?.charAt(0) ?? "MOE"}
@@ -649,7 +649,7 @@ export function ProfilePage() {
                 >
                   {post.postType === "VID" ? (
                     <img
-                      src={`https://res.cloudinary.com/dwv76nhoy/video/upload/w_300,c_fill,q_auto,so_${
+                      src={`https://res.cloudinary.com/dazttnakn/video/upload/w_300,c_fill,q_auto,so_${
                         post.videoThumbnail ?? "0"
                       }/${post.mediaUrl}.jpg`}
                       className="w-full h-full object-cover"
@@ -658,7 +658,7 @@ export function ProfilePage() {
                     />
                   ) : (
                     <img
-                      src={`https://res.cloudinary.com/dwv76nhoy/image/upload/${post.mediaUrl}`}
+                      src={`https://res.cloudinary.com/dazttnakn/image/upload/${post.mediaUrl}`}
                       className="w-full h-full object-cover"
                       alt="post"
                       onClick={() => setSelectedPost(post.postCode)}

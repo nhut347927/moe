@@ -95,7 +95,7 @@ const PostMultiImg = forwardRef<HTMLDivElement, PostMultiImgProps>(
           >
             <motion.img
               key={currentImageIndex}
-              src={`https://res.cloudinary.com/dwv76nhoy/image/upload/${images[currentImageIndex]}`}
+              src={`https://res.cloudinary.com/dazttnakn/image/upload/${images[currentImageIndex]}`}
               className="z-20 max-h-full w-full object-contain cursor-pointer moe-style rounded-3xl"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -156,7 +156,7 @@ const PostMultiImg = forwardRef<HTMLDivElement, PostMultiImgProps>(
 
           <audio
             ref={audioRef}
-            src={`https://res.cloudinary.com/dwv76nhoy/video/upload/${audioSrc}`}
+            src={`https://res.cloudinary.com/dazttnakn/video/upload/${audioSrc}`}
             onEnded={() => {
               if (audioRef.current) {
                 audioRef.current.currentTime = 0;

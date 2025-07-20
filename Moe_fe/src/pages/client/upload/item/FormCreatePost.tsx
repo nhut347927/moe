@@ -59,7 +59,7 @@ export default function FormCreatePost({
           onChange={handleChange}
           placeholder="Enter your title"
           maxLength={150}
-          className="bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+          className="rounded-xl bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 placeholder:text-gray-400 dark:placeholder:text-gray-500"
         />
         {errorMessages?.title && (
           <p className="text-sm text-red-500 mt-1">{errorMessages.title}</p>

@@ -210,7 +210,7 @@ export default function HomePage() {
       <div className="z-10 absolute inset-0 flex justify-center items-center">
         {postData[currentIndex.current]?.postType === "VID" ? (
           <img
-            src={`https://res.cloudinary.com/dwv76nhoy/video/upload/so_${
+            src={`https://res.cloudinary.com/dazttnakn/video/upload/so_${
               postData[currentIndex.current]?.thumbnail ?? "0"
             }/${postData[currentIndex.current]?.videoUrl}.jpg`}
             className="z-10 max-w-full max-h-full object-contain blur-3xl scale-125 opacity-90 brightness-75 transition-all"
@@ -218,7 +218,7 @@ export default function HomePage() {
           />
         ) : (
           <img
-            src={`https://res.cloudinary.com/dwv76nhoy/image/upload/${
+            src={`https://res.cloudinary.com/dazttnakn/image/upload/${
               postData[currentIndex.current]?.imageUrls[
                 postData[currentIndex.current]?.imageSelect ?? 0
               ]
@@ -271,7 +271,7 @@ export default function HomePage() {
           >
             <Avatar className="w-10 h-10 transition-all">
               <AvatarImage
-                src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_80,h_80/${
+                src={`https://res.cloudinary.com/dazttnakn/image/upload/w_80,h_80/${
                   postData[currentIndex.current]?.avatarUrl
                 }`}
               />

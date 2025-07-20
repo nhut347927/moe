@@ -27,7 +27,7 @@ import {
   CredentialResponse,
 } from "@react-oauth/google";
 import { ENV } from "@/common/config/env";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 
 const clientId = ENV.GOOGLE_CLIENT_ID;
 
@@ -112,7 +112,7 @@ export default function Login() {
 
   return (
     <div className="flex flex-col min-h-[50vh] h-full w-full items-center justify-center px-4">
-      <Card className="mx-auto max-w-sm">
+      <Card className="mx-auto max-w-sm rounded-3xl">
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
           <CardDescription>

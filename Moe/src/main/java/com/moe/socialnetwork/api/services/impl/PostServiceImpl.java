@@ -196,22 +196,23 @@ public class PostServiceImpl implements IPostService {
 			if (Boolean.FALSE.equals(dto.getIsUseOtherAudio())) {
 				post.setVideoUrl(dto.getVideoPublicId());
 				post.setVideoThumbnail(String.valueOf(dto.getVideoThumbnail()));
-				File videoFile = ffmpegService.downloadFileFromCloudinary(dto.getVideoPublicId(),
-						"audio.mp3", "video"); // đúng ra ở đây sử dụng type audio nhưng cloudinary nhận
-												// audio là video
+				// File videoFile = ffmpegService.downloadFileFromCloudinary(dto.getVideoPublicId(),
+				// 		"audio.mp3", "video"); // đúng ra ở đây sử dụng type audio nhưng cloudinary nhận
+				// 								// audio là video
 				try {
-					File audioFile = ffmpegService.extractAudioFromVideo(videoFile);
-					String audioPublicId = cloudinaryService.uploadAudio(audioFile);
-					videoFile.delete(); // Xóa file video tạm sau khi trích xuất audio
-					audioFile.delete(); // Xóa file audio tạm sau khi upload
+				//	File audioFile = ffmpegService.extractAudioFromVideo(videoFile);
+				//	String audioPublicId = cloudinaryService.uploadAudio(audioFile);
+//videoFile.delete(); // Xóa file video tạm sau khi trích xuất audio
+				//	audioFile.delete(); // Xóa file audio tạm sau khi upload
 					Audio audioPost = new Audio();
-					audioPost.setAudioName(audioPublicId);
+					// chuyển publicid của audio sang của video
+					audioPost.setAudioName(dto.getVideoPublicId());
 
 					save = postJPA.save(post);
 
 					audioPost.setOwnerPost(save);
 					audioJPA.save(audioPost);
-				} catch (java.io.IOException e) {
+				} catch (Exception e) {
 					throw new AppException("Failed to extract audio from video: " + e.getMessage(), 500);
 				}
 			} else {
@@ -232,15 +233,20 @@ public class PostServiceImpl implements IPostService {
 				ffmpegParams.setVideoPublicId(dto.getVideoPublicId());
 
 				// Mock FFmpeg processing logic
-				try {
-					String vidPublicId = ffmpegService.mergeAndUpload(ffmpegParams);
-					post.setVideoUrl(vidPublicId);
-					cloudinaryService.deleteFile(dto.getVideoPublicId());
+				// xử lí video với audio
+				// nhưng hiện tại ko đủ bộ nhớ nếu deploy lên Railway nên tạm cắt
 
-					save = postJPA.save(post);
-				} catch (Exception e) {
-					throw new AppException("Failed to process video with audio: " + e.getMessage(), 500);
-				}
+				//#################################################################################################
+				// try {
+				// 	String vidPublicId = ffmpegService.mergeAndUpload(ffmpegParams);
+				// 	post.setVideoUrl(vidPublicId);
+				// 	cloudinaryService.deleteFile(dto.getVideoPublicId());
+
+				// 	save = postJPA.save(post);
+				// } catch (Exception e) {
+				// 	throw new AppException("Failed to process video with audio: " + e.getMessage(), 500);
+				// }
+				//#################################################################################################
 			}
 
 		} else if ("IMG".equals(dto.getPostType())) {

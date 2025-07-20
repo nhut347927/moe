@@ -129,7 +129,7 @@ const PostCompo = ({ postCode }: PostProps) => {
           <div className="z-10 absolute inset-0 flex justify-center items-center">
             {postData?.postType === "VID" ? (
               <img
-                src={`https://res.cloudinary.com/dwv76nhoy/video/upload/so_${
+                src={`https://res.cloudinary.com/dazttnakn/video/upload/so_${
                   postData.thumbnail ?? "0"
                 }/${postData.videoUrl}.jpg`}
                 className="z-10 max-w-full max-h-full object-contain blur-3xl scale-125 opacity-90 brightness-75 transition-all"
@@ -137,7 +137,7 @@ const PostCompo = ({ postCode }: PostProps) => {
               />
             ) : (
               <img
-                src={`https://res.cloudinary.com/dwv76nhoy/image/upload/${
+                src={`https://res.cloudinary.com/dazttnakn/image/upload/${
                   postData?.imageUrls[postData.imageSelect ?? 0]
                 }.jpg`}
                 className="z-10 max-w-full max-h-full object-contain blur-3xl scale-125 opacity-90 brightness-75 transition-all"
@@ -163,7 +163,7 @@ const PostCompo = ({ postCode }: PostProps) => {
               <Link to={`/client/profile?code=${postData?.userCode}`}>
                 <Avatar className="w-10 h-10 transition-all">
                   <AvatarImage
-                    src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_80,h_80/${postData?.avatarUrl}`}
+                    src={`https://res.cloudinary.com/dazttnakn/image/upload/w_80,h_80/${postData?.avatarUrl}`}
                   />
                   <AvatarFallback className="bg-zinc-400 text-white text-sm">
                     {postData.userDisplayName?.charAt(0) || "MOE"}

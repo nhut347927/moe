@@ -8,6 +8,7 @@ import { useToast } from "@/common/hooks/use-toast";
 import { PostCreateForm, PostSearch } from "../../types";
 import { useGetApi } from "@/common/hooks/useGetApi";
 import { Page } from "@/common/hooks/type";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface PostSearchSelectorProps {
   postCreateForm: PostCreateForm | null;
@@ -111,7 +112,7 @@ export function SoundSelector({
   return (
     <div>
       <h3 className="font-semibold text-base text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
-        <Music className="w-5 h-5 text-gray-900 dark:text-gray-100" /> Chọn nhạc nền
+        <Music className="w-5 h-5 text-gray-900 dark:text-gray-100" /> Select background music
       </h3>
 
       {/* Preview */}
@@ -121,10 +122,10 @@ export function SoundSelector({
             <img
               src={
                 selectedPostSearch.postType === "VID"
-                  ? `https://res.cloudinary.com/dwv76nhoy/video/upload/w_300,c_fill,q_auto,so_${
+                  ? `https://res.cloudinary.com/dazttnakn/video/upload/w_300,c_fill,q_auto,so_${
                       selectedPostSearch.videoThumbnail ?? "0"
                     }/${selectedPostSearch.mediaUrl}.jpg`
-                  : `https://res.cloudinary.com/dwv76nhoy/image/upload/w_300,c_fill,q_auto/${selectedPostSearch.mediaUrl}`
+                  : `https://res.cloudinary.com/dazttnakn/image/upload/w_300,c_fill,q_auto/${selectedPostSearch.mediaUrl}`
               }
               className="w-full h-full object-cover"
               alt={`Thumbnail for ${selectedPostSearch.title}`}
@@ -153,7 +154,7 @@ export function SoundSelector({
             ref={audioRef}
             src={
               selectedPostSearch.audioPublicId
-                ? `https://res.cloudinary.com/dwv76nhoy/video/upload/q_auto:low/${selectedPostSearch.audioPublicId}.mp3`
+                ? `https://res.cloudinary.com/dazttnakn/video/upload/q_auto:low/${selectedPostSearch.audioPublicId}.mp3`
                 : undefined
             }
             preload="none"
@@ -169,25 +170,25 @@ export function SoundSelector({
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-400" />
         <Input
-          placeholder="Tìm kiếm nhạc..."
+          placeholder="Search music..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10 bg-white dark:bg-zinc-800 border-gray-300 dark:border-zinc-600 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-zinc-500 dark:focus:ring-zinc-400"
+          className="pl-10 rounded-xl bg-white dark:bg-zinc-900 border-gray-300 dark:border-zinc-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-zinc-500 dark:focus:ring-zinc-400"
           aria-label="Search music"
           type="search"
         />
       </div>
 
       {/* Sound list */}
-      <div className="grid gap-3 max-h-64 overflow-y-auto">
+      <ScrollArea className="grid gap-3 max-h-96 overflow-y-auto scroll-but-hidden">
         {sounds.map((sound) => (
           <div
             key={sound.postCode}
-            className="flex items-center p-3 border rounded-xl border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800"
+            className="flex items-center p-3 mb-2 border rounded-xl border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800"
           >
             {sound.postType === "VID" ? (
               <img
-                src={`https://res.cloudinary.com/dwv76nhoy/video/upload/w_300,c_fill,q_auto,so_${
+                src={`https://res.cloudinary.com/dazttnakn/video/upload/w_300,c_fill,q_auto,so_${
                   sound.videoThumbnail ?? "0"
                 }/${sound.mediaUrl}.jpg`}
                 className="w-16 h-16 object-cover rounded-md"
@@ -195,7 +196,7 @@ export function SoundSelector({
               />
             ) : (
               <img
-                src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_300,c_fill,q_auto/${sound.mediaUrl}`}
+                src={`https://res.cloudinary.com/dazttnakn/image/upload/w_300,c_fill,q_auto/${sound.mediaUrl}`}
                 className="w-16 h-16 object-cover rounded-md"
                 alt={`Thumbnail for ${sound.title}`}
               />
@@ -210,16 +211,16 @@ export function SoundSelector({
               onClick={() => handleSelectPostSearch(sound)}
               className={
                 selectedPostSearch?.postCode === sound.postCode
-                  ? "bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
+                  ? "bg-zinc-500 dark:bg-zinc-400 text-white hover:bg-zinc-600 dark:hover:bg-zinc-700"
                   : "bg-white dark:bg-zinc-800 border-gray-300 dark:border-zinc-600 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-zinc-700"
               }
               aria-label={selectedPostSearch?.postCode === sound.postCode ? "Selected sound" : "Select sound"}
             >
-              {selectedPostSearch?.postCode === sound.postCode ? "Đã chọn" : "Chọn"}
+                {selectedPostSearch?.postCode === sound.postCode ? "Selected" : "Select"}
             </Button>
           </div>
         ))}
-      </div>
+      </ScrollArea>
 
       {/* Load more */}
       {data?.hasNext && sounds.length > 0 && (
@@ -230,7 +231,7 @@ export function SoundSelector({
             disabled={loading}
             className="bg-white dark:bg-zinc-800 border-gray-300 dark:border-zinc-600 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-zinc-700"
           >
-            {loading ? "Đang tải..." : "Xem thêm"}
+            {loading ? "Loading..." : "Load more"}
           </Button>
         </div>
       )}

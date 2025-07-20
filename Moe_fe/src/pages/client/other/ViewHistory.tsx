@@ -190,7 +190,7 @@ export default function ViewHistoryPage() {
               >
                 {relatedPost.postType === "VID" ? (
                   <img
-                    src={`https://res.cloudinary.com/dwv76nhoy/video/upload/w_300,c_fill,q_auto,so_${
+                    src={`https://res.cloudinary.com/dazttnakn/video/upload/w_300,c_fill,q_auto,so_${
                       relatedPost.thumbnail ?? "0"
                     }/${relatedPost.videoUrl}.jpg`}
                     className="w-full h-full object-cover"
@@ -200,7 +200,7 @@ export default function ViewHistoryPage() {
                   />
                 ) : (
                   <img
-                    src={`https://res.cloudinary.com/dwv76nhoy/image/upload/${relatedPost.imageUrls[0]}`}
+                    src={`https://res.cloudinary.com/dazttnakn/image/upload/${relatedPost.imageUrls[0]}`}
                     className="w-full h-full object-cover"
                     alt={`Image thumbnail for post ${relatedPost.postCode}`}
                     draggable={false}

@@ -159,12 +159,12 @@ const PostVideo = forwardRef<HTMLDivElement, PostVideoProps>(
         <div
           className="h-full w-full relative flex justify-center items-center"
           onClick={togglePlay}
-          onDoubleClick={handleDoubleClick}
+          onDoubleClick={(e) => {handleDoubleClick(e); setShowSlider(true);}}
         >
           <div className="z-20 max-h-full h-full flex items-center relative">
             <video
               ref={videoRef}
-              src={`https://res.cloudinary.com/dwv76nhoy/video/upload/${videoSrc}`}
+              src={`https://res.cloudinary.com/dazttnakn/video/upload/${videoSrc}`}
               className="z-10 max-h-full object-contain cursor-pointer moe-style rounded-3xl"
               autoPlay={isPlaying}
               loop

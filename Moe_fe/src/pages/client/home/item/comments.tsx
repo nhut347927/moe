@@ -551,7 +551,7 @@ const Comments = ({ postCode }: CommentsProps) => {
           {/* Avatar */}
           <Avatar className="w-9 h-9 shrink-0">
             <AvatarImage
-              src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_80,h_80/${postData?.avatarUrl}`}
+              src={`https://res.cloudinary.com/dazttnakn/image/upload/w_80,h_80/${postData?.avatarUrl}`}
             />
             <AvatarFallback>
               {postData?.userDisplayName?.charAt(0) ?? "MOE"}
@@ -709,7 +709,7 @@ const Comments = ({ postCode }: CommentsProps) => {
               }`}
             >
               <AvatarImage
-                src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_80,h_80/${postData?.audioOwnerAvatar}`}
+                src={`https://res.cloudinary.com/dazttnakn/image/upload/w_80,h_80/${postData?.audioOwnerAvatar}`}
               />
               <AvatarFallback className="text-xs">
                 {postData?.userDisplayName?.charAt(0) ?? "MOE"}
@@ -740,7 +740,7 @@ const Comments = ({ postCode }: CommentsProps) => {
                   <div className="flex gap-3">
                     <Avatar className="h-9 w-9">
                       <AvatarImage
-                        src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_80,h_80/${comment.avatarUrl}`}
+                        src={`https://res.cloudinary.com/dazttnakn/image/upload/w_80,h_80/${comment.avatarUrl}`}
                       />
                       <AvatarFallback>{comment.displayName[0]}</AvatarFallback>
                     </Avatar>
@@ -853,7 +853,7 @@ const Comments = ({ postCode }: CommentsProps) => {
                               <div className="flex gap-2">
                                 <Avatar className="h-7 w-7">
                                   <AvatarImage
-                                    src={`https://res.cloudinary.com/dwv76nhoy/image/upload/w_80,h_80/${reply.avatarUrl}`}
+                                    src={`https://res.cloudinary.com/dazttnakn/image/upload/w_80,h_80/${reply.avatarUrl}`}
                                   />
                                   <AvatarFallback>
                                     {reply.displayName[0]}
