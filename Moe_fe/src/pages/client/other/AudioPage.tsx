@@ -5,7 +5,7 @@ import axiosInstance from "@/services/axios/AxiosInstance";
 import { Post } from "../types";
 import { Page } from "@/common/hooks/type";
 import { useGetApi } from "@/common/hooks/useGetApi";
-import { Play, Pause, Heart, MessageSquareHeart, Eye } from "lucide-react";
+import { Play, Pause, Heart, MessageSquareHeart } from "lucide-react";
 import PostCompo from "@/components/post/PostCompo";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
