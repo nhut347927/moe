@@ -6,7 +6,7 @@ import {
   forwardRef,
 } from "react";
 import { Play } from "lucide-react";
-import SlideVideo from "@/components/slide/SlideVideo";
+import SlideVideo from "@/components/slide/slide-video";
 
 export interface PostVideoProps {
   videoSrc: string;

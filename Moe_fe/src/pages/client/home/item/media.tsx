@@ -1,7 +1,7 @@
 import { RefObject } from "react";
 import { Post } from "../../types";
-import PostVideo from "./Video";
-import PostMultiImg from "./Image";
+import PostVideo from "./video";
+import PostMultiImg from "./image";
 
 interface PostContentProps {
   post: Post;

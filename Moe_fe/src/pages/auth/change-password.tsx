@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { useForm } from "react-hook-form";
 import axiosInstance from "@/services/axios/axios-instance";
 import { Eye, EyeOff } from "lucide-react";
@@ -22,33 +22,33 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
-export default function Register() {
+export default function ChangePassword() {
   const { toast } = useToast();
-  const navigate = useNavigate(); // Tạo instance của useNavigate
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errorMessages, setErrorMessages] = useState<any>({}); // State để lưu thông báo lỗi từ backend
+  const [errorMessages, setErrorMessages] = useState<any>({});
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
+
   const toggleConfirmPasswordVisibility = () =>
     setShowConfirmPassword(!showConfirmPassword);
-
   const form = useForm({
     defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
+      newPassword: "",
+      confirmNewPassword: "",
     },
   });
   async function onSubmit(values: any) {
     try {
-      // Gửi yêu cầu đăng nhập
-      const response = await axiosInstance.post("auth/register", {
-        displayName: values.name,
-        email: values.email,
-        password: values.password,
-        confirmPassword: values.confirmPassword,
-      });
+
+      const response = await axiosInstance.put(
+        "auth/change-password",
+        {
+          newPassword: values.newPassword,
+          confirmNewPassword: values.confirmNewPassword,
+        }
+      );
+      
 
       toast({
         variant: "default",
@@ -70,57 +70,33 @@ export default function Register() {
       }
     }
   }
-
   return (
-    <div className="flex min-h-[60vh] h-full w-full items-center justify-center px-4">
+    <div className="flex min-h-[50vh] h-full w-full items-center justify-center px-4">
       <Card className="mx-auto max-w-sm rounded-3xl">
         <CardHeader>
-          <CardTitle className="text-2xl">Register</CardTitle>
+          <CardTitle className="text-2xl">Change Password</CardTitle>
           <CardDescription>
-            Create a new account by filling out the form below.
+            Enter your new password to change your password.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <div className="grid gap-4">
-                {/* Email Field */}
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem className="grid gap-2">
-                      <FormLabel htmlFor="email">Email</FormLabel>
-                      <FormControl>
-                        <Input
-                          id="email"
-                          placeholder="johndoe@mail.com"
-                          type="text"
-                          autoComplete="email"
-                          {...field}
-                        />
-                      </FormControl>
-                      {errorMessages?.email && (
-                        <FormMessage>{errorMessages.email}</FormMessage>
-                      )}
-                    </FormItem>
-                  )}
-                />
-
                 {/* Password Field */}
                 <FormField
                   control={form.control}
-                  name="password"
+                  name="newPassword"
                   render={({ field }) => (
                     <FormItem className="grid gap-2">
-                      <FormLabel htmlFor="password">Password</FormLabel>
+                      <FormLabel htmlFor="newPassword">New Password</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
-                            id="password"
+                            id="newPassword"
                             type={showPassword ? "text" : "password"}
                             placeholder="******"
-                            autoComplete="password"
+                            autoComplete="new-password"
                             {...field}
                           />
                           <button
@@ -136,8 +112,8 @@ export default function Register() {
                           </button>
                         </div>
                       </FormControl>
-                      {errorMessages?.password && (
-                        <FormMessage>{errorMessages.password}</FormMessage>
+                      {errorMessages?.newPassword && (
+                        <FormMessage>{errorMessages.newPassword}</FormMessage>
                       )}
                     </FormItem>
                   )}
@@ -146,19 +122,19 @@ export default function Register() {
                 {/* Confirm Password Field */}
                 <FormField
                   control={form.control}
-                  name="confirmPassword"
+                  name="confirmNewPassword"
                   render={({ field }) => (
                     <FormItem className="grid gap-2">
-                      <FormLabel htmlFor="confirmPassword">
-                        Confirm Password
+                      <FormLabel htmlFor="confirmNewPassword">
+                        Confirm New Password
                       </FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
-                            id="confirmPassword"
+                            id="confirmNewPassword"
                             type={showConfirmPassword ? "text" : "password"}
                             placeholder="******"
-                            autoComplete="confirm-password"
+                            autoComplete="confirm-new-password"
                             {...field}
                           />
 
@@ -175,48 +151,21 @@ export default function Register() {
                           </button>
                         </div>
                       </FormControl>
-                      {errorMessages?.confirmPassword && (
+                      {errorMessages?.confirmNewPassword && (
                         <FormMessage>
-                          {errorMessages.confirmPassword}
+                          {errorMessages.confirmNewPassword}
                         </FormMessage>
                       )}
                     </FormItem>
                   )}
                 />
-                {/* Name Field */}
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem className="grid gap-2">
-                      <FormLabel htmlFor="name">Display name</FormLabel>
-                      <FormControl>
-                        <Input
-                          id="name"
-                          type="text"
-                          placeholder="abc123"
-                          autoComplete="display-name"
-                          {...field}
-                        />
-                      </FormControl>
-                      {errorMessages?.displayName && (
-                        <FormMessage>{errorMessages.displayName}</FormMessage>
-                      )}
-                    </FormItem>
-                  )}
-                />
+
                 <Button type="submit" className="w-full">
-                  Register
+                  Change Password
                 </Button>
               </div>
             </form>
           </Form>
-          <div className="mt-4 text-center text-sm">
-            Already have an account?{" "}
-            <Link to="/auth/login" className="underline">
-              Login
-            </Link>
-          </div>
         </CardContent>
       </Card>
     </div>

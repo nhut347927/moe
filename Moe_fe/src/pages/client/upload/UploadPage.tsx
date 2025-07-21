@@ -7,9 +7,9 @@ import HashtagSearch from "@/pages/client/upload/item/HashtagSearch";
 import MediaUpload from "./item/MediaUpload";
 import FormCreatePost from "./item/FormCreatePost";
 import { useState } from "react";
-import Slide from "@/components/slide/SlideImage";
+import Slide from "@/components/slide/slide-image";
 import { SoundSelector } from "./item/SoundSelector";
-import axiosInstance from "@/services/axios/AxiosInstance";
+import axiosInstance from "@/services/axios/axios-instance";
 import { PostCreateForm } from "../types";
 
 export default function UploadPage() {

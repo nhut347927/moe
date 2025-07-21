@@ -7,7 +7,7 @@ import {
 } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
-import Slide from "@/components/slide/SlideImage";
+import Slide from "@/components/slide/slide-image";
 
 interface PostMultiImgProps {
   images: string[];

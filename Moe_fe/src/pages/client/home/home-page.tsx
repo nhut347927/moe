@@ -2,16 +2,16 @@ import { useState, useRef, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useToast } from "@/common/hooks/use-toast";
 import { Post } from "../types";
-import PostContent from "./item/Media";
-import PostComments from "./item/Comments";
+import PostContent from "./item/media";
+import PostComments from "./item/comments";
 import { Heart, MessageSquareHeart, Proportions } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
 import { cn, getTimeAgo } from "@/common/utils/utils";
-import { useGetApi } from "@/common/hooks/useGetApi";
-import { usePostApi } from "@/common/hooks/usePostApi";
-import Spinner from "@/components/common/Spiner";
-import axiosInstance from "@/services/axios/AxiosInstance";
+import { useGetApi } from "@/common/hooks/use-get-api";
+import { usePostApi } from "@/common/hooks/use-post-api";
+import Spinner from "@/components/common/spiner";
+import axiosInstance from "@/services/axios/axios-instance";
 
 // Define fetchPostByCode function
 const fetchPostByCode = async (postCode: string): Promise<Post> => {

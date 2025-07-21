@@ -3,10 +3,10 @@ import ReactDOM from "react-dom/client";
 import { StrictMode } from "react";
 import { Provider } from "react-redux";
 import App from "./App";
-import { store } from "./store/Store";
-import { FilterProvider } from "./common/context/FilterContext";
+import { store } from "./store/temp";
+import { FilterProvider } from "./common/context/filter-context";
 import { AliveScope } from "react-activation";
-import { ThemeProvider } from "./components/common/ThemeProvider";
+import { ThemeProvider } from "./components/common/theme-provider";
 
 const root = ReactDOM.createRoot(document.getElementById("root")!);
 

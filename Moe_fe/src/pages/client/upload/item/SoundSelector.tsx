@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/common/hooks/use-toast";
 import { PostCreateForm, PostSearch } from "../../types";
-import { useGetApi } from "@/common/hooks/useGetApi";
+import { useGetApi } from "@/common/hooks/use-get-api";
 import { Page } from "@/common/hooks/type";
 import { ScrollArea } from "@/components/ui/scroll-area";
 

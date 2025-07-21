@@ -1,0 +1,1 @@
+import{j as s,O as t}from"./index-D3stqS3y.js";import{T as r}from"./toaster-DupfdVH1.js";const o=()=>s.jsxs("div",{className:"w-full h-screen",children:[s.jsx(t,{})," ",s.jsx(r,{})]});export{o as default};

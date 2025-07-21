@@ -4,10 +4,10 @@ import type React from "react";
 import { useState, useRef, useEffect } from "react";
 import { Video, ImageIcon, X, Upload, Play, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import axiosInstance from "@/services/axios/AxiosInstance";
+import axiosInstance from "@/services/axios/axios-instance";
 import { useToast } from "@/common/hooks/use-toast";
 import { PostCreateForm } from "../../types";
-import Spinner from "@/components/common/Spiner";
+import Spinner from "@/components/common/spiner";
 import axios from "axios";
 
 interface MediaUploadProp {

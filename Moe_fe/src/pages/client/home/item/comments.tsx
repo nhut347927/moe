@@ -23,17 +23,17 @@ import {
 } from "@/components/ui/popover";
 import { Post, Comment, Reply, commonEmojis } from "../../types";
 import { getTimeAgo } from "@/common/utils/utils";
-import { ActionMenuItem } from "@/components/dialog/ActionMenuItem";
-import ActionMenuDialog from "@/components/dialog/ActionMenuDialog";
-import DeleteConfirmationDialog from "@/components/dialog/DeleteConfirmationDialog";
+import { ActionMenuItem } from "@/components/dialog/action-menu-item";
+import ActionMenuDialog from "@/components/dialog/action-menu-dialog";
+import DeleteConfirmationDialog from "@/components/dialog/delete-confirmation-dialog";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import ReportDialog from "@/components/dialog/ReportDialog";
-import axiosInstance from "@/services/axios/AxiosInstance";
+import ReportDialog from "@/components/dialog/report-dialog";
+import axiosInstance from "@/services/axios/axios-instance";
 import { useToast } from "@/common/hooks/use-toast";
 import { Page } from "@/common/hooks/type";
-import Spinner from "@/components/common/Spiner";
+import Spinner from "@/components/common/spiner";
 
 interface CommentsProps {
   postCode: string;
