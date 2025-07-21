@@ -1,5 +1,5 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Bell,
@@ -15,7 +15,6 @@ import {
   Settings,
   Shield,
   User,
-  Wand2,
   X,
 } from "lucide-react";
 

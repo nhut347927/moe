@@ -95,9 +95,9 @@ export default function ViewHistoryPage() {
     setSelectedPost(postCode);
   }, []);
 
-  const handleCloseModal = useCallback(() => {
-    setSelectedPost(null);
-  }, []);
+  // const handleCloseModal = useCallback(() => {
+  //   setSelectedPost(null);
+  // }, []);
 
   const handleLoadMore = () => {
     if (

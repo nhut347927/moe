@@ -2,18 +2,16 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useGetApi } from "@/common/hooks/useGetApi";
 import { Page } from "@/common/hooks/type";
-import PostCompo from "@/components/post/PostCompo";
 import { Button } from "@/components/ui/button";
 import { debounce } from "lodash";
 import { KeywordSearch } from "../types";
-import { Link } from "react-router-dom";
 import { Clock, Search } from "lucide-react";
 
 export default function KeywordPage() {
   const [page, setPage] = useState(0);
   const [posts, setPosts] = useState<KeywordSearch[]>([]);
   const [sort, setSort] = useState<"asc" | "desc">("desc");
-  const [selectedPost, setSelectedPost] = useState<string | null>(null);
+ // const [selectedPost, setSelectedPost] = useState<string | null>(null);
   const size = 12;
   const scrollAreaRef = useRef<HTMLDivElement>(null); // Ref for ScrollArea viewport
 

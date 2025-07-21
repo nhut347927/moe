@@ -1,8 +1,7 @@
+"use client";
 
-"use client"
-
-import { useEffect, useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Award,
   Bell,
@@ -47,19 +46,30 @@ import {
   Type,
   CuboidIcon,
   X,
-} from "lucide-react"
+} from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Progress } from "@/components/ui/progress"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { cn } from "@/common/utils/utils"
-
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { cn } from "@/common/utils/utils";
 
 // Sample data for apps
 const apps = [
@@ -171,7 +181,7 @@ const apps = [
     new: false,
     progress: 100,
   },
-]
+];
 
 // Sample data for recent files
 const recentFiles = [
@@ -238,7 +248,7 @@ const recentFiles = [
     size: "156 MB",
     collaborators: 0,
   },
-]
+];
 
 // Sample data for projects
 const projects = [
@@ -274,7 +284,7 @@ const projects = [
     members: 5,
     files: 31,
   },
-]
+];
 
 // Sample data for tutorials
 const tutorials = [
@@ -323,7 +333,7 @@ const tutorials = [
     category: "Design",
     views: "41K",
   },
-]
+];
 
 // Sample data for community posts
 const communityPosts = [
@@ -359,7 +369,7 @@ const communityPosts = [
     image: "/placeholder.svg?height=300&width=400",
     time: "5 days ago",
   },
-]
+];
 
 // Sample data for sidebar navigation
 const sidebarItems = [
@@ -429,28 +439,30 @@ const sidebarItems = [
       { title: "Templates", url: "#" },
     ],
   },
-]
+];
 
 export function DesignaliCreative() {
-  const [progress, setProgress] = useState(0)
-  const [notifications, setNotifications] = useState(5)
-  const [activeTab, setActiveTab] = useState("home")
-  const [sidebarOpen, setSidebarOpen] = useState(true)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({})
+  //  const [progress, setProgress] = useState(0)
+  const [notifications] = useState(5);
+  const [activeTab, setActiveTab] = useState("home");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>(
+    {}
+  );
 
   // Simulate progress loading
-  useEffect(() => {
-    const timer = setTimeout(() => setProgress(100), 1000)
-    return () => clearTimeout(timer)
-  }, [])
+  // useEffect(() => {
+  //   const timer = setTimeout(() => setProgress(100), 1000)
+  //   return () => clearTimeout(timer)
+  // }, [])
 
   const toggleExpanded = (title: string) => {
     setExpandedItems((prev) => ({
       ...prev,
       [title]: !prev[title],
-    }))
-  }
+    }));
+  };
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
@@ -465,19 +477,26 @@ export function DesignaliCreative() {
             "radial-gradient(circle at 50% 50%, rgba(120, 41, 190, 0.5) 0%, rgba(53, 71, 125, 0.5) 50%, rgba(0, 0, 0, 0) 100%)",
           ],
         }}
-        transition={{ duration: 30, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+        transition={{
+          duration: 30,
+          repeat: Number.POSITIVE_INFINITY,
+          ease: "linear",
+        }}
       />
 
       {/* Mobile menu overlay */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-black/50 md:hidden" onClick={() => setMobileMenuOpen(false)} />
+        <div
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
       )}
 
       {/* Sidebar - Mobile */}
       <div
         className={cn(
           "fixed inset-y-0 left-0 z-50 w-64 transform bg-background transition-transform duration-300 ease-in-out md:hidden",
-          mobileMenuOpen ? "translate-x-0" : "-translate-x-full",
+          mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex h-full flex-col border-r">
@@ -491,7 +510,11 @@ export function DesignaliCreative() {
                 <p className="text-xs text-muted-foreground">Creative Suite</p>
               </div>
             </div>
-            <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setMobileMenuOpen(false)}
+            >
               <X className="h-5 w-5" />
             </Button>
           </div>
@@ -499,7 +522,11 @@ export function DesignaliCreative() {
           <div className="px-3 py-2">
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input type="search" placeholder="Search..." className="w-full rounded-2xl bg-muted pl-9 pr-4 py-2" />
+              <Input
+                type="search"
+                placeholder="Search..."
+                className="w-full rounded-2xl bg-muted pl-9 pr-4 py-2"
+              />
             </div>
           </div>
 
@@ -510,7 +537,9 @@ export function DesignaliCreative() {
                   <button
                     className={cn(
                       "flex w-full items-center justify-between rounded-2xl px-3 py-2 text-sm font-medium",
-                      item.isActive ? "bg-primary/10 text-primary" : "hover:bg-muted",
+                      item.isActive
+                        ? "bg-primary/10 text-primary"
+                        : "hover:bg-muted"
                     )}
                     onClick={() => item.items && toggleExpanded(item.title)}
                   >
@@ -519,7 +548,10 @@ export function DesignaliCreative() {
                       <span>{item.title}</span>
                     </div>
                     {item.badge && (
-                      <Badge variant="outline" className="ml-auto rounded-full px-2 py-0.5 text-xs">
+                      <Badge
+                        variant="outline"
+                        className="ml-auto rounded-full px-2 py-0.5 text-xs"
+                      >
                         {item.badge}
                       </Badge>
                     )}
@@ -527,7 +559,7 @@ export function DesignaliCreative() {
                       <ChevronDown
                         className={cn(
                           "ml-2 h-4 w-4 transition-transform",
-                          expandedItems[item.title] ? "rotate-180" : "",
+                          expandedItems[item.title] ? "rotate-180" : ""
                         )}
                       />
                     )}
@@ -543,7 +575,10 @@ export function DesignaliCreative() {
                         >
                           {subItem.title}
                           {subItem.badge && (
-                            <Badge variant="outline" className="ml-auto rounded-full px-2 py-0.5 text-xs">
+                            <Badge
+                              variant="outline"
+                              className="ml-auto rounded-full px-2 py-0.5 text-xs"
+                            >
                               {subItem.badge}
                             </Badge>
                           )}
@@ -565,7 +600,10 @@ export function DesignaliCreative() {
               <button className="flex w-full items-center justify-between rounded-2xl px-3 py-2 text-sm font-medium hover:bg-muted">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-6 w-6">
-                    <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
+                    <AvatarImage
+                      src="/placeholder.svg?height=32&width=32"
+                      alt="User"
+                    />
                     <AvatarFallback>JD</AvatarFallback>
                   </Avatar>
                   <span>John Doe</span>
@@ -583,7 +621,7 @@ export function DesignaliCreative() {
       <div
         className={cn(
           "fixed inset-y-0 left-0 z-30 hidden w-64 transform border-r bg-background transition-transform duration-300 ease-in-out md:block",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex h-full flex-col">
@@ -602,7 +640,11 @@ export function DesignaliCreative() {
           <div className="px-3 py-2">
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input type="search" placeholder="Search..." className="w-full rounded-2xl bg-muted pl-9 pr-4 py-2" />
+              <Input
+                type="search"
+                placeholder="Search..."
+                className="w-full rounded-2xl bg-muted pl-9 pr-4 py-2"
+              />
             </div>
           </div>
 
@@ -613,7 +655,9 @@ export function DesignaliCreative() {
                   <button
                     className={cn(
                       "flex w-full items-center justify-between rounded-2xl px-3 py-2 text-sm font-medium",
-                      item.isActive ? "bg-primary/10 text-primary" : "hover:bg-muted",
+                      item.isActive
+                        ? "bg-primary/10 text-primary"
+                        : "hover:bg-muted"
                     )}
                     onClick={() => item.items && toggleExpanded(item.title)}
                   >
@@ -622,7 +666,10 @@ export function DesignaliCreative() {
                       <span>{item.title}</span>
                     </div>
                     {item.badge && (
-                      <Badge variant="outline" className="ml-auto rounded-full px-2 py-0.5 text-xs">
+                      <Badge
+                        variant="outline"
+                        className="ml-auto rounded-full px-2 py-0.5 text-xs"
+                      >
                         {item.badge}
                       </Badge>
                     )}
@@ -630,7 +677,7 @@ export function DesignaliCreative() {
                       <ChevronDown
                         className={cn(
                           "ml-2 h-4 w-4 transition-transform",
-                          expandedItems[item.title] ? "rotate-180" : "",
+                          expandedItems[item.title] ? "rotate-180" : ""
                         )}
                       />
                     )}
@@ -646,7 +693,10 @@ export function DesignaliCreative() {
                         >
                           {subItem.title}
                           {subItem.badge && (
-                            <Badge variant="outline" className="ml-auto rounded-full px-2 py-0.5 text-xs">
+                            <Badge
+                              variant="outline"
+                              className="ml-auto rounded-full px-2 py-0.5 text-xs"
+                            >
                               {subItem.badge}
                             </Badge>
                           )}
@@ -668,7 +718,10 @@ export function DesignaliCreative() {
               <button className="flex w-full items-center justify-between rounded-2xl px-3 py-2 text-sm font-medium hover:bg-muted">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-6 w-6">
-                    <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
+                    <AvatarImage
+                      src="/placeholder.svg?height=32&width=32"
+                      alt="User"
+                    />
                     <AvatarFallback>JD</AvatarFallback>
                   </Avatar>
                   <span>John Doe</span>
@@ -683,12 +736,27 @@ export function DesignaliCreative() {
       </div>
 
       {/* Main Content */}
-      <div className={cn("min-h-screen transition-all duration-300 ease-in-out", sidebarOpen ? "md:pl-64" : "md:pl-0")}>
+      <div
+        className={cn(
+          "min-h-screen transition-all duration-300 ease-in-out",
+          sidebarOpen ? "md:pl-64" : "md:pl-0"
+        )}
+      >
         <header className="sticky top-0 z-10 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur">
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileMenuOpen(true)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={() => setMobileMenuOpen(true)}
+          >
             <Menu className="h-5 w-5" />
           </Button>
-          <Button variant="ghost" size="icon" className="hidden md:flex" onClick={() => setSidebarOpen(!sidebarOpen)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hidden md:flex"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
             <PanelLeft className="h-5 w-5" />
           </Button>
           <div className="flex flex-1 items-center justify-between">
@@ -719,7 +787,11 @@ export function DesignaliCreative() {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" className="rounded-2xl relative">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-2xl relative"
+                    >
                       <Bell className="h-5 w-5" />
                       {notifications > 0 && (
                         <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
@@ -733,7 +805,10 @@ export function DesignaliCreative() {
               </TooltipProvider>
 
               <Avatar className="h-9 w-9 border-2 border-primary">
-                <AvatarImage src="/placeholder.svg?height=40&width=40" alt="User" />
+                <AvatarImage
+                  src="/placeholder.svg?height=40&width=40"
+                  alt="User"
+                />
                 <AvatarFallback>JD</AvatarFallback>
               </Avatar>
             </div>
@@ -741,22 +816,42 @@ export function DesignaliCreative() {
         </header>
 
         <main className="flex-1 p-4 md:p-6">
-          <Tabs defaultValue="home" value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs
+            defaultValue="home"
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
             <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <TabsList className="grid w-full max-w-[600px] grid-cols-5 rounded-2xl p-1">
-                <TabsTrigger value="home" className="rounded-xl data-[state=active]:rounded-xl">
+                <TabsTrigger
+                  value="home"
+                  className="rounded-xl data-[state=active]:rounded-xl"
+                >
                   Home
                 </TabsTrigger>
-                <TabsTrigger value="apps" className="rounded-xl data-[state=active]:rounded-xl">
+                <TabsTrigger
+                  value="apps"
+                  className="rounded-xl data-[state=active]:rounded-xl"
+                >
                   Apps
                 </TabsTrigger>
-                <TabsTrigger value="files" className="rounded-xl data-[state=active]:rounded-xl">
+                <TabsTrigger
+                  value="files"
+                  className="rounded-xl data-[state=active]:rounded-xl"
+                >
                   Files
                 </TabsTrigger>
-                <TabsTrigger value="projects" className="rounded-xl data-[state=active]:rounded-xl">
+                <TabsTrigger
+                  value="projects"
+                  className="rounded-xl data-[state=active]:rounded-xl"
+                >
                   Projects
                 </TabsTrigger>
-                <TabsTrigger value="learn" className="rounded-xl data-[state=active]:rounded-xl">
+                <TabsTrigger
+                  value="learn"
+                  className="rounded-xl data-[state=active]:rounded-xl"
+                >
                   Learn
                 </TabsTrigger>
               </TabsList>
@@ -790,11 +885,15 @@ export function DesignaliCreative() {
                     >
                       <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                         <div className="space-y-4">
-                          <Badge className="bg-white/20 text-white hover:bg-white/30 rounded-xl">Premium</Badge>
-                          <h2 className="text-3xl font-bold">Welcome to DesignAli Creative Suite</h2>
+                          <Badge className="bg-white/20 text-white hover:bg-white/30 rounded-xl">
+                            Premium
+                          </Badge>
+                          <h2 className="text-3xl font-bold">
+                            Welcome to DesignAli Creative Suite
+                          </h2>
                           <p className="max-w-[600px] text-white/80">
-                            Unleash your creativity with our comprehensive suite of professional design tools and
-                            resources.
+                            Unleash your creativity with our comprehensive suite
+                            of professional design tools and resources.
                           </p>
                           <div className="flex flex-wrap gap-3">
                             <Button className="rounded-2xl bg-white text-indigo-700 hover:bg-white/90">
@@ -811,7 +910,11 @@ export function DesignaliCreative() {
                         <div className="hidden lg:block">
                           <motion.div
                             animate={{ rotate: 360 }}
-                            transition={{ duration: 50, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                            transition={{
+                              duration: 50,
+                              repeat: Number.POSITIVE_INFINITY,
+                              ease: "linear",
+                            }}
                             className="relative h-40 w-40"
                           >
                             <div className="absolute inset-0 rounded-full bg-white/10 backdrop-blur-md" />
@@ -836,24 +939,39 @@ export function DesignaliCreative() {
                       {apps
                         .filter((app) => app.recent)
                         .map((app) => (
-                          <motion.div key={app.name} whileHover={{ scale: 1.02, y: -5 }} whileTap={{ scale: 0.98 }}>
+                          <motion.div
+                            key={app.name}
+                            whileHover={{ scale: 1.02, y: -5 }}
+                            whileTap={{ scale: 0.98 }}
+                          >
                             <Card className="overflow-hidden rounded-3xl border-2 hover:border-primary/50 transition-all duration-300">
                               <CardHeader className="pb-2">
                                 <div className="flex items-center justify-between">
                                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted">
                                     {app.icon}
                                   </div>
-                                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-2xl">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 rounded-2xl"
+                                  >
                                     <Star className="h-4 w-4" />
                                   </Button>
                                 </div>
                               </CardHeader>
                               <CardContent className="pb-2">
-                                <CardTitle className="text-lg">{app.name}</CardTitle>
-                                <CardDescription>{app.description}</CardDescription>
+                                <CardTitle className="text-lg">
+                                  {app.name}
+                                </CardTitle>
+                                <CardDescription>
+                                  {app.description}
+                                </CardDescription>
                               </CardContent>
                               <CardFooter>
-                                <Button variant="secondary" className="w-full rounded-2xl">
+                                <Button
+                                  variant="secondary"
+                                  className="w-full rounded-2xl"
+                                >
                                   Open
                                 </Button>
                               </CardFooter>
@@ -876,7 +994,9 @@ export function DesignaliCreative() {
                           {recentFiles.slice(0, 4).map((file) => (
                             <motion.div
                               key={file.name}
-                              whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
+                              whileHover={{
+                                backgroundColor: "rgba(0,0,0,0.02)",
+                              }}
                               className="flex items-center justify-between p-4"
                             >
                               <div className="flex items-center gap-3">
@@ -892,12 +1012,19 @@ export function DesignaliCreative() {
                               </div>
                               <div className="flex items-center gap-2">
                                 {file.shared && (
-                                  <Badge variant="outline" className="rounded-xl">
+                                  <Badge
+                                    variant="outline"
+                                    className="rounded-xl"
+                                  >
                                     <Users className="mr-1 h-3 w-3" />
                                     {file.collaborators}
                                   </Badge>
                                 )}
-                                <Button variant="ghost" size="sm" className="rounded-xl">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="rounded-xl"
+                                >
                                   Open
                                 </Button>
                               </div>
@@ -909,7 +1036,9 @@ export function DesignaliCreative() {
 
                     <section className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <h2 className="text-2xl font-semibold">Active Projects</h2>
+                        <h2 className="text-2xl font-semibold">
+                          Active Projects
+                        </h2>
                         <Button variant="ghost" className="rounded-2xl">
                           View All
                         </Button>
@@ -919,7 +1048,9 @@ export function DesignaliCreative() {
                           {projects.slice(0, 3).map((project) => (
                             <motion.div
                               key={project.name}
-                              whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
+                              whileHover={{
+                                backgroundColor: "rgba(0,0,0,0.02)",
+                              }}
                               className="p-4"
                             >
                               <div className="flex items-center justify-between mb-2">
@@ -928,13 +1059,18 @@ export function DesignaliCreative() {
                                   Due {project.dueDate}
                                 </Badge>
                               </div>
-                              <p className="text-sm text-muted-foreground mb-3">{project.description}</p>
+                              <p className="text-sm text-muted-foreground mb-3">
+                                {project.description}
+                              </p>
                               <div className="space-y-2">
                                 <div className="flex items-center justify-between text-sm">
                                   <span>Progress</span>
                                   <span>{project.progress}%</span>
                                 </div>
-                                <Progress value={project.progress} className="h-2 rounded-xl" />
+                                <Progress
+                                  value={project.progress}
+                                  className="h-2 rounded-xl"
+                                />
                               </div>
                               <div className="flex items-center justify-between mt-3 text-sm text-muted-foreground">
                                 <div className="flex items-center">
@@ -955,14 +1091,20 @@ export function DesignaliCreative() {
 
                   <section className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <h2 className="text-2xl font-semibold">Community Highlights</h2>
+                      <h2 className="text-2xl font-semibold">
+                        Community Highlights
+                      </h2>
                       <Button variant="ghost" className="rounded-2xl">
                         Explore
                       </Button>
                     </div>
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                       {communityPosts.map((post) => (
-                        <motion.div key={post.title} whileHover={{ scale: 1.02, y: -5 }} whileTap={{ scale: 0.98 }}>
+                        <motion.div
+                          key={post.title}
+                          whileHover={{ scale: 1.02, y: -5 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
                           <Card className="overflow-hidden rounded-3xl">
                             <div className="aspect-[4/3] overflow-hidden bg-muted">
                               <img
@@ -973,7 +1115,9 @@ export function DesignaliCreative() {
                             </div>
                             <CardContent className="p-4">
                               <h3 className="font-semibold">{post.title}</h3>
-                              <p className="text-sm text-muted-foreground">by {post.author}</p>
+                              <p className="text-sm text-muted-foreground">
+                                by {post.author}
+                              </p>
                               <div className="mt-2 flex items-center justify-between text-sm">
                                 <div className="flex items-center gap-2">
                                   <Heart className="h-4 w-4 text-red-500" />
@@ -981,7 +1125,9 @@ export function DesignaliCreative() {
                                   <MessageSquare className="ml-2 h-4 w-4 text-blue-500" />
                                   {post.comments}
                                 </div>
-                                <span className="text-muted-foreground">{post.time}</span>
+                                <span className="text-muted-foreground">
+                                  {post.time}
+                                </span>
                               </div>
                             </CardContent>
                           </Card>
@@ -1001,9 +1147,12 @@ export function DesignaliCreative() {
                     >
                       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                         <div className="space-y-2">
-                          <h2 className="text-3xl font-bold">Creative Apps Collection</h2>
+                          <h2 className="text-3xl font-bold">
+                            Creative Apps Collection
+                          </h2>
                           <p className="max-w-[600px] text-white/80">
-                            Discover our full suite of professional design and creative applications.
+                            Discover our full suite of professional design and
+                            creative applications.
                           </p>
                         </div>
                         <Button className="w-fit rounded-2xl bg-white text-red-700 hover:bg-white/90">
@@ -1047,30 +1196,48 @@ export function DesignaliCreative() {
                       {apps
                         .filter((app) => app.new)
                         .map((app) => (
-                          <motion.div key={app.name} whileHover={{ scale: 1.02, y: -5 }} whileTap={{ scale: 0.98 }}>
+                          <motion.div
+                            key={app.name}
+                            whileHover={{ scale: 1.02, y: -5 }}
+                            whileTap={{ scale: 0.98 }}
+                          >
                             <Card className="overflow-hidden rounded-3xl border-2 hover:border-primary/50 transition-all duration-300">
                               <CardHeader className="pb-2">
                                 <div className="flex items-center justify-between">
                                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted">
                                     {app.icon}
                                   </div>
-                                  <Badge className="rounded-xl bg-amber-500">New</Badge>
+                                  <Badge className="rounded-xl bg-amber-500">
+                                    New
+                                  </Badge>
                                 </div>
                               </CardHeader>
                               <CardContent className="pb-2">
-                                <CardTitle className="text-lg">{app.name}</CardTitle>
-                                <CardDescription>{app.description}</CardDescription>
+                                <CardTitle className="text-lg">
+                                  {app.name}
+                                </CardTitle>
+                                <CardDescription>
+                                  {app.description}
+                                </CardDescription>
                                 <div className="mt-2">
                                   <div className="flex items-center justify-between text-sm">
                                     <span>Installation</span>
                                     <span>{app.progress}%</span>
                                   </div>
-                                  <Progress value={app.progress} className="h-2 mt-1 rounded-xl" />
+                                  <Progress
+                                    value={app.progress}
+                                    className="h-2 mt-1 rounded-xl"
+                                  />
                                 </div>
                               </CardContent>
                               <CardFooter>
-                                <Button variant="secondary" className="w-full rounded-2xl">
-                                  {app.progress < 100 ? "Continue Install" : "Open"}
+                                <Button
+                                  variant="secondary"
+                                  className="w-full rounded-2xl"
+                                >
+                                  {app.progress < 100
+                                    ? "Continue Install"
+                                    : "Open"}
                                 </Button>
                               </CardFooter>
                             </Card>
@@ -1083,7 +1250,11 @@ export function DesignaliCreative() {
                     <h2 className="text-2xl font-semibold">All Apps</h2>
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                       {apps.map((app) => (
-                        <motion.div key={app.name} whileHover={{ scale: 1.02, y: -5 }} whileTap={{ scale: 0.98 }}>
+                        <motion.div
+                          key={app.name}
+                          whileHover={{ scale: 1.02, y: -5 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
                           <Card className="overflow-hidden rounded-3xl border hover:border-primary/50 transition-all duration-300">
                             <CardHeader className="pb-2">
                               <div className="flex items-center justify-between">
@@ -1096,14 +1267,25 @@ export function DesignaliCreative() {
                               </div>
                             </CardHeader>
                             <CardContent className="pb-2">
-                              <CardTitle className="text-lg">{app.name}</CardTitle>
-                              <CardDescription>{app.description}</CardDescription>
+                              <CardTitle className="text-lg">
+                                {app.name}
+                              </CardTitle>
+                              <CardDescription>
+                                {app.description}
+                              </CardDescription>
                             </CardContent>
                             <CardFooter className="flex gap-2">
-                              <Button variant="secondary" className="flex-1 rounded-2xl">
+                              <Button
+                                variant="secondary"
+                                className="flex-1 rounded-2xl"
+                              >
                                 {app.progress < 100 ? "Install" : "Open"}
                               </Button>
-                              <Button variant="outline" size="icon" className="rounded-2xl">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="rounded-2xl"
+                              >
                                 <Star className="h-4 w-4" />
                               </Button>
                             </CardFooter>
@@ -1124,9 +1306,12 @@ export function DesignaliCreative() {
                     >
                       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                         <div className="space-y-2">
-                          <h2 className="text-3xl font-bold">Your Creative Files</h2>
+                          <h2 className="text-3xl font-bold">
+                            Your Creative Files
+                          </h2>
                           <p className="max-w-[600px] text-white/80">
-                            Access, manage, and share all your design files in one place.
+                            Access, manage, and share all your design files in
+                            one place.
                           </p>
                         </div>
                         <div className="flex flex-wrap gap-3">
@@ -1179,11 +1364,19 @@ export function DesignaliCreative() {
                     <div className="flex items-center justify-between">
                       <h2 className="text-2xl font-semibold">All Files</h2>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm" className="rounded-2xl">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="rounded-2xl"
+                        >
                           <PanelLeft className="mr-2 h-4 w-4" />
                           Filter
                         </Button>
-                        <Button variant="outline" size="sm" className="rounded-2xl">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="rounded-2xl"
+                        >
                           <ArrowUpDown className="mr-2 h-4 w-4" />
                           Sort
                         </Button>
@@ -1218,15 +1411,29 @@ export function DesignaliCreative() {
                                 )}
                               </div>
                             </div>
-                            <div className="col-span-2 text-sm md:text-base">{file.app}</div>
-                            <div className="col-span-2 text-sm md:text-base">{file.size}</div>
+                            <div className="col-span-2 text-sm md:text-base">
+                              {file.app}
+                            </div>
+                            <div className="col-span-2 text-sm md:text-base">
+                              {file.size}
+                            </div>
                             <div className="col-span-2 flex items-center justify-between w-full md:w-auto">
-                              <span className="text-sm md:text-base">{file.modified}</span>
+                              <span className="text-sm md:text-base">
+                                {file.modified}
+                              </span>
                               <div className="flex gap-1">
-                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 rounded-xl"
+                                >
                                   <Share2 className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 rounded-xl"
+                                >
                                   <MoreHorizontal className="h-4 w-4" />
                                 </Button>
                               </div>
@@ -1248,9 +1455,12 @@ export function DesignaliCreative() {
                     >
                       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                         <div className="space-y-2">
-                          <h2 className="text-3xl font-bold">Project Management</h2>
+                          <h2 className="text-3xl font-bold">
+                            Project Management
+                          </h2>
                           <p className="max-w-[600px] text-white/80">
-                            Organize your creative work into projects and collaborate with your team.
+                            Organize your creative work into projects and
+                            collaborate with your team.
                           </p>
                         </div>
                         <Button className="w-fit rounded-2xl bg-white text-indigo-700 hover:bg-white/90">
@@ -1293,7 +1503,11 @@ export function DesignaliCreative() {
                     <h2 className="text-2xl font-semibold">Active Projects</h2>
                     <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
                       {projects.map((project) => (
-                        <motion.div key={project.name} whileHover={{ scale: 1.02, y: -5 }} whileTap={{ scale: 0.98 }}>
+                        <motion.div
+                          key={project.name}
+                          whileHover={{ scale: 1.02, y: -5 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
                           <Card className="overflow-hidden rounded-3xl border hover:border-primary/50 transition-all duration-300">
                             <CardHeader>
                               <div className="flex items-center justify-between">
@@ -1302,7 +1516,9 @@ export function DesignaliCreative() {
                                   Due {project.dueDate}
                                 </Badge>
                               </div>
-                              <CardDescription>{project.description}</CardDescription>
+                              <CardDescription>
+                                {project.description}
+                              </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                               <div className="space-y-2">
@@ -1310,7 +1526,10 @@ export function DesignaliCreative() {
                                   <span>Progress</span>
                                   <span>{project.progress}%</span>
                                 </div>
-                                <Progress value={project.progress} className="h-2 rounded-xl" />
+                                <Progress
+                                  value={project.progress}
+                                  className="h-2 rounded-xl"
+                                />
                               </div>
                               <div className="flex items-center justify-between text-sm text-muted-foreground">
                                 <div className="flex items-center">
@@ -1324,24 +1543,37 @@ export function DesignaliCreative() {
                               </div>
                             </CardContent>
                             <CardFooter className="flex gap-2">
-                              <Button variant="secondary" className="flex-1 rounded-2xl">
+                              <Button
+                                variant="secondary"
+                                className="flex-1 rounded-2xl"
+                              >
                                 Open Project
                               </Button>
-                              <Button variant="outline" size="icon" className="rounded-2xl">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="rounded-2xl"
+                              >
                                 <Share2 className="h-4 w-4" />
                               </Button>
                             </CardFooter>
                           </Card>
                         </motion.div>
                       ))}
-                      <motion.div whileHover={{ scale: 1.02, y: -5 }} whileTap={{ scale: 0.98 }}>
+                      <motion.div
+                        whileHover={{ scale: 1.02, y: -5 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
                         <Card className="flex h-full flex-col items-center justify-center rounded-3xl border border-dashed p-8 hover:border-primary/50 transition-all duration-300">
                           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                             <Plus className="h-6 w-6" />
                           </div>
-                          <h3 className="text-lg font-medium">Create New Project</h3>
+                          <h3 className="text-lg font-medium">
+                            Create New Project
+                          </h3>
                           <p className="mb-4 text-center text-sm text-muted-foreground">
-                            Start a new creative project from scratch or use a template
+                            Start a new creative project from scratch or use a
+                            template
                           </p>
                           <Button className="rounded-2xl">New Project</Button>
                         </Card>
@@ -1350,60 +1582,94 @@ export function DesignaliCreative() {
                   </section>
 
                   <section className="space-y-4">
-                    <h2 className="text-2xl font-semibold">Project Templates</h2>
+                    <h2 className="text-2xl font-semibold">
+                      Project Templates
+                    </h2>
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                       <Card className="overflow-hidden rounded-3xl">
                         <div className="aspect-video bg-gradient-to-br from-blue-500 to-purple-600 p-6 text-white">
-                          <h3 className="text-lg font-medium">Brand Identity</h3>
-                          <p className="text-sm text-white/80">Complete brand design package</p>
+                          <h3 className="text-lg font-medium">
+                            Brand Identity
+                          </h3>
+                          <p className="text-sm text-white/80">
+                            Complete brand design package
+                          </p>
                         </div>
                         <CardFooter className="flex justify-between p-4">
                           <Badge variant="outline" className="rounded-xl">
                             Popular
                           </Badge>
-                          <Button variant="ghost" size="sm" className="rounded-xl">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="rounded-xl"
+                          >
                             Use Template
                           </Button>
                         </CardFooter>
                       </Card>
                       <Card className="overflow-hidden rounded-3xl">
                         <div className="aspect-video bg-gradient-to-br from-amber-500 to-red-600 p-6 text-white">
-                          <h3 className="text-lg font-medium">Marketing Campaign</h3>
-                          <p className="text-sm text-white/80">Multi-channel marketing assets</p>
+                          <h3 className="text-lg font-medium">
+                            Marketing Campaign
+                          </h3>
+                          <p className="text-sm text-white/80">
+                            Multi-channel marketing assets
+                          </p>
                         </div>
                         <CardFooter className="flex justify-between p-4">
                           <Badge variant="outline" className="rounded-xl">
                             New
                           </Badge>
-                          <Button variant="ghost" size="sm" className="rounded-xl">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="rounded-xl"
+                          >
                             Use Template
                           </Button>
                         </CardFooter>
                       </Card>
                       <Card className="overflow-hidden rounded-3xl">
                         <div className="aspect-video bg-gradient-to-br from-green-500 to-teal-600 p-6 text-white">
-                          <h3 className="text-lg font-medium">Website Redesign</h3>
-                          <p className="text-sm text-white/80">Complete website design workflow</p>
+                          <h3 className="text-lg font-medium">
+                            Website Redesign
+                          </h3>
+                          <p className="text-sm text-white/80">
+                            Complete website design workflow
+                          </p>
                         </div>
                         <CardFooter className="flex justify-between p-4">
                           <Badge variant="outline" className="rounded-xl">
                             Featured
                           </Badge>
-                          <Button variant="ghost" size="sm" className="rounded-xl">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="rounded-xl"
+                          >
                             Use Template
                           </Button>
                         </CardFooter>
                       </Card>
                       <Card className="overflow-hidden rounded-3xl">
                         <div className="aspect-video bg-gradient-to-br from-pink-500 to-rose-600 p-6 text-white">
-                          <h3 className="text-lg font-medium">Product Launch</h3>
-                          <p className="text-sm text-white/80">Product launch campaign assets</p>
+                          <h3 className="text-lg font-medium">
+                            Product Launch
+                          </h3>
+                          <p className="text-sm text-white/80">
+                            Product launch campaign assets
+                          </p>
                         </div>
                         <CardFooter className="flex justify-between p-4">
                           <Badge variant="outline" className="rounded-xl">
                             Popular
                           </Badge>
-                          <Button variant="ghost" size="sm" className="rounded-xl">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="rounded-xl"
+                          >
                             Use Template
                           </Button>
                         </CardFooter>
@@ -1424,7 +1690,8 @@ export function DesignaliCreative() {
                         <div className="space-y-2">
                           <h2 className="text-3xl font-bold">Learn & Grow</h2>
                           <p className="max-w-[600px] text-white/80">
-                            Expand your creative skills with tutorials, courses, and resources.
+                            Expand your creative skills with tutorials, courses,
+                            and resources.
                           </p>
                         </div>
                         <Button className="w-fit rounded-2xl bg-white text-emerald-700 hover:bg-white/90">
@@ -1468,14 +1735,24 @@ export function DesignaliCreative() {
                   </div>
 
                   <section className="space-y-4">
-                    <h2 className="text-2xl font-semibold">Featured Tutorials</h2>
+                    <h2 className="text-2xl font-semibold">
+                      Featured Tutorials
+                    </h2>
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                       {tutorials.slice(0, 3).map((tutorial) => (
-                        <motion.div key={tutorial.title} whileHover={{ scale: 1.02, y: -5 }} whileTap={{ scale: 0.98 }}>
+                        <motion.div
+                          key={tutorial.title}
+                          whileHover={{ scale: 1.02, y: -5 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
                           <Card className="overflow-hidden rounded-3xl">
                             <div className="aspect-video overflow-hidden bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 relative">
                               <div className="absolute inset-0 flex items-center justify-center">
-                                <Button size="icon" variant="secondary" className="h-14 w-14 rounded-full">
+                                <Button
+                                  size="icon"
+                                  variant="secondary"
+                                  className="h-14 w-14 rounded-full"
+                                >
                                   <Play className="h-6 w-6" />
                                 </Button>
                               </div>
@@ -1483,17 +1760,25 @@ export function DesignaliCreative() {
                                 <Badge className="bg-white/20 text-white hover:bg-white/30 rounded-xl">
                                   {tutorial.category}
                                 </Badge>
-                                <h3 className="mt-2 text-lg font-medium">{tutorial.title}</h3>
+                                <h3 className="mt-2 text-lg font-medium">
+                                  {tutorial.title}
+                                </h3>
                               </div>
                             </div>
                             <CardContent className="p-4">
-                              <p className="text-sm text-muted-foreground">{tutorial.description}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {tutorial.description}
+                              </p>
                               <div className="mt-4 flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                   <Avatar className="h-6 w-6">
-                                    <AvatarFallback>{tutorial.instructor.charAt(0)}</AvatarFallback>
+                                    <AvatarFallback>
+                                      {tutorial.instructor.charAt(0)}
+                                    </AvatarFallback>
                                   </Avatar>
-                                  <span className="text-sm">{tutorial.instructor}</span>
+                                  <span className="text-sm">
+                                    {tutorial.instructor}
+                                  </span>
                                 </div>
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                   <Clock className="h-4 w-4" />
@@ -1518,7 +1803,9 @@ export function DesignaliCreative() {
 
                   <section className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <h2 className="text-2xl font-semibold">Popular Courses</h2>
+                      <h2 className="text-2xl font-semibold">
+                        Popular Courses
+                      </h2>
                       <Button variant="ghost" className="rounded-2xl">
                         View All
                       </Button>
@@ -1541,7 +1828,9 @@ export function DesignaliCreative() {
                             </div>
                             <div className="flex-1">
                               <h3 className="font-medium">{tutorial.title}</h3>
-                              <p className="text-sm text-muted-foreground">{tutorial.description}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {tutorial.description}
+                              </p>
                               <div className="mt-2 flex flex-wrap items-center gap-3">
                                 <Badge variant="outline" className="rounded-xl">
                                   {tutorial.level}
@@ -1557,7 +1846,11 @@ export function DesignaliCreative() {
                               </div>
                             </div>
                             <div className="flex items-center">
-                              <Button variant="ghost" size="sm" className="rounded-xl">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="rounded-xl"
+                              >
                                 Watch Now
                               </Button>
                             </div>
@@ -1573,11 +1866,18 @@ export function DesignaliCreative() {
                       <Card className="overflow-hidden rounded-3xl border-2 hover:border-primary/50 transition-all duration-300">
                         <CardHeader className="pb-2">
                           <div className="flex items-center justify-between">
-                            <Badge className="rounded-xl bg-blue-500">Beginner</Badge>
+                            <Badge className="rounded-xl bg-blue-500">
+                              Beginner
+                            </Badge>
                             <Award className="h-5 w-5 text-amber-500" />
                           </div>
-                          <CardTitle className="mt-2">UI/UX Design Fundamentals</CardTitle>
-                          <CardDescription>Master the basics of user interface and experience design</CardDescription>
+                          <CardTitle className="mt-2">
+                            UI/UX Design Fundamentals
+                          </CardTitle>
+                          <CardDescription>
+                            Master the basics of user interface and experience
+                            design
+                          </CardDescription>
                         </CardHeader>
                         <CardContent>
                           <div className="space-y-2">
@@ -1586,11 +1886,16 @@ export function DesignaliCreative() {
                               <span>4.8 ★</span>
                             </div>
                             <Progress value={30} className="h-2 rounded-xl" />
-                            <p className="text-xs text-muted-foreground">30% completed</p>
+                            <p className="text-xs text-muted-foreground">
+                              30% completed
+                            </p>
                           </div>
                         </CardContent>
                         <CardFooter>
-                          <Button variant="secondary" className="w-full rounded-2xl">
+                          <Button
+                            variant="secondary"
+                            className="w-full rounded-2xl"
+                          >
                             Continue Learning
                           </Button>
                         </CardFooter>
@@ -1599,11 +1904,17 @@ export function DesignaliCreative() {
                       <Card className="overflow-hidden rounded-3xl border-2 hover:border-primary/50 transition-all duration-300">
                         <CardHeader className="pb-2">
                           <div className="flex items-center justify-between">
-                            <Badge className="rounded-xl bg-amber-500">Intermediate</Badge>
+                            <Badge className="rounded-xl bg-amber-500">
+                              Intermediate
+                            </Badge>
                             <Award className="h-5 w-5 text-amber-500" />
                           </div>
-                          <CardTitle className="mt-2">Digital Illustration Mastery</CardTitle>
-                          <CardDescription>Create stunning digital artwork and illustrations</CardDescription>
+                          <CardTitle className="mt-2">
+                            Digital Illustration Mastery
+                          </CardTitle>
+                          <CardDescription>
+                            Create stunning digital artwork and illustrations
+                          </CardDescription>
                         </CardHeader>
                         <CardContent>
                           <div className="space-y-2">
@@ -1612,11 +1923,16 @@ export function DesignaliCreative() {
                               <span>4.9 ★</span>
                             </div>
                             <Progress value={0} className="h-2 rounded-xl" />
-                            <p className="text-xs text-muted-foreground">Not started</p>
+                            <p className="text-xs text-muted-foreground">
+                              Not started
+                            </p>
                           </div>
                         </CardContent>
                         <CardFooter>
-                          <Button variant="secondary" className="w-full rounded-2xl">
+                          <Button
+                            variant="secondary"
+                            className="w-full rounded-2xl"
+                          >
                             Start Learning
                           </Button>
                         </CardFooter>
@@ -1625,11 +1941,17 @@ export function DesignaliCreative() {
                       <Card className="overflow-hidden rounded-3xl border-2 hover:border-primary/50 transition-all duration-300">
                         <CardHeader className="pb-2">
                           <div className="flex items-center justify-between">
-                            <Badge className="rounded-xl bg-red-500">Advanced</Badge>
+                            <Badge className="rounded-xl bg-red-500">
+                              Advanced
+                            </Badge>
                             <Award className="h-5 w-5 text-amber-500" />
                           </div>
-                          <CardTitle className="mt-2">Motion Graphics & Animation</CardTitle>
-                          <CardDescription>Create professional motion graphics and animations</CardDescription>
+                          <CardTitle className="mt-2">
+                            Motion Graphics & Animation
+                          </CardTitle>
+                          <CardDescription>
+                            Create professional motion graphics and animations
+                          </CardDescription>
                         </CardHeader>
                         <CardContent>
                           <div className="space-y-2">
@@ -1638,11 +1960,16 @@ export function DesignaliCreative() {
                               <span>4.7 ★</span>
                             </div>
                             <Progress value={0} className="h-2 rounded-xl" />
-                            <p className="text-xs text-muted-foreground">Not started</p>
+                            <p className="text-xs text-muted-foreground">
+                              Not started
+                            </p>
                           </div>
                         </CardContent>
                         <CardFooter>
-                          <Button variant="secondary" className="w-full rounded-2xl">
+                          <Button
+                            variant="secondary"
+                            className="w-full rounded-2xl"
+                          >
                             Start Learning
                           </Button>
                         </CardFooter>
@@ -1656,5 +1983,5 @@ export function DesignaliCreative() {
         </main>
       </div>
     </div>
-  )
+  );
 }

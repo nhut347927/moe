@@ -10,7 +10,6 @@ import {
   RefreshCw,
   Search,
   ArrowUpDown,
-  Shield,
   ArrowRight,
 } from "lucide-react";
 import {
