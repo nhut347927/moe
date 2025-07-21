@@ -29,6 +29,24 @@ export default function UploadPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleCreatePost = async () => {
+    if (!postCreateForm.title.trim()) {
+      errorMessages.tagCodeList = "";
+      errorMessages.title = "Title is required.";
+      return;
+    }
+
+    if (postCreateForm.title.trim().length > 70) {
+      errorMessages.tagCodeList = "";
+      errorMessages.title = "Title must be less than 70 characters.";
+      return;
+    }
+
+    if ((postCreateForm.tagCodeList?.length ?? 0) <= 0) {
+      errorMessages.title = "";
+      errorMessages.tagCodeList = "Tag is required.";
+      return;
+    }
+
     if (postCreateForm.postType === "VID") {
       if (!postCreateForm.videoPublicId) {
         toast({
@@ -145,7 +163,7 @@ export default function UploadPage() {
             </div>
           )}
 
-          <div className="mb-6">
+          <div className="mb-12">
             <FormCreatePost
               postCreateForm={postCreateForm}
               setPostCreateForm={setPostCreateForm}
@@ -196,7 +214,7 @@ export default function UploadPage() {
                   disabled={isSubmitting}
                   aria-label="Create post"
                 >
-                  {isSubmitting ? "Đang tạo..." : "Create Post"}
+                  {isSubmitting ? "Creating..." : "Create Post"}
                 </Button>
               </div>
             </div>

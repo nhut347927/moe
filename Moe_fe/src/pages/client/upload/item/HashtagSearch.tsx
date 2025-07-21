@@ -24,8 +24,7 @@ interface HashtagSearchProp {
   postCreateForm: PostCreateForm | null;
   setPostCreateForm: (form: PostCreateForm) => void;
   errorMessages?: {
-    title?: string;
-    description?: string;
+    tagCodeList?: string;
   };
 }
 
@@ -176,6 +175,11 @@ export default function HashtagSearch({
               className="rounded-xl bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 placeholder:text-gray-400 dark:placeholder:text-gray-500"
               aria-label="Search hashtags"
             />
+              {errorMessages?.tagCodeList && (
+              <p className="text-sm text-red-500 mt-1">
+                {errorMessages.tagCodeList}
+              </p>
+            )}
             {searchTerm && (
               <button
                 onClick={() => {
@@ -329,16 +333,8 @@ export default function HashtagSearch({
           </Badge>
         ))}
       </div>
-      {errorMessages?.title && (
-        <p className="text-red-500 dark:text-red-400 text-xs mt-2">
-          {errorMessages.title}
-        </p>
-      )}
-      {errorMessages?.description && (
-        <p className="text-red-500 dark:text-red-400 text-xs mt-1">
-          {errorMessages.description}
-        </p>
-      )}
+  
+    
     </div>
   );
 }

@@ -1,58 +1,56 @@
-fix:	Khi sửa một bug/bug logic
-feat:	Khi thêm chức năng mới
-chore:	Khi thay đổi cấu hình, tài liệu, CI/CD
-refactor:	Khi cải tiến mã nhưng không thay đổi hành vi
-style:	Thay đổi style/code format
-docs: Cập nhật tài liệu
-
-
 # Moe Social Network Backend
 
 ## Overview
-Moe is a backend service for a social networking application built with Java and Spring Boot. It provides RESTful APIs to manage users, posts, comments, likes, follows, search history, file uploads, and reporting. The service supports authentication via JWT and Google OAuth, media storage with Cloudinary.
+Moe là backend cho ứng dụng mạng xã hội, phát triển bằng Java 17+ và Spring Boot. Hệ thống cung cấp RESTful API quản lý người dùng, bài đăng, bình luận, lượt thích, theo dõi, lịch sử tìm kiếm, upload file, báo cáo, và logging hoạt động. Hỗ trợ xác thực JWT, Google OAuth, lưu trữ media với Cloudinary, xử lý video/audio với FFmpeg.
 
 ## Technologies Used
 - Java 17+
 - Spring Boot (Web, Security, Data JPA)
-- MySQL 8 (via Hibernate)
-- Kafka (Apache Kafka for messaging)
+- Hibernate (ORM)
+- MySQL 8
 - Cloudinary (media storage)
-- JWT (JSON Web Tokens for authentication)
+- FFmpeg (video/audio processing)
+- JWT (authentication)
 - Google OAuth2
 - Gmail SMTP (email notifications)
-- Dotenv (environment variable management)
+- Dotenv (.env environment management)
 - Maven (build tool)
+- Docker (containerization)
+- Lombok (code generation)
+- JUnit (unit testing)
 
 ## Features
-- User account management: profile update, avatar upload, follow/unfollow users
-- Post management: create, view, like, delete posts
-- Comment management: add comments and replies, like and delete comments
-- Search functionality: search users and posts with pagination and sorting
-- File upload support for images and videos (max 200MB)
-- Authentication and authorization with JWT and Google OAuth2
-- Email notifications for password reset and other events
-- Activity logging and reporting
-- Kafka integration for asynchronous processing and messaging
+- Quản lý tài khoản: cập nhật hồ sơ, avatar, theo dõi/hủy theo dõi
+- Quản lý bài đăng: tạo, xem, thích, xóa bài đăng, xử lý video/audio
+- Quản lý bình luận: thêm bình luận/trả lời, thích/xóa bình luận
+- Tìm kiếm: người dùng, bài đăng, phân trang và sắp xếp
+- Upload file ảnh/video (tối đa 100MB)
+- Xác thực & phân quyền: JWT, Google OAuth2
+- Email thông báo: đặt lại mật khẩu, sự kiện hệ thống
+- Logging hoạt động & báo cáo
+- Tích hợp Kafka cho các tác vụ bất đồng bộ
+- Lên lịch dọn dẹp dữ liệu (Spring Scheduler)
 
 ## Architecture Overview
-- **Controllers**: REST API endpoints for various resources (users, posts, comments, search, reports)
-- **Services**: Business logic implementations for handling core functionalities
-- **Models**: JPA entities representing database tables
-- **Repositories (JPA)**: Data access layer for CRUD operations
-- **DTOs**: Data Transfer Objects for request and response payloads
-- **Security**: JWT and OAuth2 configuration for securing APIs
-- **Utils**: Utility classes for common tasks (JWT handling, text normalization, date parsing)
-- **Queue**: Kafka producers and consumers for asynchronous tasks
-- **Exception Handling**: Global exception handler for consistent API error responses
+- **Controllers**: REST API cho các tài nguyên (users, posts, comments, search, reports)
+- **Services**: Xử lý nghiệp vụ chính
+- **Models**: Entity JPA ánh xạ bảng dữ liệu
+- **Repositories (JPA)**: Truy cập dữ liệu
+- **DTOs**: Đối tượng truyền dữ liệu request/response
+- **Security**: JWT, OAuth2 cấu hình bảo mật
+- **Utils**: Tiện ích chung (JWT, chuẩn hóa text, parse ngày tháng)
+- **Queue**: Kafka producer/consumer
+- **Exception Handling**: Xử lý lỗi tập trung
 
 ## Configuration
-- Configured via `src/main/resources/application.properties` and environment variables loaded from `.env`
-- Database connection to MySQL with Hibernate auto schema update
-- CORS configured for frontend origin
-- JWT secrets and expiration times configurable via environment variables
-- Email SMTP settings for Gmail
-- Cloudinary credentials for media uploads
-- Kafka bootstrap servers and serialization settings
+- Cấu hình qua `src/main/resources/application.properties` và biến môi trường `.env`
+- Kết nối MySQL, Hibernate tự động cập nhật schema
+- CORS cho frontend
+- JWT secret, thời gian hết hạn qua biến môi trường
+- SMTP Gmail cho email
+- Cloudinary cho upload media
+- Kafka cho queue
+- FFmpeg path cho xử lý video/audio
 
 ## Folder Structure
 ```
@@ -60,44 +58,46 @@ src/
 ├── main/
 │   ├── java/com/moe/socialnetwork/
 │   │   ├── api/                # Controllers, DTOs, Services, Queue, Response
-│   │   ├── auth/               # Authentication controllers, DTOs, security config, services
-│   │   ├── config/             # Application configuration classes
-│   │   ├── exception/          # Exception handling classes
-│   │   ├── jpa/                # JPA repository interfaces
-│   │   ├── models/             # JPA entity classes
-│   │   ├── response/           # API response wrapper classes
+│   │   ├── auth/               # Authentication, security config
+│   │   ├── config/             # Application config
+│   │   ├── exception/          # Exception handler
+│   │   ├── jpa/                # JPA repositories
+│   │   ├── models/             # JPA entities
+│   │   ├── response/           # API response wrapper
 │   │   ├── util/               # Utility classes
-│   │   ├── MoeApplication.java # Main Spring Boot application class
-│   │   └── ServletInitializer.java # Servlet initializer for deployment
+│   │   ├── MoeApplication.java # Main Spring Boot class
+│   │   └── ServletInitializer.java
 │   └── resources/
-│       ├── application.properties # Application configuration
-│       ├── static/                  # Static resources (images, videos)
-│       └── templates/               # Template files (if any)
-└── test/                            # Unit and integration tests
+│       ├── application.properties
+│       ├── static/
+│       └── templates/
+└── test/
 ```
 
 ## Build and Run
-1. Ensure you have Java 17+ and Maven installed.
-2. Configure environment variables in a `.env` file or system environment:
-   - Database credentials (`DB_USERNAME`, `DB_PASSWORD`)
-   - JWT secret (`APP_JWT_SECRET`)
-   - Email credentials (`SPRING_MAIL_USERNAME`, `SPRING_MAIL_PASSWORD`, `APP_EMAIL_FROM`)
-   - Google OAuth client ID (`GOOGLE_CLIENT_ID`)
-   - Cloudinary credentials (`CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `CLOUDINARY_CLOUD_NAME`)
-3. Build the project:
+1. Cài đặt Java 17+ và Maven.
+2. Tạo file `.env` hoặc cấu hình biến môi trường:
+   - DB_USERNAME, DB_PASSWORD
+   - APP_JWT_SECRET
+   - SPRING_MAIL_USERNAME, SPRING_MAIL_PASSWORD, APP_EMAIL_FROM
+   - GOOGLE_CLIENT_ID
+   - CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_CLOUD_NAME
+   - KAFKA_BOOTSTRAP_SERVERS
+   - FFmpeg path nếu cần xử lý video/audio
+3. Build:
    ```bash
    ./mvnw clean package
    ```
-4. Run the application:
+4. Chạy ứng dụng:
    ```bash
    java -jar target/moe-0.0.1-SNAPSHOT.jar
    ```
-5. The server will start on port 8080 by default.
+5. Server mặc định chạy ở port 8080.
 
 ## Notes
-- Kafka must be running and accessible at the configured bootstrap server.
-- Cloudinary account is required for media uploads.
-- Frontend application should be configured to communicate with this backend API.
+- Cloudinary bắt buộc để upload media.
+- FFmpeg cần cài đặt trên server để xử lý video/audio.
+- Frontend cần cấu hình đúng origin để kết nối API backend.
 
 ## Author
 - nhutnm379
