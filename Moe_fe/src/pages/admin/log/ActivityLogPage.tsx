@@ -40,13 +40,14 @@ const ActivityLogPage = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [page, setPage] = useState<number>(0);
-  const [size, setSize] = useState<number>(10);
+  const [size, setSize] = useState<number>(25);
   const [sort, setSort] = useState<string>("desc");
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [hasNext, setHasNext] = useState<boolean>(false);
   const [viewDetail, setViewDetail] = useState<string | null>(null);
   // Debounce search term
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>("");
+  const [logTotal, setLogTotal] = useState<number>(0);
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
@@ -66,6 +67,7 @@ const ActivityLogPage = () => {
     },
     enabled: true,
     onSuccess: (data) => {
+      setLogTotal(Number(data?.totalElements) || 0);
       setLogs(
         page === 0 ? data?.contents || [] : [...logs, ...(data?.contents || [])]
       );
@@ -134,11 +136,14 @@ const ActivityLogPage = () => {
   };
 
   return (
-    <div className="w-full flex-1 flex justify-center">
-      <ScrollArea className="max-w-full overflow-auto">
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
-          Activity Log
-        </h1>
+    <div className="w-full flex justify-center">
+      <div className="w-full">
+        <div className=" flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
+            Activity Log
+          </h1>
+          <p>Logs:{logTotal}</p>
+        </div>
 
         {/* Search Input, Sort, and Refresh */}
         <div className="flex items-center gap-2 mb-4">
@@ -184,95 +189,79 @@ const ActivityLogPage = () => {
         </div>
 
         {/* Table */}
+
         <div className="w-full">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Status</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Data</TableHead>
-                <TableHead>Error</TableHead>
-                <TableHead>Message</TableHead>
-                <TableHead>IP</TableHead>
-                <TableHead>User</TableHead>
-                <TableHead>Time</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {logs.length === 0 && !loading ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={8}
-                    className="text-center text-zinc-500 dark:text-zinc-400"
-                  >
-                    No activity logs found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                logs.map((log) => (
-                  <TableRow key={log.code}>
-                    <TableCell>{renderStatusIcon(log.responseCode)}</TableCell>
+       <Table className="w-full table-fixed"> {/* table-fixed quan trọng để các width có hiệu lực */}
+  <TableHeader>
+    <TableRow>
+      <TableHead className="w-[80px]">Status</TableHead>
+      <TableHead className="w-[120px]">Type</TableHead>
+      <TableHead className="w-[180px]">Data</TableHead>
+      <TableHead className="w-[180px]">Error</TableHead>
+      <TableHead className="w-[180px]">Message</TableHead>
+      <TableHead className="w-[130px]">IP</TableHead>
+      <TableHead className="w-[130px]">User</TableHead>
+      <TableHead className="w-[160px]">Time</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    {logs.map((log) => (
+      <TableRow key={log.code}>
+        <TableCell>{renderStatusIcon(log.responseCode)}</TableCell>
+        <TableCell
+          onClick={() => setViewDetail(log.type)}
+          className="cursor-pointer uppercase truncate"
+        >
+          {log.type}
+        </TableCell>
+        <TableCell
+          onClick={() => setViewDetail(log.data)}
+          className="cursor-pointer truncate"
+          title={log.data}
+        >
+          {log.data}
+        </TableCell>
+        <TableCell
+          onClick={() => setViewDetail(log.error)}
+          className="cursor-pointer truncate"
+          title={log.error}
+        >
+          {log.error || "No error"}
+        </TableCell>
+        <TableCell
+          onClick={() => setViewDetail(log.message)}
+          className="cursor-pointer truncate"
+          title={log.message}
+        >
+          {log.message}
+        </TableCell>
+        <TableCell
+          onClick={() => setViewDetail(log.ip)}
+          className="cursor-pointer truncate"
+          title={log.ip}
+        >
+          {log.ip}
+        </TableCell>
+        <TableCell
+          onClick={() => setViewDetail(log.userCode)}
+          className="cursor-pointer truncate"
+          title={log.userCode}
+        >
+          {log.userCode}
+        </TableCell>
+        <TableCell
+          onClick={() => setViewDetail(log.createdAt)}
+          className="cursor-pointer truncate flex items-center gap-1"
+          title={new Date(log.createdAt).toLocaleString()}
+        >
+          <Clock className="w-4 h-4 text-zinc-400" />
+          {new Date(log.createdAt).toLocaleString()}
+        </TableCell>
+      </TableRow>
+    ))}
+  </TableBody>
+</Table>
 
-                    <TableCell
-                      onClick={() => setViewDetail(log.type)}
-                      className="uppercase cursor-pointer"
-                    >
-                      {log.type}
-                    </TableCell>
-
-                    <TableCell
-                      onClick={() => setViewDetail(log.data)}
-                      className="max-w-xs overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer"
-                      title={log.data}
-                    >
-                      {log.data}
-                    </TableCell>
-
-                    <TableCell
-                      onClick={() => setViewDetail(log.error)}
-                      className="max-w-xs overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer"
-                      title={log.error}
-                    >
-                      {log.error || "No error"}
-                    </TableCell>
-
-                    <TableCell
-                      onClick={() => setViewDetail(log.message)}
-                      className="max-w-xs overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer"
-                      title={log.message}
-                    >
-                      {log.message}
-                    </TableCell>
-
-                    <TableCell
-                      onClick={() => setViewDetail(log.ip)}
-                      className="max-w-xs overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer"
-                      title={log.ip}
-                    >
-                      {log.ip}
-                    </TableCell>
-
-                    <TableCell
-                      onClick={() => setViewDetail(log.userCode)}
-                      className="max-w-xs overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer"
-                      title={log.userCode}
-                    >
-                      {log.userCode}
-                    </TableCell>
-
-                    <TableCell
-                      onClick={() => setViewDetail(log.createdAt)}
-                      className="flex items-center gap-1 cursor-pointer whitespace-nowrap"
-                      title={new Date(log.createdAt).toLocaleString()}
-                    >
-                      <Clock className="w-4 h-4 text-zinc-400" />
-                      {new Date(log.createdAt).toLocaleString()}
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
         </div>
 
         {/* Pagination */}
@@ -340,7 +329,7 @@ const ActivityLogPage = () => {
             </div>
           </div>
         )}
-      </ScrollArea>
+      </div>
     </div>
   );
 };

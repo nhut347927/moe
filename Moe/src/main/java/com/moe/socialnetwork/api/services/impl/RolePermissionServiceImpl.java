@@ -14,7 +14,11 @@ import com.moe.socialnetwork.jpa.RolePermissionJPA;
 import com.moe.socialnetwork.jpa.UserJPA;
 import com.moe.socialnetwork.models.RolePermission;
 import com.moe.socialnetwork.models.User;
+
+import jakarta.transaction.Transactional;
+
 import com.moe.socialnetwork.exception.AppException;
+
 /**
  * Author: nhutnm379
  */
@@ -30,36 +34,68 @@ public class RolePermissionServiceImpl implements IRolePermissionService {
         this.roleJpa = roleJpa;
     }
 
-    public List<RPRolePermissionDTO> getPermissionsByUser(String userCode) {
-        List<RolePermission> rolePermission = rolePermissionJpa.findByUserCode(UUID.fromString(userCode));
-        if (rolePermission.isEmpty()) {
-            throw new AppException("No permissions found for user with code: " + userCode, 404);
+    public List<RPRolePermissionDTO> getPermissionsByUser(UUID userCode) {
+        List<RolePermission> rolePermissions = rolePermissionJpa.findByUserCode(userCode);
+
+        // Nếu có dữ liệu, chuyển sang DTO và trả về
+        if (!rolePermissions.isEmpty()) {
+            return rolePermissions.stream()
+                    .map(this::toDTO)
+                    .toList();
         }
-        return rolePermission.stream()
-                .map(this::toDTO)
+
+        // Nếu không có, tạo danh sách DTO với role và tất cả quyền là false
+        List<Role> allRoles = roleJpa.findAll();
+
+        return allRoles.stream()
+                .map(role -> {
+                    RPRolePermissionDTO dto = new RPRolePermissionDTO();
+                    dto.setUserCode(userCode.toString());
+                    dto.setRoleCode(role.getCode().toString());
+                    dto.setRoleName(role.getRoleName());
+                    dto.setCanView(false);
+                    dto.setCanInsert(false);
+                    dto.setCanUpdate(false);
+                    dto.setCanDelete(false);
+                    dto.setCanRestore(false);
+                    return dto;
+                })
                 .toList();
     }
 
+ @Transactional
     public void createOrUpdatePermission(List<RPRolePermissionDTO> rolePermissions) {
-        // Lấy user
+        if (rolePermissions.isEmpty()) {
+            throw new AppException("No permissions provided", 400);
+        }
+
         String userCode = rolePermissions.get(0).getUserCode();
         User user = userJpa.findByCode(UUID.fromString(userCode))
-                .orElseThrow(() -> new AppException("User not found or deleted",404));
+                .orElseThrow(() -> new AppException("User not found or deleted", 404));
 
-        // Lấy tất cả role để cache
         List<Role> roles = roleJpa.findAll();
-
-        // Danh sách gom tất cả entity cần lưu
         List<RolePermission> result = new ArrayList<>();
 
-        // Xử lý từng RolePermissionDTO
         for (RPRolePermissionDTO perDto : rolePermissions) {
             Role role = roles.stream()
                     .filter(r -> r.getCode().toString().equals(perDto.getRoleCode()))
                     .findFirst()
                     .orElseThrow(() -> new AppException("Role not found", 404));
 
-            RolePermission entity = new RolePermission();
+            RolePermission entity;
+            if (perDto.getCode() != null && !perDto.getCode().isEmpty()) {
+                try {
+                    UUID code = UUID.fromString(perDto.getCode());
+                    entity = rolePermissionJpa.findByCode(code)
+                            .orElseGet(RolePermission::new);
+                    entity.setCode(code);
+                } catch (IllegalArgumentException ex) {
+                    throw new AppException("Invalid UUID format: " + perDto.getCode(), 400);
+                }
+            } else {
+                entity = new RolePermission();
+            }
+
             entity.setUser(user);
             entity.setRole(role);
             entity.setCanView(perDto.getCanView());
@@ -68,18 +104,9 @@ public class RolePermissionServiceImpl implements IRolePermissionService {
             entity.setCanDelete(perDto.getCanDelete());
             entity.setCanRestore(perDto.getCanRestore());
 
-            if (perDto.getCode() != null && !perDto.getCode().isEmpty()) {
-                try {
-                    entity.setCode(UUID.fromString(perDto.getCode()));
-                } catch (IllegalArgumentException ex) {
-                    throw new AppException("Invalid UUID format: " + perDto.getCode(), 400);
-                }
-            }
-
             result.add(entity);
         }
 
-        // Chỉ khi xử lý xong hết và không lỗi thì mới save
         rolePermissionJpa.saveAll(result);
     }
 
@@ -92,6 +119,7 @@ public class RolePermissionServiceImpl implements IRolePermissionService {
                 entity.getCode().toString(),
                 entity.getUser().getCode().toString(),
                 entity.getRole().getCode().toString(),
+                entity.getRole().getRoleName(),
                 entity.getCanView(),
                 entity.getCanInsert(),
                 entity.getCanUpdate(),

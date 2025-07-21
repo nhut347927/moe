@@ -38,7 +38,9 @@ public class SecurityConfig {
                                 "api/file/upload-image", "api/file/upload-video", "/api/file/upload-audio",
                                 "/api/file/upload-any")
                         .permitAll()
-                        .requestMatchers("/api/upload/image").hasAuthority("ADMIN_INSERT") // demo
+                        .requestMatchers("/api/logs/**").hasAuthority("LOG_VIEW")
+                        .requestMatchers("/api/user/**").hasAuthority("USER_VIEW")
+                        .requestMatchers("/api/role-permission/**").hasAuthority("LOG_VIEW")
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

@@ -18,7 +18,7 @@ export default function KeywordPage() {
   const scrollAreaRef = useRef<HTMLDivElement>(null); // Ref for ScrollArea viewport
 
   const { data, loading, error, refetch } = useGetApi<Page<KeywordSearch>>({
-    endpoint: "/user/activity/search-history",
+    endpoint: "/activity/search-history",
     params: { page, size, sort },
     enabled: true,
     onSuccess: (responseData) => {

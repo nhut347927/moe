@@ -45,7 +45,7 @@ public class ActivityLogController {
     }
 
     @GetMapping
-    public ResponseEntity<ResponseAPI<ZRPPageDTO<RPActivityLogDTO>>> getUserComments(
+    public ResponseEntity<ResponseAPI<ZRPPageDTO<RPActivityLogDTO>>> getLog(
             @Valid @ModelAttribute ZRQFilterPageDTO request,
             @AuthenticationPrincipal User user) {
 

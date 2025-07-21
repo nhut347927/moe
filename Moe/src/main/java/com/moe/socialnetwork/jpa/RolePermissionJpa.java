@@ -1,6 +1,7 @@
 package com.moe.socialnetwork.jpa;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,4 +22,8 @@ public interface RolePermissionJPA extends JpaRepository<RolePermission, Long> {
 	// viết phương thức delete permisson theo code của user
 	@Query("DeLETE FROM RolePermission rp WHERE rp.user.code = :code")
 	void deleteByUserCode(@Param("code") UUID code);
+
+
+	@Query("SELECT rp FROM RolePermission rp  WHERE rp.code = :roleCode")
+	 Optional<RolePermission> findByCode(@Param("roleCode") UUID roleCode);
 }

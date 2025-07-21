@@ -16,7 +16,7 @@ export default function FavoritePage() {
   const scrollAreaRef = useRef<HTMLDivElement>(null); // Ref for ScrollArea viewport
 
   const { data, loading, error, refetch } = useGetApi<Page<Post>>({
-    endpoint: "/user/activity/likes",
+    endpoint: "/activity/likes",
     params: { page, size, sort },
     enabled: true,
     onSuccess: (responseData) => {

@@ -13,6 +13,8 @@ import {
   PanelLeft,
   Search,
   Settings,
+  Shield,
+  User,
   Wand2,
   X,
 } from "lucide-react";
@@ -32,35 +34,6 @@ import { cn } from "@/common/utils/utils";
 import logo from "../assets/images/logo.png";
 import { Toaster } from "@/components/ui/toaster";
 
-// Sample data for sidebar navigation
-const sidebarItems = [
-  {
-    title: "Home",
-    icon: <Home />,
-    isActive: true,
-    path: "/admin/home",
-  },
-  {
-    title: "Activity Log",
-    icon: <FileClock />,
-    isActive: false,
-    path: "/admin/activity-log",
-  },
-  {
-    title: "App",
-    icon: <Grid />,
-    badge: "2",
-    items: [
-      { title: "All Apps", url: "#" },
-      { title: "Recent", url: "#" },
-      { title: "Updates", url: "#", badge: "2" },
-      { title: "Installed", url: "#" },
-    ],
-    path: "/admin/app",
-    isActive: false,
-  },
-];
-
 const AdminLayout = () => {
   const [notifications] = useState(5);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -77,17 +50,32 @@ const AdminLayout = () => {
     {
       title: "Home",
       icon: <Home />,
-      path: "/admin/home",
+      isActive: false,
+      path: "/admin",
     },
     {
       title: "Activity Log",
       icon: <FileClock />,
+      isActive: false,
       path: "/admin/activity-log",
     },
     {
-      title: "App",
+      title: "User",
+      icon: <User />,
+      isActive: false,
+      path: "/admin/user",
+    },
+    {
+      title: "Permissions",
+      icon: <Shield />,
+      isActive: false,
+      path: "/admin/permissions",
+    },
+    {
+      title: "App (Example)",
       icon: <Grid />,
       badge: "2",
+      isActive: false,
       items: [
         { title: "All Apps", url: "/admin/app/all" },
         { title: "Recent", url: "/admin/app/recent" },

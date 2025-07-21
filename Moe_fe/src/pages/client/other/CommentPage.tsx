@@ -18,7 +18,7 @@ export default function CommentPage() {
   const scrollAreaRef = useRef<HTMLDivElement>(null); // Ref for ScrollArea viewport
 
   const { data, loading, error, refetch } = useGetApi<Page<UserComment>>({
-    endpoint: "/user/activity/comments",
+    endpoint: "/activity/comments",
     params: { page, size, sort },
     enabled: true,
     onSuccess: (responseData) => {

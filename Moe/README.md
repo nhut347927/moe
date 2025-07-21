@@ -9,7 +9,7 @@ docs: Cập nhật tài liệu
 # Moe Social Network Backend
 
 ## Overview
-Moe is a backend service for a social networking application built with Java and Spring Boot. It provides RESTful APIs to manage users, posts, comments, likes, follows, search history, file uploads, and reporting. The service supports authentication via JWT and Google OAuth, media storage with Cloudinary, messaging with Kafka, and email notifications.
+Moe is a backend service for a social networking application built with Java and Spring Boot. It provides RESTful APIs to manage users, posts, comments, likes, follows, search history, file uploads, and reporting. The service supports authentication via JWT and Google OAuth, media storage with Cloudinary.
 
 ## Technologies Used
 - Java 17+

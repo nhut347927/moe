@@ -21,6 +21,8 @@ import FavoritePage from "@/pages/client/other/FavoritePage";
 import CommentPage from "@/pages/client/other/CommentPage";
 import KeywordPage from "@/pages/client/other/KeywordPage";
 import ActivityLogPage from "@/pages/admin/log/ActivityLogPage";
+import PermissionsPage from "@/pages/admin/permissions/PermissionsPage";
+import UserPage from "@/pages/admin/user/UserPage";
 // Lazy load layouts
 const ClientLayout = React.lazy(() => import("./ClientLayout"));
 const AuthLayout = React.lazy(() => import("./AuthLayout"));
@@ -78,6 +80,23 @@ const AppRoutes = () => {
             element={
               <KeepAlive id="activity-log">
                 <ActivityLogPage />
+              </KeepAlive>
+            }
+          />
+          <Route
+            path="permissions"
+            element={
+              <KeepAlive id="permissions">
+                <PermissionsPage />
+              </KeepAlive>
+            }
+          />
+
+          <Route
+            path="user"
+            element={
+              <KeepAlive id="user">
+                <UserPage />
               </KeepAlive>
             }
           />

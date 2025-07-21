@@ -16,6 +16,7 @@ public class RPRolePermissionDTO {
     private String userCode;
     @NotBlank(message = "Role ID cannot be blank")
     private String roleCode;
+    private String roleName;
     private Boolean canView = false;
     private Boolean canInsert = false;
     private Boolean canUpdate = false;

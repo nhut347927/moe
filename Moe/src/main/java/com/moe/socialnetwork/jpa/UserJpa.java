@@ -44,6 +44,15 @@ public interface UserJPA extends JpaRepository<User, Long> {
 	boolean existsDisplayNameExcludingId(@Param("displayName") String displayName,
 			@Param("excludedId") Long excludedId);
 
+	@Query("""
+			    SELECT u FROM User u
+			    WHERE
+			        (:keyword IS NULL OR LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%')))
+			        OR (:keyword IS NULL OR LOWER(u.userName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+			        OR (:keyword IS NULL OR LOWER(u.displayName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+			        OR (:keyword IS NULL OR LOWER(u.bio) LIKE LOWER(CONCAT('%', :keyword, '%')))
+			        OR (:keyword IS NULL OR LOWER(u.provider) LIKE LOWER(CONCAT('%', :keyword, '%')))
+			""")
+	Page<User> searchUsers(@Param("keyword") String keyword, Pageable pageable);
 
-			
 }

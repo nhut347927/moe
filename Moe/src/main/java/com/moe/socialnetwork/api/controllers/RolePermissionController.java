@@ -1,6 +1,7 @@
 package com.moe.socialnetwork.api.controllers;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class RolePermissionController {
     public ResponseEntity<ResponseAPI<List<RPRolePermissionDTO>>> getPermissionsByUser(
             @ModelAttribute ZRQCodeAndContentDTO request) {
 
-        List<RPRolePermissionDTO> permissions = rolePermissionService.getPermissionsByUser(request.getCode());
+        List<RPRolePermissionDTO> permissions = rolePermissionService.getPermissionsByUser(UUID.fromString(request.getCode()));
 
         ResponseAPI<List<RPRolePermissionDTO>> response = new ResponseAPI<>();
         response.setCode(HttpStatus.OK.value());
