@@ -6,12 +6,7 @@ import { useToast } from "@/common/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  RefreshCw,
-  Search,
-  ArrowUpDown,
-  ArrowRight,
-} from "lucide-react";
+import { RefreshCw, Search, ArrowUpDown, ArrowRight } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -149,8 +144,9 @@ const UserPage = () => {
               <TableHead>Display Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Gender</TableHead>
-              <TableHead>Location</TableHead>
+              <TableHead>Provider</TableHead>
               <TableHead>Verified</TableHead>
+              <TableHead>Bio</TableHead>
               <TableHead>Created At</TableHead>
               <TableHead>Action</TableHead>
             </TableRow>
@@ -183,8 +179,9 @@ const UserPage = () => {
                   <TableCell>{user.displayName}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.gender}</TableCell>
-                  <TableCell>{user.location || "N/A"}</TableCell>
+                  <TableCell>{user.provider || "N/A"}</TableCell>
                   <TableCell>{user.isVerified ? "Yes" : "No"}</TableCell>
+                  <TableCell>{user.bio}</TableCell>
                   <TableCell>
                     {new Date(user.createdAt).toLocaleString()}
                   </TableCell>
