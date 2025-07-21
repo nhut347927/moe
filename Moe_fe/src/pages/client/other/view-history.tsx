@@ -16,7 +16,7 @@ export default function ViewHistoryPage() {
   const scrollAreaRef = useRef<HTMLDivElement>(null); // Ref for ScrollArea viewport
 
   const { data, loading, error, refetch } = useGetApi<Page<Post>>({
-    endpoint: "//activity/views",
+    endpoint: "/activity/views",
     params: { page, size, sort },
     enabled: true,
     onSuccess: (responseData) => {
