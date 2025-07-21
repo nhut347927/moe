@@ -285,7 +285,7 @@ export default function HomePage() {
               handleLike?.(postData[currentIndex.current]?.postCode)
             }
             className={cn(
-              "opacity-80 w-[42px] h-[42px] p-2 rounded-full flex items-center justify-center transition-all",
+              "opacity-80 min-w-[42px] min-h-[42px] w-[42px] h-[42px] p-2 rounded-full flex items-center justify-center transition-all",
               postData[currentIndex.current]?.isLiked
                 ? "bg-red-100 hover:bg-red-200"
                 : "bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700"
@@ -302,7 +302,7 @@ export default function HomePage() {
           </span>
 
           <span
-            className="opacity-80 w-[42px] h-[42px] p-2 rounded-full flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+            className="opacity-80 min-w-[42px] min-h-[42px] w-[42px] h-[42px] p-2 rounded-full flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700"
             onClick={() => setOpenComment(true)}
           >
             <MessageSquareHeart className="w-5 h-5 mt-0.5 text-zinc-500 dark:text-zinc-500" />
