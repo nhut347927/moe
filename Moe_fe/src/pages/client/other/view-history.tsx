@@ -6,6 +6,7 @@ import { Page } from "@/common/hooks/type";
 import PostCompo from "@/components/post/post-compo";
 import { Button } from "@/components/ui/button";
 import { debounce } from "lodash";
+import { Clapperboard, Images } from "lucide-react";
 
 export default function ViewHistoryPage() {
   const [page, setPage] = useState(0);
@@ -112,8 +113,9 @@ export default function ViewHistoryPage() {
 
   return (
     <div className="relative flex-1 flex justify-center bg-white dark:bg-zinc-900">
-      <ScrollArea className="flex-1 max-h-full h-screen max-w-3xl w-full p-3 overflow-y-auto overflow-x-hidden relative">
-        <div ref={scrollAreaRef} className="h-full overflow-y-auto">
+      <ScrollArea className="flex-1 max-h-full h-screen  w-full p-2 overflow-y-auto overflow-x-hidden relative">
+    <div className="max-w-4xl mx-auto w-full">
+          <div ref={scrollAreaRef} className="h-full overflow-y-auto">
           {/* Header with sort */}
           <div className="bg-zinc-100 dark:bg-zinc-800 rounded-3xl px-6 py-8 mb-6  transform transition-transform duration-300  border border-transparent hover:border-zinc-400 dark:hover:border-zinc-500">
             <div className="flex flex-col space-y-4">
@@ -172,11 +174,11 @@ export default function ViewHistoryPage() {
             </div>
           )}
 
-          <div className="grid grid-cols-3 gap-2 mt-4">
+          <div className="grid grid-cols-3 gap-0.5 mt-4">
             {posts.map((relatedPost) => (
               <div
                 key={relatedPost.postCode}
-                className="aspect-square bg-zinc-200 dark:bg-zinc-800 overflow-hidden rounded-xl relative cursor-pointer"
+                className="aspect-[4/5] bg-zinc-200 dark:bg-zinc-800 overflow-hidden rounded-xl relative cursor-pointer"
                 onClick={() => handlePostClick(relatedPost.postCode)}
                 role="button"
                 tabIndex={0}
@@ -207,6 +209,15 @@ export default function ViewHistoryPage() {
                     loading="lazy"
                   />
                 )}
+  {/* Icon loại bài (video hoặc ảnh) */}
+                    <div className="absolute top-3 right-3">
+                      {relatedPost.postType === "VID" ? (
+                        <Clapperboard  className="w-4 h-4 text-white" strokeWidth={3} />
+                      ) : (
+                        <Images className="w-4 h-4 text-white" strokeWidth={3}/>
+                      )}
+                    </div>
+
               </div>
             ))}
           </div>
@@ -227,6 +238,7 @@ export default function ViewHistoryPage() {
               </div>
             )}
         </div>
+    </div>
       </ScrollArea>
       {/* Post modal */}
       {selectedPost && (

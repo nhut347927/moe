@@ -22,6 +22,8 @@ import {
   Clock,
   MessageCircle,
   Search,
+  Clapperboard,
+  Images,
 } from "lucide-react";
 import { AccountDetail, PostAccount } from "../types";
 import { Page } from "@/common/hooks/type";
@@ -451,248 +453,258 @@ export function ProfilePage() {
         )}
       </div>
       <ScrollArea
-        className="flex-1 max-h-full h-screen max-w-3xl w-full p-2 overflow-y-auto overflow-x-hidden relative"
+        className="flex-1 max-h-full h-screen  w-full overflow-y-auto overflow-x-hidden relative"
         data-scroll-ignore
       >
-        <div className="w-full mx-auto px-2 pb-96">
-          <div className="grid grid-cols-[auto,1fr] gap-4 py-6 mb-6 mt-6 items-start">
-            {/* Avatar */}
-            <div className="w-24 sm:w-36 aspect-square overflow-hidden">
-              <div className="relative group">
-                <Avatar className="w-24 h-24 sm:w-36 sm:h-36 z-10 border-4 border-zinc-300 dark:border-zinc-700 rounded-full">
-                  <AvatarImage
-                    src={`https://res.cloudinary.com/dazttnakn/image/upload/w_200,h_200,c_thumb,f_auto,q_auto/${accountDetail?.avatarUrl}`}
+        <div className="max-w-4xl w-full mx-auto">
+          <div className="w-full mx-auto p-2">
+            <div className="grid grid-cols-[auto,1fr] gap-4 py-9 mb-6 mt-6 px-2 items-start">
+              {/* Avatar */}
+              <div className="w-24 sm:w-36 aspect-square overflow-hidden">
+                <div className="relative group">
+                  <Avatar className="w-24 h-24 sm:w-36 sm:h-36 z-10 border-4 border-zinc-300 dark:border-zinc-700 rounded-full">
+                    <AvatarImage
+                      src={`https://res.cloudinary.com/dazttnakn/image/upload/w_200,h_200,c_thumb,f_auto,q_auto/${accountDetail?.avatarUrl}`}
+                    />
+                    <AvatarFallback>
+                      {accountDetail?.displayName?.charAt(0) ?? "MOE"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <input
+                    id="avatarUploadInput"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleAvatarFileChange}
                   />
-                  <AvatarFallback>
-                    {accountDetail?.displayName?.charAt(0) ?? "MOE"}
-                  </AvatarFallback>
-                </Avatar>
-                <input
-                  id="avatarUploadInput"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleAvatarFileChange}
-                />
-                <Button
-                  onClick={handleEditAvatar}
-                  className="absolute w-9 h-9 z-30 bottom-0 right-1 p-1 rounded-full bg-white dark:bg-zinc-800 border shadow hover:scale-105 transition"
-                  aria-label="Edit avatar"
-                >
-                  <Pencil className="w-4 h-4 text-zinc-700 dark:text-zinc-200" />
-                </Button>
+                  <Button
+                    onClick={handleEditAvatar}
+                    className="absolute w-9 h-9 z-30 bottom-0 right-1 p-1 rounded-full bg-white dark:bg-zinc-800 border shadow hover:scale-105 transition"
+                    aria-label="Edit avatar"
+                  >
+                    <Pencil className="w-4 h-4 text-zinc-700 dark:text-zinc-200" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Info */}
+              <div className="min-w-0 overflow-hidden">
+                {/* Name + Follow button */}
+                <div className="grid grid-cols-[1fr_auto] items-start gap-3 mb-4">
+                  <div className="min-w-0 max-w-full">
+                    <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 truncate">
+                      {accountDetail?.displayName ?? "[DisplayName]"}
+                    </h2>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400 truncate">
+                      @{accountDetail?.userName ?? "[UserName]"}
+                    </p>
+                  </div>
+
+                  <Button
+                    variant={accountDetail?.isFollowing ? "outline" : "default"}
+                    className="rounded-full px-4 text-sm shrink-0"
+                    disabled={
+                      accountDetail?.userAccountCode ===
+                      accountDetail?.userCurrentCode
+                    }
+                    onClick={() => handleFollow(accountDetail?.userCode ?? "0")}
+                  >
+                    {accountDetail?.userAccountCode ===
+                    accountDetail?.userCurrentCode
+                      ? "You"
+                      : accountDetail?.isFollowing
+                      ? "Following"
+                      : "Follow"}
+                  </Button>
+                </div>
+
+                {/* Stats */}
+                <div className="mb-2 flex flex-wrap gap-4 text-sm text-zinc-700 dark:text-zinc-200">
+                  <p className="text-xs">{accountDetail?.followed} Following</p>
+                  <p className="text-xs">{accountDetail?.follower} Followers</p>
+                  <p className="text-xs">{accountDetail?.likeCount} Likes</p>
+                </div>
+
+                {accountDetail?.userAccountCode ===
+                accountDetail?.userCurrentCode ? (
+                  <div className="flex justify-start gap-2">
+                    <ActionMenuDialog
+                      trigger={
+                        <Button
+                          className="bg-white text-black border border-zinc-300 hover:bg-zinc-100 
+                  dark:bg-zinc-900 dark:text-white dark:border-zinc-600 dark:hover:bg-zinc-800
+                  flex items-center gap-2 rounded-xl"
+                          aria-label="Edit profile"
+                        >
+                          <UserCog className="w-4 h-4" />
+                          Edit
+                        </Button>
+                      }
+                      size="sm"
+                      className="!rounded-3xl p-0 overflow-hidden"
+                    >
+                      <div className="p-5 space-y-5 text-sm">
+                        {/* Display Name */}
+                        <div className="space-y-1">
+                          <label className="block font-medium text-zinc-700 dark:text-zinc-300">
+                            Display Name
+                          </label>
+                          <Input
+                            name="displayName"
+                            value={form.displayName}
+                            onChange={handleChange}
+                            placeholder="Your display name"
+                            className="text-sm rounded-xl"
+                          />
+                          {errorProfile?.displayName && (
+                            <p className="text-xs mt-2 text-red-500">
+                              {errorProfile.displayName}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Username */}
+                        <div className="space-y-1">
+                          <label className="block font-medium text-zinc-700 dark:text-zinc-300">
+                            Username
+                          </label>
+                          <Input
+                            name="userName"
+                            value={form.userName}
+                            onChange={handleChange}
+                            placeholder="Your username"
+                            className="text-sm rounded-xl"
+                          />
+                          {errorProfile?.userName && (
+                            <p className="text-xs mt-2 text-red-500">
+                              {errorProfile.userName}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Bio */}
+                        <div className="space-y-1">
+                          <label className="block font-medium text-zinc-700 dark:text-zinc-300">
+                            Bio
+                          </label>
+                          <Textarea
+                            name="bio"
+                            value={form.bio}
+                            onChange={handleChange}
+                            placeholder="Tell us something about yourself..."
+                            className="text-sm min-h-[100px] resize-none rounded-xl"
+                          />
+                          {errorProfile?.bio && (
+                            <p className="text-xs mt-2 text-red-500">
+                              {errorProfile.bio}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex justify-end gap-3 pt-2">
+                          <DialogClose asChild>
+                            <Button variant="ghost" className="text-sm">
+                              Cancel
+                            </Button>
+                          </DialogClose>
+                          <Button
+                            onClick={handleSubmit}
+                            disabled={isSubmitting}
+                            className="text-sm"
+                          >
+                            {isSubmitting ? "Saving..." : "Save Changes"}
+                          </Button>
+                        </div>
+                      </div>
+                    </ActionMenuDialog>
+                    <Link to="/client/upload">
+                      <Button
+                        className="bg-white text-black border border-zinc-300 hover:bg-zinc-100 
+                dark:bg-zinc-900 dark:text-white dark:border-zinc-600 dark:hover:bg-zinc-800
+                flex items-center gap-2 rounded-xl"
+                        aria-label="Upload new post"
+                      >
+                        <UploadCloud className="w-4 h-4" />
+                        Upload
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  ""
+                )}
+                {/* Bio */}
+                {accountDetail?.bio && (
+                  <p className="mt-6 text-sm text-zinc-600 dark:text-zinc-300 line-clamp-3 break-words">
+                    {accountDetail?.bio}
+                  </p>
+                )}
               </div>
             </div>
 
-            {/* Info */}
-            <div className="space-y-2 min-w-0 overflow-hidden">
-              {/* Name + Follow button */}
-              <div className="grid grid-cols-[1fr_auto] items-start gap-2 mb-4">
-                <div className="min-w-0 max-w-full">
-                  <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 truncate">
-                    {accountDetail?.displayName ?? "[DisplayName]"}
-                  </h2>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400 truncate">
-                    @{accountDetail?.userName ?? "[UserName]"}
-                  </p>
-                </div>
-
-                <Button
-                  variant={accountDetail?.isFollowing ? "outline" : "default"}
-                  className="rounded-full px-4 text-sm shrink-0"
-                  disabled={
-                    accountDetail?.userAccountCode ===
-                    accountDetail?.userCurrentCode
-                  }
-                  onClick={() => handleFollow(accountDetail?.userCode ?? "0")}
-                >
-                  {accountDetail?.userAccountCode ===
-                  accountDetail?.userCurrentCode
-                    ? "You"
-                    : accountDetail?.isFollowing
-                    ? "Following"
-                    : "Follow"}
-                </Button>
-              </div>
-
-              {/* Stats */}
-              <div className="flex flex-wrap gap-4 text-sm text-zinc-700 dark:text-zinc-200">
-                <p className="text-xs">{accountDetail?.followed} Following</p>
-                <p className="text-xs">{accountDetail?.follower} Followers</p>
-                <p className="text-xs">{accountDetail?.likeCount} Likes</p>
-              </div>
-
-              {accountDetail?.userAccountCode ===
-              accountDetail?.userCurrentCode ? (
-                <div className="flex justify-start gap-2">
-                  <ActionMenuDialog
-                    trigger={
-                      <Button
-                        className="bg-white text-black border border-zinc-300 hover:bg-zinc-100 
-                  dark:bg-zinc-900 dark:text-white dark:border-zinc-600 dark:hover:bg-zinc-800
-                  flex items-center gap-2 rounded-xl"
-                        aria-label="Edit profile"
-                      >
-                        <UserCog className="w-4 h-4" />
-                        Edit
-                      </Button>
-                    }
-                    size="sm"
-                    className="!rounded-3xl p-0 overflow-hidden"
+            <div className="grid grid-cols-3 gap-0.5">
+              {accountDetail?.posts?.length ? (
+                accountDetail?.posts.map((post) => (
+                  <div
+                    key={post.postCode}
+                    className="aspect-[4/5] overflow-hidden relative group cursor-pointer"
+                    onClick={() => setSelectedPost(post.postCode)}
                   >
-                    <div className="p-5 space-y-5 text-sm">
-                      {/* Display Name */}
-                      <div className="space-y-1">
-                        <label className="block font-medium text-zinc-700 dark:text-zinc-300">
-                          Display Name
-                        </label>
-                        <Input
-                          name="displayName"
-                          value={form.displayName}
-                          onChange={handleChange}
-                          placeholder="Your display name"
-                          className="text-sm rounded-xl"
-                        />
-                        {errorProfile?.displayName && (
-                          <p className="text-xs mt-2 text-red-500">
-                            {errorProfile.displayName}
-                          </p>
-                        )}
-                      </div>
+                    <img
+                      src={
+                        post.postType === "VID"
+                          ? `https://res.cloudinary.com/dazttnakn/video/upload/w_300,c_fill,q_auto,so_${
+                              post.videoThumbnail ?? "0"
+                            }/${post.mediaUrl}.jpg`
+                          : `https://res.cloudinary.com/dazttnakn/image/upload/${post.mediaUrl}`
+                      }
+                      className="w-full h-full object-cover rounded-xl"
+                      alt="post"
+                    />
 
-                      {/* Username */}
-                      <div className="space-y-1">
-                        <label className="block font-medium text-zinc-700 dark:text-zinc-300">
-                          Username
-                        </label>
-                        <Input
-                          name="userName"
-                          value={form.userName}
-                          onChange={handleChange}
-                          placeholder="Your username"
-                          className="text-sm rounded-xl"
-                        />
-                        {errorProfile?.userName && (
-                          <p className="text-xs mt-2 text-red-500">
-                            {errorProfile.userName}
-                          </p>
-                        )}
-                      </div>
+                    {/* Icon loại bài (video hoặc ảnh) */}
+                    <div className="absolute top-3 right-3">
+                      {post.postType === "VID" ? (
+                        <Clapperboard  className="w-4 h-4 text-white" strokeWidth={3} />
+                      ) : (
+                        <Images className="w-4 h-4 text-white" strokeWidth={3}/>
+                      )}
+                    </div>
 
-                      {/* Bio */}
-                      <div className="space-y-1">
-                        <label className="block font-medium text-zinc-700 dark:text-zinc-300">
-                          Bio
-                        </label>
-                        <Textarea
-                          name="bio"
-                          value={form.bio}
-                          onChange={handleChange}
-                          placeholder="Tell us something about yourself..."
-                          className="text-sm min-h-[100px] resize-none rounded-xl"
-                        />
-                        {errorProfile?.bio && (
-                          <p className="text-xs mt-2 text-red-500">
-                            {errorProfile.bio}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex justify-end gap-3 pt-2">
-                        <DialogClose asChild>
-                          <Button variant="ghost" className="text-sm">
-                            Cancel
-                          </Button>
-                        </DialogClose>
-                        <Button
-                          onClick={handleSubmit}
-                          disabled={isSubmitting}
-                          className="text-sm"
-                        >
-                          {isSubmitting ? "Saving..." : "Save Changes"}
-                        </Button>
+                    {/* View count (hiện khi hover) */}
+                    <div className="absolute inset-0 bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200 rounded-xl">
+                      <div className="flex items-center gap-1 bg-black bg-opacity-60 rounded-lg px-2 py-0.5">
+                        <Eye className="h-4 w-4 text-white" />
+                        <span className="text-xs text-white font-medium">
+                          {post.viewCount}
+                        </span>
                       </div>
                     </div>
-                  </ActionMenuDialog>
-                  <Link to="/client/upload">
-                    <Button
-                      className="bg-white text-black border border-zinc-300 hover:bg-zinc-100 
-                dark:bg-zinc-900 dark:text-white dark:border-zinc-600 dark:hover:bg-zinc-800
-                flex items-center gap-2 rounded-xl"
-                      aria-label="Upload new post"
-                    >
-                      <UploadCloud className="w-4 h-4" />
-                      Upload
-                    </Button>
-                  </Link>
-                </div>
+                  </div>
+                ))
               ) : (
-                ""
-              )}
-              {/* Bio */}
-              {accountDetail?.bio && (
-                <p className="text-sm text-zinc-600 dark:text-zinc-300 line-clamp-3 break-words">
-                  {accountDetail?.bio}
+                <p className="text-center text-zinc-500 dark:text-zinc-400 col-span-3 py-4">
+                  No posts available
                 </p>
               )}
             </div>
-          </div>
 
-          {/* Posts */}
-          <div className="grid grid-cols-3 gap-1">
-            {accountDetail?.posts?.length ? (
-              accountDetail?.posts.map((post) => (
-                <div
-                  key={post.postCode}
-                  className="aspect-square bg-zinc-200 dark:bg-zinc-800 overflow-hidden rounded-xl relative"
+            {accountDetail?.hasNext && (
+              <div className="flex justify-center mb-6">
+                <button
+                  onClick={() =>
+                    loadMorePost(
+                      accountDetail?.userCode,
+                      String(accountDetail?.page)
+                    )
+                  }
+                  className="px-4 py-1.5 mt-12 text-sm rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
                 >
-                  {post.postType === "VID" ? (
-                    <img
-                      src={`https://res.cloudinary.com/dazttnakn/video/upload/w_300,c_fill,q_auto,so_${
-                        post.videoThumbnail ?? "0"
-                      }/${post.mediaUrl}.jpg`}
-                      className="w-full h-full object-cover"
-                      alt="post"
-                      onClick={() => setSelectedPost(post.postCode)}
-                    />
-                  ) : (
-                    <img
-                      src={`https://res.cloudinary.com/dazttnakn/image/upload/${post.mediaUrl}`}
-                      className="w-full h-full object-cover"
-                      alt="post"
-                      onClick={() => setSelectedPost(post.postCode)}
-                    />
-                  )}
-                  <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-black bg-opacity-60 rounded-lg px-2 py-0.5">
-                    <Eye className="h-4 w-4 text-white" />
-                    <span className="text-xs text-white font-medium">
-                      {post.viewCount}
-                    </span>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-center text-zinc-500 dark:text-zinc-400 col-span-3 py-4">
-                No posts available
-              </p>
+                  Load more posts
+                </button>
+              </div>
             )}
           </div>
-          {accountDetail?.hasNext && (
-            <div className="flex justify-center">
-              <button
-                onClick={() =>
-                  loadMorePost(
-                    accountDetail?.userCode,
-                    String(accountDetail?.page)
-                  )
-                }
-                className="px-4 py-1.5 mt-12 text-sm rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
-              >
-                Load more posts
-              </button>
-            </div>
-          )}
         </div>
       </ScrollArea>
 

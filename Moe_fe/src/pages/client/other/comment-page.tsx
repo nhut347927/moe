@@ -108,8 +108,9 @@ export default function CommentPage() {
 
   return (
     <div className="relative flex-1 flex justify-center bg-white dark:bg-zinc-900">
-      <ScrollArea className="flex-1 max-h-full h-screen max-w-3xl w-full p-3 overflow-y-auto overflow-x-hidden relative">
-        <div ref={scrollAreaRef} className="h-full overflow-y-auto">
+      <ScrollArea className="flex-1 max-h-full h-screen w-full p-2 overflow-y-auto overflow-x-hidden relative">
+     <div className="max-w-4xl mx-auto w-full">
+         <div ref={scrollAreaRef} className="h-full overflow-y-auto">
           {/* Header with sort */}
           <div className="bg-zinc-100 dark:bg-zinc-800 rounded-3xl px-6 py-8 mb-6 transform transition-transform duration-300  border border-transparent hover:border-zinc-400 dark:hover:border-zinc-500">
             <div className="flex flex-col space-y-4">
@@ -220,6 +221,7 @@ export default function CommentPage() {
               </div>
             )}
         </div>
+     </div>
       </ScrollArea>
     </div>
   );
