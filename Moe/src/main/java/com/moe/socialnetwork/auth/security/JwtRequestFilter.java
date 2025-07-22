@@ -13,7 +13,6 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moe.socialnetwork.api.services.IActivityLogService;
-import com.moe.socialnetwork.api.services.impl.ActivityLogServiceImpl;
 import com.moe.socialnetwork.auth.active.UserActivityContextService;
 import com.moe.socialnetwork.auth.services.impl.TokenServiceImpl;
 import com.moe.socialnetwork.models.User;

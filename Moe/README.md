@@ -1,5 +1,15 @@
 # Moe Social Network Backend
 
+
+fix:	Khi sửa một bug/bug logic
+feat:	Khi thêm chức năng mới
+chore:	Khi thay đổi cấu hình, tài liệu, CI/CD
+refactor:	Khi cải tiến mã nhưng không thay đổi hành vi
+style:	Thay đổi style/code format
+docs: Cập nhật tài liệu
+
+
+
 ## Overview
 Moe là backend cho ứng dụng mạng xã hội, phát triển bằng Java 17+ và Spring Boot. Hệ thống cung cấp RESTful API quản lý người dùng, bài đăng, bình luận, lượt thích, theo dõi, lịch sử tìm kiếm, upload file, báo cáo, và logging hoạt động. Hỗ trợ xác thực JWT, Google OAuth, lưu trữ media với Cloudinary, xử lý video/audio với FFmpeg.
 
@@ -17,7 +27,6 @@ Moe là backend cho ứng dụng mạng xã hội, phát triển bằng Java 17+
 - Maven (build tool)
 - Docker (containerization)
 - Lombok (code generation)
-- JUnit (unit testing)
 
 ## Features
 - Quản lý tài khoản: cập nhật hồ sơ, avatar, theo dõi/hủy theo dõi
@@ -39,7 +48,6 @@ Moe là backend cho ứng dụng mạng xã hội, phát triển bằng Java 17+
 - **DTOs**: Đối tượng truyền dữ liệu request/response
 - **Security**: JWT, OAuth2 cấu hình bảo mật
 - **Utils**: Tiện ích chung (JWT, chuẩn hóa text, parse ngày tháng)
-- **Queue**: Kafka producer/consumer
 - **Exception Handling**: Xử lý lỗi tập trung
 
 ## Configuration
@@ -49,7 +57,6 @@ Moe là backend cho ứng dụng mạng xã hội, phát triển bằng Java 17+
 - JWT secret, thời gian hết hạn qua biến môi trường
 - SMTP Gmail cho email
 - Cloudinary cho upload media
-- Kafka cho queue
 - FFmpeg path cho xử lý video/audio
 
 ## Folder Structure
