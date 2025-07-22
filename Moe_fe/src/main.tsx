@@ -9,6 +9,9 @@ import { AliveScope } from "react-activation";
 import { ThemeProvider } from "./components/common/theme-provider";
 
 const root = ReactDOM.createRoot(document.getElementById("root")!);
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js');
+}
 
 root.render(
   <StrictMode>
