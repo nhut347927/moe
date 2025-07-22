@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useGetApi } from "@/common/hooks/use-get-api";
 import { useToast } from "@/common/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -10,14 +9,20 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
 import { UserActivity } from "../type";
 import { Page } from "@/common/hooks/type";
-
-
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const Dashboard = () => {
   const { toast } = useToast();
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
   const [query, setQuery] = useState("");
+  const [autoRefresh, setAutoRefresh] = useState<string>("off"); // Auto-refresh state: "off", "30s", "60s", "10m"
 
   // Fetch paginated active users
   const { data, loading, error, refetch } = useGetApi<Page<UserActivity>>({
@@ -45,6 +50,33 @@ const Dashboard = () => {
       setPage(0); // Reset to first page when size changes
     }
   };
+
+  // Auto-refresh effect
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout | null = null;
+
+    if (autoRefresh !== "off") {
+      const intervalTime = {
+        "30s": 30 * 1000, // 30 seconds
+        "60s": 60 * 1000, // 60 seconds
+        "10m": 10 * 60 * 1000, // 10 minutes
+      }[autoRefresh];
+
+      intervalId = setInterval(() => {
+        refetch();
+        toast({
+          description: `Auto-refreshed at ${new Date().toLocaleTimeString()}`,
+        });
+      }, intervalTime);
+    }
+
+    // Cleanup interval on component unmount or when autoRefresh changes
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [autoRefresh, refetch, toast]);
 
   return (
     <div className="flex-1 flex justify-center">
@@ -76,18 +108,31 @@ const Dashboard = () => {
           </p>
         </div>
 
-        {/* Refresh Button and Pagination */}
+        {/* Refresh Button, Auto-Refresh Select, and Pagination */}
         <div className="flex items-center justify-between mb-4">
-          <Button
-            variant="outline"
-            onClick={refetch}
-            disabled={loading}
-            className="flex items-center gap-2 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700"
-            aria-label="Refresh active users"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
-            Refresh
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={refetch}
+              disabled={loading}
+              className="flex items-center gap-2 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+              aria-label="Refresh active users"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+              Refresh
+            </Button>
+            <Select value={autoRefresh} onValueChange={setAutoRefresh}>
+              <SelectTrigger className="w-[120px] rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100">
+                <SelectValue placeholder="Auto-refresh" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="off">Off</SelectItem>
+                <SelectItem value="30s">30s</SelectItem>
+                <SelectItem value="60s">60s</SelectItem>
+                <SelectItem value="10m">10m</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"

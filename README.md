@@ -115,8 +115,6 @@ Below are placeholder sections for screenshots. You can add images here later to
 
 ![App preview](./Moe_fe/src/assets/images/screenshot_1753155101.png)
 
-![App preview](./Moe_fe/src/assets/images/screenshot_1753154359.png)
-
 ![App preview](./Moe_fe/src/assets/images/screenshot_1753155126.png)
 
 ![App preview](./Moe_fe/src/assets/images/screenshot_1753155146.png)
@@ -128,4 +126,4 @@ Below are placeholder sections for screenshots. You can add images here later to
 ![App preview](./Moe_fe/src/assets/images/screenshot_1753155899.png)
 ---
 
-Thank you for using the Moe project! For any questions or contributions, please refer to the respective folders for backend and frontend source code.
+Thank you for using the Moe project!
