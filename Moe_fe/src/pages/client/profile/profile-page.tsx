@@ -24,6 +24,7 @@ import {
   Search,
   Clapperboard,
   Images,
+  Download,
 } from "lucide-react";
 import { AccountDetail, PostAccount } from "../types";
 import { Page } from "@/common/hooks/type";
@@ -36,6 +37,7 @@ import { convertFileToBase64 } from "@/common/utils/utils";
 import { ModeToggle } from "@/components/common/mode-toggle";
 import Spinner from "@/components/common/spiner";
 import { Separator } from "@/components/ui/separator";
+import InstallPWAButton from "@/components/pwa/InstallPWAButton";
 
 export function ProfilePage() {
   const { toast } = useToast();
@@ -360,6 +362,23 @@ export function ProfilePage() {
                 Copy URL
               </Button>
 
+              <InstallPWAButton
+                trigger={(onClick) => (
+                  <>
+                    <Separator />
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start gap-2 text-sm px-3 py-2"
+                      onClick={onClick}
+                      aria-label="Install app"
+                    >
+                      <Download className="w-4 h-4" />
+                      Install App
+                    </Button>
+                    <Separator />
+                  </>
+                )}
+              />
               <Separator />
 
               {/* 3. View-related links */}
@@ -665,9 +684,15 @@ export function ProfilePage() {
                     {/* Icon loại bài (video hoặc ảnh) */}
                     <div className="absolute top-3 right-3">
                       {post.postType === "VID" ? (
-                        <Clapperboard  className="w-4 h-4 text-white" strokeWidth={3} />
+                        <Clapperboard
+                          className="w-4 h-4 text-white"
+                          strokeWidth={3}
+                        />
                       ) : (
-                        <Images className="w-4 h-4 text-white" strokeWidth={3}/>
+                        <Images
+                          className="w-4 h-4 text-white"
+                          strokeWidth={3}
+                        />
                       )}
                     </div>
 
