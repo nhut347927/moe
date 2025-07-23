@@ -4,7 +4,7 @@ import { useToast } from "@/common/hooks/use-toast";
 import { Post } from "../types";
 import PostContent from "./item/media";
 import PostComments from "./item/comments";
-import { Heart, MessageSquareHeart, Proportions } from "lucide-react";
+import { Heart, MessageSquareHeart } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
 import { cn, getTimeAgo } from "@/common/utils/utils";
