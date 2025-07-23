@@ -196,10 +196,13 @@ export default function Login() {
 
                 {/* Nút đăng nhập Google */}
                 <GoogleOAuthProvider clientId={clientId}>
-                  <GoogleLogin
-                    onSuccess={loginGoogleButton}
-                    onError={handleLoginFailure}
-                  />
+                  <div className="w-full">
+                    <GoogleLogin
+                      onSuccess={loginGoogleButton}
+                      onError={handleLoginFailure}
+                      width="100%" // Cần thêm nếu GoogleLogin hỗ trợ
+                    />
+                  </div>
                 </GoogleOAuthProvider>
               </div>
             </form>

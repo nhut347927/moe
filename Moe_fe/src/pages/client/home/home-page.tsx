@@ -203,7 +203,7 @@ export default function HomePage() {
   // Render Logic
   return (
     <div className="max-h-screen h-screen w-full relative">
-      <div className="absolute z-30 right-2 top-2 px-2 h-[30px] flex items-center rounded-lg">
+      <div className="absolute z-30 right-2 top-2 px-2 h-[30px] flex items-center rounded-lg shadow-sm">
         <span className="text-xs text-zinc-500 dark:text-zinc-500">
           {currentIndex.current + 1}/{postData.length}
         </span>
@@ -231,7 +231,7 @@ export default function HomePage() {
         )}
       </div>
 
-      <div className="max-h-screen h-screen w-full flex flex-col">
+      <div className="h-full w-full relative">
         <div
           id="video-container"
           className="z-10 overflow-y-auto scroll-but-hidden snap-y snap-mandatory h-full w-full"
@@ -243,10 +243,10 @@ export default function HomePage() {
           )}
 
           {postData?.map((post, index) => (
-            <div key={index} className="h-full">
+            <div key={index}>
               <div
                 ref={(el) => (mediaRefs.current[index] = el)}
-                className="max-h-full h-full snap-center flex flex-col"
+                className="h-screen snap-center flex flex-col"
               >
                 <PostContent
                   post={post}
@@ -255,6 +255,7 @@ export default function HomePage() {
                   mediaRefs={mediaRefs}
                   isPlaying={post.isPlaying}
                 />
+                <div className="w-full h-16 sm:h-0 mt-2 sm:mt-0"></div>
               </div>
               {index === postData?.length - 1 && !loading && (
                 <div className="h-full w-full flex justify-center items-center text-sm text-gray-500">
@@ -265,7 +266,7 @@ export default function HomePage() {
           ))}
         </div>
 
-        <div className="z-30 relative sm:absolute bottom-2 left-0 right-0  pointer-events-none px-4 pt-3 flex items-end justify-between">
+        <div className="z-30 pointer-events-none absolute bottom-2 left-0 right-0 px-4 flex items-end justify-between">
           <div className="pointer-events-auto mb-2 max-w-full flex items-center space-x-3">
             <Link
               to={`/client/profile?code=${
@@ -311,11 +312,11 @@ export default function HomePage() {
               <MessageSquareHeart className="w-5 h-5 mt-0.5 text-zinc-500 dark:text-zinc-500" />
             </span>
 
-            <div className="w-full leading-tight">
+            <div className="leading-tight">
               <p className="text-[12px] text-zinc-400 dark:text-zinc-500 mb-0.5">
                 [{getTimeAgo(postData[currentIndex.current]?.createdAt)}]
               </p>
-              <p className="w-56 sm:w-full text-sm font-medium text-zinc-600 dark:text-zinc-300 truncate">
+              <p className="w-48 sm:w-full text-sm font-medium text-zinc-600 dark:text-zinc-300 truncate">
                 {postData[currentIndex.current]?.title}
               </p>
             </div>

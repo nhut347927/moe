@@ -25,7 +25,7 @@ const PostVideo = forwardRef<HTMLDivElement, PostVideoProps>(
     const [isDragging, setIsDragging] = useState(false);
     const [showDetailedProgress, setShowDetailedProgress] = useState(false);
     const lastClickTime = useRef<number>(0);
-    const [showSlider, setShowSlider] = useState<boolean>(false);
+  const [showSlider, setShowSlider] = useState<boolean>(false);
     useImperativeHandle(ref, () => containerRef.current as HTMLDivElement);
 
     useEffect(() => {
@@ -155,14 +155,11 @@ const PostVideo = forwardRef<HTMLDivElement, PostVideoProps>(
     }, [isDragging]);
 
     return (
-      <div ref={containerRef} className="h-full flex items-center py-2 sm:p-2">
+      <div ref={containerRef} className="h-full flex items-center sm:p-2">
         <div
           className="h-full w-full relative flex justify-center items-center"
           onClick={togglePlay}
-          onDoubleClick={(e) => {
-            handleDoubleClick(e);
-            setShowSlider(true);
-          }}
+          onDoubleClick={(e) => {handleDoubleClick(e); setShowSlider(true);}}
         >
           <div className="z-20 max-h-full h-full flex items-center relative">
             <video
@@ -219,13 +216,13 @@ const PostVideo = forwardRef<HTMLDivElement, PostVideoProps>(
             </div>
           </div>
         </div>
-        {videoSrc && (
-          <SlideVideo
-            video={videoSrc}
-            showSlider={showSlider}
-            setShowSlider={setShowSlider}
-          />
-        )}
+         {videoSrc && (
+            <SlideVideo
+              video={videoSrc}
+              showSlider={showSlider}
+              setShowSlider={setShowSlider}
+            />
+          )}
       </div>
     );
   }

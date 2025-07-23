@@ -145,8 +145,7 @@ const PostCompo = ({ postCode }: PostProps) => {
               />
             )}
           </div>
-        <div className="max-h-screen h-screen w-full flex flex-col">
-            {/* Post content */}
+          {/* Post content */}
           <div className="z-20 overflow-y-auto h-full max-w-3xl mx-auto">
             <div className="h-full flex flex-col">
               <PostContent
@@ -156,10 +155,11 @@ const PostCompo = ({ postCode }: PostProps) => {
                 mediaRefs={{ current: [mediaRef.current] }}
                 isPlaying={postData.isPlaying}
               />
+              <div className="w-full h-16 sm:h-0 mt-2 sm:mt-0"></div>
             </div>
           </div>
           {/* Post info and actions */}
-          <div className="z-30 pointer-events-none relative sm:absolute bottom-2 left-0 right-0 px-4 pt-3 flex items-end justify-between">
+          <div className="z-30 pointer-events-none absolute bottom-2 left-0 right-0 px-4 flex items-end justify-between">
             <div className="pointer-events-auto opacity-80 mb-2 max-w-3xl w-full mx-auto  flex items-center space-x-3">
               <Link to={`/client/profile?code=${postData?.userCode}`}>
                 <Avatar className="w-10 h-10 transition-all">
@@ -199,13 +199,12 @@ const PostCompo = ({ postCode }: PostProps) => {
                 <p className="text-[12px] text-zinc-400 dark:text-zinc-500 mb-0.5">
                   [{getTimeAgo(postData.createdAt)}]
                 </p>
-                <p className="w-56 sm:w-full  text-sm font-medium text-zinc-600 dark:text-zinc-300 truncate">
+                <p className="w-48 sm:w-full text-sm font-medium text-zinc-600 dark:text-zinc-300 truncate">
                   {postData.title}
                 </p>
               </div>
             </div>
           </div>
-        </div>
           {/* Comments modal */}
           {openComment && (
             <>
