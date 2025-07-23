@@ -24,7 +24,6 @@ import {
   Search,
   Clapperboard,
   Images,
-  Download,
 } from "lucide-react";
 import { AccountDetail, PostAccount } from "../types";
 import { Page } from "@/common/hooks/type";
@@ -363,22 +362,16 @@ export function ProfilePage() {
               </Button>
 
               <InstallPWAButton
-                trigger={(onClick) => (
-                  <>
-                    <Separator />
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start gap-2 text-sm px-3 py-2"
-                      onClick={onClick}
-                      aria-label="Install app"
-                    >
-                      <Download className="w-4 h-4" />
-                      Install App
-                    </Button>
-                    <Separator />
-                  </>
-                )}
+                 onInstallSuccess={() =>
+                  console.log("The app has been installed!")
+                }
+                onInstallDismiss={() =>
+                  console.log("Installation was dismissed.")
+                }
+           
               />
+          
+
               <Separator />
 
               {/* 3. View-related links */}

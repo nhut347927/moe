@@ -25,7 +25,7 @@ const PostVideo = forwardRef<HTMLDivElement, PostVideoProps>(
     const [isDragging, setIsDragging] = useState(false);
     const [showDetailedProgress, setShowDetailedProgress] = useState(false);
     const lastClickTime = useRef<number>(0);
-  const [showSlider, setShowSlider] = useState<boolean>(false);
+    const [showSlider, setShowSlider] = useState<boolean>(false);
     useImperativeHandle(ref, () => containerRef.current as HTMLDivElement);
 
     useEffect(() => {
@@ -159,20 +159,23 @@ const PostVideo = forwardRef<HTMLDivElement, PostVideoProps>(
         <div
           className="h-full w-full relative flex justify-center items-center"
           onClick={togglePlay}
-          onDoubleClick={(e) => {handleDoubleClick(e); setShowSlider(true);}}
+          onDoubleClick={(e) => {
+            handleDoubleClick(e);
+            setShowSlider(true);
+          }}
         >
           <div className="z-20 max-h-full h-full flex items-center relative">
             <video
               ref={videoRef}
               src={`https://res.cloudinary.com/dazttnakn/video/upload/${videoSrc}`}
-              className="z-10 max-h-full object-contain cursor-pointer moe-style rounded-3xl"
+              className="z-10 max-h-full object-contain cursor-pointer moe-style rounded-xl"
               autoPlay={isPlaying}
               loop
               playsInline
             />
             <div
               ref={progressBarRef}
-              className={`absolute bottom-16 sm:bottom-0 w-full px-6 pt-6 z-30 transition-transform ${
+              className={`absolute bottom-0 w-full px-4 pt-6 z-30 transition-transform ${
                 showDetailedProgress ? "translate-y-0" : ""
               }`}
               onMouseDown={handleMouseDown}
@@ -216,13 +219,13 @@ const PostVideo = forwardRef<HTMLDivElement, PostVideoProps>(
             </div>
           </div>
         </div>
-         {videoSrc && (
-            <SlideVideo
-              video={videoSrc}
-              showSlider={showSlider}
-              setShowSlider={setShowSlider}
-            />
-          )}
+        {videoSrc && (
+          <SlideVideo
+            video={videoSrc}
+            showSlider={showSlider}
+            setShowSlider={setShowSlider}
+          />
+        )}
       </div>
     );
   }

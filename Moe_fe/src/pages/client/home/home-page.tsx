@@ -42,7 +42,10 @@ export default function HomePage() {
           setPostData((prev) => {
             const existing = new Set(prev.map((p) => p.postCode));
             if (!existing.has(post.postCode)) {
-              return [{ ...post, comments: post.comments ?? [], isPlaying: true }, ...prev];
+              return [
+                { ...post, comments: post.comments ?? [], isPlaying: true },
+                ...prev,
+              ];
             }
             return prev;
           });
@@ -200,8 +203,7 @@ export default function HomePage() {
   // Render Logic
   return (
     <div className="max-h-screen h-screen w-full relative">
-      <div className="absolute z-30 right-3 top-3 px-2 h-[30px] bg-zinc-100/70 dark:bg-zinc-800/60 backdrop-blur-sm flex items-center rounded-lg shadow-sm">
-        <Proportions className="h-3.5 w-3.5 mr-1 text-zinc-500 dark:text-zinc-500" />
+      <div className="absolute z-30 right-2 top-2 px-2 h-[30px] flex items-center rounded-lg">
         <span className="text-xs text-zinc-500 dark:text-zinc-500">
           {currentIndex.current + 1}/{postData.length}
         </span>
@@ -229,92 +231,94 @@ export default function HomePage() {
         )}
       </div>
 
-      <div
-        id="video-container"
-        className="z-10 overflow-y-auto scroll-but-hidden snap-y snap-mandatory h-full w-full"
-      >
-        {postData?.length === 0 && !loading && (
-          <div className="h-full w-full flex justify-center items-center space-x-2">
-            <Spinner className="mr-2" /> Loading...
-          </div>
-        )}
-
-        {postData?.map((post, index) => (
-          <div key={index}>
-            <div
-              ref={(el) => (mediaRefs.current[index] = el)}
-              className="h-screen snap-center flex flex-col"
-            >
-              <PostContent
-                post={post}
-                updateImageSelect={updateImageSelect}
-                index={index}
-                mediaRefs={mediaRefs}
-                isPlaying={post.isPlaying}
-              />
+      <div className="max-h-screen h-screen w-full flex flex-col">
+        <div
+          id="video-container"
+          className="z-10 overflow-y-auto scroll-but-hidden snap-y snap-mandatory h-full w-full"
+        >
+          {postData?.length === 0 && !loading && (
+            <div className="h-full w-full flex justify-center items-center space-x-2">
+              <Spinner className="mr-2" /> Loading...
             </div>
-            {index === postData?.length - 1 && !loading && (
-              <div className="h-full w-full flex justify-center items-center text-sm text-gray-500">
-                <Spinner className="mr-2" /> Loading more...
+          )}
+
+          {postData?.map((post, index) => (
+            <div key={index} className="h-full">
+              <div
+                ref={(el) => (mediaRefs.current[index] = el)}
+                className="max-h-full h-full snap-center flex flex-col"
+              >
+                <PostContent
+                  post={post}
+                  updateImageSelect={updateImageSelect}
+                  index={index}
+                  mediaRefs={mediaRefs}
+                  isPlaying={post.isPlaying}
+                />
               </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div className="z-30 pointer-events-none absolute bottom-2 left-0 right-0 px-4 flex items-end justify-between">
-        <div className="pointer-events-auto mb-2 max-w-full flex items-center space-x-3">
-          <Link
-            to={`/client/profile?code=${
-              postData[currentIndex.current]?.userCode
-            }`}
-          >
-            <Avatar className="w-10 h-10 transition-all">
-              <AvatarImage
-                src={`https://res.cloudinary.com/dazttnakn/image/upload/w_80,h_80/${
-                  postData[currentIndex.current]?.avatarUrl
-                }`}
-              />
-              <AvatarFallback className="bg-zinc-400 text-white text-sm">
-                CN
-              </AvatarFallback>
-            </Avatar>
-          </Link>
-          <span
-            onClick={() =>
-              handleLike?.(postData[currentIndex.current]?.postCode)
-            }
-            className={cn(
-              "opacity-80 min-w-[42px] min-h-[42px] w-[42px] h-[42px] p-2 rounded-full flex items-center justify-center transition-all",
-              postData[currentIndex.current]?.isLiked
-                ? "bg-red-100 hover:bg-red-200"
-                : "bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700"
-            )}
-          >
-            <Heart
-              className={cn(
-                "w-5 h-5 mt-0.5 transition-colors",
-                postData[currentIndex.current]?.isLiked
-                  ? "text-red-500 fill-red-500"
-                  : "text-zinc-500 dark:text-zinc-500"
+              {index === postData?.length - 1 && !loading && (
+                <div className="h-full w-full flex justify-center items-center text-sm text-gray-500">
+                  <Spinner className="mr-2" /> Loading more...
+                </div>
               )}
-            />
-          </span>
+            </div>
+          ))}
+        </div>
 
-          <span
-            className="opacity-80 min-w-[42px] min-h-[42px] w-[42px] h-[42px] p-2 rounded-full flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700"
-            onClick={() => setOpenComment(true)}
-          >
-            <MessageSquareHeart className="w-5 h-5 mt-0.5 text-zinc-500 dark:text-zinc-500" />
-          </span>
+        <div className="z-30 relative sm:absolute bottom-2 left-0 right-0  pointer-events-none px-4 pt-3 flex items-end justify-between">
+          <div className="pointer-events-auto mb-2 max-w-full flex items-center space-x-3">
+            <Link
+              to={`/client/profile?code=${
+                postData[currentIndex.current]?.userCode
+              }`}
+            >
+              <Avatar className="w-10 h-10 transition-all">
+                <AvatarImage
+                  src={`https://res.cloudinary.com/dazttnakn/image/upload/w_80,h_80/${
+                    postData[currentIndex.current]?.avatarUrl
+                  }`}
+                />
+                <AvatarFallback className="bg-zinc-400 text-white text-sm">
+                  CN
+                </AvatarFallback>
+              </Avatar>
+            </Link>
+            <span
+              onClick={() =>
+                handleLike?.(postData[currentIndex.current]?.postCode)
+              }
+              className={cn(
+                "opacity-80 min-w-[42px] min-h-[42px] w-[42px] h-[42px] p-2 rounded-full flex items-center justify-center transition-all",
+                postData[currentIndex.current]?.isLiked
+                  ? "bg-red-100 hover:bg-red-200"
+                  : "bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+              )}
+            >
+              <Heart
+                className={cn(
+                  "w-5 h-5 mt-0.5 transition-colors",
+                  postData[currentIndex.current]?.isLiked
+                    ? "text-red-500 fill-red-500"
+                    : "text-zinc-500 dark:text-zinc-500"
+                )}
+              />
+            </span>
 
-          <div className="leading-tight">
-            <p className="text-[12px] text-zinc-400 dark:text-zinc-500 mb-0.5">
-              [{getTimeAgo(postData[currentIndex.current]?.createdAt)}]
-            </p>
-            <p className="text-sm font-medium text-zinc-600 dark:text-zinc-300 truncate">
-              {postData[currentIndex.current]?.title}
-            </p>
+            <span
+              className="opacity-80 min-w-[42px] min-h-[42px] w-[42px] h-[42px] p-2 rounded-full flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+              onClick={() => setOpenComment(true)}
+            >
+              <MessageSquareHeart className="w-5 h-5 mt-0.5 text-zinc-500 dark:text-zinc-500" />
+            </span>
+
+            <div className="w-full leading-tight">
+              <p className="text-[12px] text-zinc-400 dark:text-zinc-500 mb-0.5">
+                [{getTimeAgo(postData[currentIndex.current]?.createdAt)}]
+              </p>
+              <p className="w-56 sm:w-full text-sm font-medium text-zinc-600 dark:text-zinc-300 truncate">
+                {postData[currentIndex.current]?.title}
+              </p>
+            </div>
           </div>
         </div>
       </div>

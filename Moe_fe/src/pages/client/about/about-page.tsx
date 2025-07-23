@@ -21,26 +21,26 @@ import image55899 from "@/assets/images/screenshot_1753155899.png";
 
 export default function AboutPage() {
   return (
-    <ScrollArea className="max-w-5xl mx-auto h-screen overflow-auto px-4 py-6 text-zinc-800 dark:text-zinc-100 space-y-6">
-      <div>
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-center">
+    <ScrollArea className="w-full h-screen overflow-auto">
+      <div className="max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 text-zinc-800 dark:text-zinc-100 space-y-8">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center break-words">
           🌟 About Moe
         </h1>
-        <p className="text-sm sm:text-base md:text-lg text-center mt-2 sm:mt-4 mx-auto">
+        <p className="text-base sm:text-lg lg:text-xl text-center mt-4 mx-auto max-w-3xl break-words">
           Moe is a modern social media platform that combines <b>video viewing</b> and <b>community interaction</b>. 
           The application is built with a separated Frontend and Backend architecture for scalability and maintainability.
         </p>
 
         <section>
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-2 sm:mb-3">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-4 break-words">
             🧩 Technologies Used
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
             <div>
-              <h3 className="font-medium text-sm sm:text-base md:text-lg mb-1">
+              <h3 className="font-medium text-lg sm:text-xl lg:text-2xl mb-2 break-words">
                 Frontend
               </h3>
-              <ul className="list-disc list-inside space-y-1 text-xs sm:text-sm md:text-base">
+              <ul className="list-disc list-inside space-y-2 text-sm sm:text-base lg:text-lg break-words">
                 <li>⚛️ React 18.3.1 + TypeScript</li>
                 <li>⚡ Vite (optimized dev + build)</li>
                 <li>🎨 Tailwind CSS with animations</li>
@@ -57,10 +57,10 @@ export default function AboutPage() {
               </ul>
             </div>
             <div>
-              <h3 className="font-medium text-sm sm:text-base md:text-lg mb-1">
+              <h3 className="font-medium text-lg sm:text-xl lg:text-2xl mb-2 break-words">
                 Backend
               </h3>
-              <ul className="list-disc list-inside space-y-1 text-xs sm:text-sm md:text-base">
+              <ul className="list-disc list-inside space-y-2 text-sm sm:text-base lg:text-lg break-words">
                 <li>☕ Java 17 + Spring Boot 3.3.4</li>
                 <li>🛢️ MySQL + Hibernate</li>
                 <li>🔒 JWT + Google OAuth2</li>
@@ -68,9 +68,7 @@ export default function AboutPage() {
                 <li>✉️ Gmail SMTP for emails</li>
                 <li>🛠️ Lombok for code reduction</li>
                 <li>✅ Hibernate Validator</li>
-                <li>📊 Apache POI (Excel handling)</li>
                 <li>🔄 ModelMapper for object mapping</li>
-                <li>🛠️ Apache Commons Lang3 + Codec</li>
                 <li>🌐 Google API Client</li>
                 <li>🎥 FFmpeg for media processing</li>
                 <li>🌳 dotenv-java for env variables</li>
@@ -81,10 +79,10 @@ export default function AboutPage() {
         </section>
 
         <section>
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-2 sm:mb-3">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-4 break-words">
             🚀 Key Features
           </h2>
-          <ul className="list-disc list-inside space-y-1 text-xs sm:text-sm md:text-base">
+          <ul className="list-disc list-inside space-y-2 text-sm sm:text-base lg:text-lg break-words">
             <li>📸 Post images or videos with automatic thumbnail extraction</li>
             <li>🗣️ Comment, like posts, and follow users</li>
             <li>🔍 Search users and posts (with pagination and sorting)</li>
@@ -98,27 +96,30 @@ export default function AboutPage() {
         </section>
 
         <section>
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-2 sm:mb-3">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-4 break-words">
             📁 Project Structure
           </h2>
-          <h3 className="font-medium text-sm sm:text-base md:text-lg mb-1 sm:mb-2">
+          <h3 className="font-medium text-lg sm:text-xl lg:text-2xl mb-2 break-words">
             Frontend (React + Vite)
           </h3>
-          <pre className="bg-zinc-900 text-white text-xs rounded p-3 sm:p-4 overflow-x-auto">
-            {`src/
+          <div className="w-full max-w-full overflow-x-auto">
+            <pre className="bg-zinc-900 text-white text-sm rounded p-4 whitespace-pre-wrap break-words">
+              {`src/
 ├── pages/client/       # User facing pages (home, profile)
 ├── pages/admin/        # Admin dashboard pages
 ├── pages/auth/         # Authentication pages (login, register)
 ├── components/         # Reusable UI components
 ├── services/           # Axios API services
 └── main.tsx, App.tsx   # Router & provider setup`}
-          </pre>
+            </pre>
+          </div>
 
-          <h3 className="font-medium text-sm sm:text-base md:text-lg mt-3 sm:mt-4 mb-1 sm:mb-2">
+          <h3 className="font-medium text-lg sm:text-xl lg:text-2xl mt-6 mb-2 break-words">
             Backend (Java + Spring Boot)
           </h3>
-          <pre className="bg-zinc-900 text-white text-xs rounded p-3 sm:p-4 overflow-x-auto">
-            {`src/main/java/com/moe/socialnetwork/
+          <div className="w-full max-w-full overflow-x-auto">
+            <pre className="bg-zinc-900 text-white text-sm rounded p-4 whitespace-pre-wrap break-words">
+              {`src/main/java/com/moe/socialnetwork/
 ├── api/              # Controllers, Services, DTOs
 ├── auth/             # OAuth2 + JWT authentication
 ├── jpa/              # JPA repositories
@@ -126,15 +127,16 @@ export default function AboutPage() {
 ├── config/           # Security & system configs
 ├── util/             # Helper classes
 └── Application.java  # Main application`}
-          </pre>
+            </pre>
+          </div>
         </section>
 
         <section>
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-2 sm:mb-3">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-4 break-words">
             🌐 Deployment
           </h2>
-          <ul className="list-disc list-inside space-y-1 text-xs sm:text-sm md:text-base">
-            <li>Frontend: Vercel (<a href="https://moechan.vercel.app/client/home" className="text-blue-500 hover:underline">moechan.vercel.app</a>)</li>
+          <ul className="list-disc list-inside space-y-2 text-sm sm:text-base lg:text-lg break-words">
+            <li>Frontend: Vercel (<a href="https://moechan.vercel.app/client/home" className="text-blue-500 hover:underline break-all">moechan.vercel.app</a>)</li>
             <li>Backend: Render (Note: ~1 min startup time)</li>
             <li>Database: MySQL on Railway</li>
             <li>Media: Cloudinary for image/video hosting</li>
@@ -142,92 +144,93 @@ export default function AboutPage() {
         </section>
 
         <section>
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-2 sm:mb-3">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-4 break-words">
             ⚙️ Installation & Setup
           </h2>
-          <h3 className="font-medium text-sm sm:text-base md:text-lg mb-1 sm:mb-2">
+          <h3 className="font-medium text-lg sm:text-xl lg:text-2xl mb-2 break-words">
             Frontend
           </h3>
-          <pre className="bg-zinc-900 text-white text-xs rounded p-3 sm:p-4 overflow-x-auto">
-            {`cd Moe_fe
+          <div className="w-full max-w-full overflow-x-auto">
+            <pre className="bg-zinc-900 text-white text-sm rounded p-4 whitespace-pre-wrap break-words">
+              {`cd Moe_fe
 npm install
 npm run dev`}
-          </pre>
+            </pre>
+          </div>
 
-          <h3 className="font-medium text-sm sm:text-base md:text-lg mt-3 sm:mt-4 mb-1 sm:mb-2">
+          <h3 className="font-medium text-lg sm:text-xl lg:text-2xl mt-6 mb-2 break-words">
             Backend
           </h3>
-          <pre className="bg-zinc-900 text-white text-xs rounded p-3 sm:p-4 overflow-x-auto">
-            {`cd Moe
+          <div className="w-full max-w-full overflow-x-auto">
+            <pre className="bg-zinc-900 text-white text-sm rounded p-4 whitespace-pre-wrap break-words">
+              {`cd Moe
 mvn clean install
 java -jar target/moe-0.0.1-SNAPSHOT.jar`}
-          </pre>
+            </pre>
+          </div>
 
-          <h3 className="font-medium text-sm sm:text-base md:text-lg mt-3 sm:mt-4 mb-1 sm:mb-2">
+          <h3 className="font-medium text-lg sm:text-xl lg:text-2xl mt-6 mb-2 break-words">
             Required .env Variables
           </h3>
-          <pre className="bg-zinc-900 text-white text-xs rounded p-3 sm:p-4 overflow-x-auto">
-            {`DB_USERNAME=
+          <div className="w-full max-w-full overflow-x-auto">
+            <pre className="bg-zinc-900 text-white text-sm rounded p-4 whitespace-pre-wrap break-words">
+              {`DB_USERNAME=
 DB_PASSWORD=
 APP_JWT_SECRET=
 GOOGLE_CLIENT_ID=
 CLOUDINARY_API_KEY=
 SPRING_MAIL_USERNAME=
 ...`}
-          </pre>
+            </pre>
+          </div>
         </section>
 
         <section>
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-2 sm:mb-3">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-4 break-words">
             📸 Screenshots
           </h2>
-          <h3 className="font-medium text-sm sm:text-base md:text-lg mb-1 sm:mb-2">
+          <h3 className="font-medium text-lg sm:text-xl lg:text-2xl mb-2 break-words">
             Frontend Screenshots
           </h3>
-          <ul className="list-disc list-inside space-y-1 text-xs sm:text-sm md:text-base">
-            <li><img src={image54359} alt="App preview" /></li>
-            <li><img src={image54412} alt="App preview" /></li>
-            <li><img src={image54460} alt="App preview" /></li>
-            <li><img src={image54481} alt="App preview" /></li>
-            <li><img src={image54574} alt="App preview" /></li>
-            <li><img src={image54617} alt="App preview" /></li>
-            <li><img src={image54636} alt="App preview" /></li>
-            <li><img src={image54657} alt="App preview" /></li>
-            <li><img src={image54686} alt="App preview" /></li>
-            <li><img src={image55216} alt="App preview" /></li>
-            <li><img src={image55234} alt="App preview" /></li>
-            <li><img src={image54737} alt="App preview" /></li>
-            <li><img src={image54759} alt="App preview" /></li>
-            <li><img src={image55087} alt="App preview" /></li>
-            <li><img src={image55101} alt="App preview" /></li>
-            <li><img src={image55126} alt="App preview" /></li>
-            <li><img src={image55146} alt="App preview" /></li>
-          </ul>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              image54359, image54412, image54460, image54481, image54574,
+              image54617, image54636, image54657, image54686, image55216,
+              image55234, image54737, image54759, image55087, image55101,
+              image55126, image55146
+            ].map((img, index) => (
+              <div key={index} className="w-full">
+                <img
+                  src={img}
+                  alt={`Frontend screenshot ${index + 1}`}
+                  className="w-full h-auto rounded-lg shadow-md object-contain"
+                />
+              </div>
+            ))}
+          </div>
 
-          <h3 className="font-medium text-sm sm:text-base md:text-lg mt-3 sm:mt-4 mb-1 sm:mb-2">
+          <h3 className="font-medium text-lg sm:text-xl lg:text-2xl mt-6 mb-2 break-words">
             Backend Screenshots
           </h3>
-          <ul className="list-disc list-inside space-y-1 text-xs sm:text-sm md:text-base">
-            <li><img src={image55878} alt="App preview" /></li>
-            <li><img src={image55899} alt="App preview" /></li>
-          </ul>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[image55878, image55899].map((img, index) => (
+              <div key={index} className="w-full">
+                <img
+                  src={img}
+                  alt={`Backend screenshot ${index + 1}`}
+                  className="w-full h-auto rounded-lg shadow-md object-contain"
+                />
+              </div>
+            ))}
+          </div>
         </section>
 
         <section>
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-2 sm:mb-3">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-4 break-words">
             👨‍💻 Author
           </h2>
-          <p className="text-xs sm:text-sm md:text-base">
+          <p className="text-sm sm:text-base lg:text-lg break-words">
             Developed by: <b>nhutnm379</b>
-          </p>
-        </section>
-
-        <section className="mb-16 sm:mb-32">
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-2 sm:mb-3">
-            📜 License
-          </h2>
-          <p className="text-xs sm:text-sm md:text-base">
-            The Moe project is open for use, modification, and deployment under a permissive license.
           </p>
         </section>
       </div>

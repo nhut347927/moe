@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { Button } from "../ui/button";
+import { Download } from "lucide-react";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -6,32 +8,34 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 interface InstallPWAButtonProps {
-  trigger?: (onClick: () => Promise<void>) => React.ReactNode;
   onInstallSuccess?: () => void;
   onInstallDismiss?: () => void;
 }
 
 const InstallPWAButton = ({
-  trigger,
   onInstallSuccess,
   onInstallDismiss,
 }: InstallPWAButtonProps) => {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [canInstall, setCanInstall] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
+  const [canInstall, setCanInstall] = useState(
+    localStorage.getItem("pwaCanInstall") !== "false"
+  );
 
   useEffect(() => {
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       setCanInstall(true);
+      localStorage.setItem("pwaCanInstall", "true");
     };
 
     window.addEventListener("beforeinstallprompt", handler);
 
-    // Check if app is already installed
     window.addEventListener("appinstalled", () => {
       setCanInstall(false);
       setDeferredPrompt(null);
+      localStorage.setItem("pwaCanInstall", "false");
       onInstallSuccess?.();
     });
 
@@ -47,33 +51,44 @@ const InstallPWAButton = ({
     try {
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      
+
       if (outcome === "accepted") {
+        setCanInstall(false);
+        localStorage.setItem("pwaCanInstall", "false");
         onInstallSuccess?.();
       } else {
         onInstallDismiss?.();
       }
     } catch (error) {
-      console.error("Error prompting PWA install:", error);
+      console.error("Lỗi khi hiển thị lời nhắc cài đặt PWA:", error);
     } finally {
       setDeferredPrompt(null);
-      setCanInstall(false);
     }
   };
 
-  // Don't render anything if installation is not possible
-  if (!canInstall) return null;
-
-  return trigger ? (
-    <>{trigger(handleClick)}</>
-  ) : (
-    <button
+  return canInstall ? (
+    <Button
+      variant="ghost"
+      className="w-full justify-start gap-2 text-sm px-3 py-2"
       onClick={handleClick}
-      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-200"
-      aria-label="Install application"
+      aria-label="Install app"
     >
+      <Download className="w-4 h-4" />
       Install App
-    </button>
+    </Button>
+  ) : (
+    <div>
+      <p className="w-full justify-start gap-2 text-sm px-3 py-2">
+        Installation option is not available. Please reload the page.
+      </p>
+      <button
+        onClick={() => window.location.reload()}
+        className="w-full justify-start gap-2 text-sm px-3 py-2"
+        aria-label="Reload to check installation availability"
+      >
+        Reload Page
+      </button>
+    </div>
   );
 };
 
